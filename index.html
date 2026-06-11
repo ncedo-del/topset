@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOPSET — Strength Log (Powered by Supabase)</title>
 
-    <!-- Google Fonts: Bebas Neue for bold numbers, Inter for clean body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -75,7 +73,6 @@
             line-height: 1.5;
         }
 
-        /* Reuse your existing styles (compact but modern) */
         .header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
         .logo { font-family: var(--font-display); font-size: 32px; letter-spacing: 2px; display: flex; align-items: center; gap: 2px; cursor: pointer; }
         .logo .top { color: var(--accent-green); }
@@ -90,7 +87,6 @@
         .btn-outline:hover { border-color: var(--accent-green); color: var(--accent-green); }
         .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
         .btn-ghost:hover { color: var(--text-primary); background: var(--bg-card-hover); }
-        .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
         .nav-tabs { display: flex; gap: 4px; background: var(--bg-card); border-radius: var(--radius); padding: 4px; border: 1px solid var(--border); }
         .nav-tab { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
         .nav-tab.active { background: var(--accent-green); color: #0b0b0b; font-weight: 700; box-shadow: var(--green-glow); }
@@ -129,6 +125,9 @@
         .hidden { display: none !important; }
         .user-indicator { font-size: 13px; font-weight: 600; background: var(--bg-card-hover); padding: 5px 12px; border-radius: 40px; display: flex; align-items: center; gap: 8px; }
         .avatar-mini { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
+        .stat-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+        .mt-2 { margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -141,16 +140,15 @@
             <button class="nav-tab active" data-page="log">📝 Log</button>
             <button class="nav-tab" data-page="history">📋 History</button>
             <button class="nav-tab" data-page="prs">🏆 PRs</button>
-            <button class="nav-tab" data-page="leaderboard" id="navLeaderboard">📊 Board</button>
+            <button class="nav-tab" data-page="leaderboard">📊 Board</button>
         </nav>
         <button class="btn btn-ghost" onclick="toggleTheme()">🌓</button>
     </div>
 </header>
 
 <div class="main-container">
-    <!-- LOG PAGE -->
     <div class="page active" id="page-log">
-        <div class="stats-row" id="statsRow">
+        <div class="stats-row">
             <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value green" id="statStreak">0</div><div class="stat-sub">days</div></div>
             <div class="stat-card"><div class="stat-label">Total Workouts</div><div class="stat-value" id="statTotalWorkouts">0</div><div class="stat-sub">sessions</div></div>
             <div class="stat-card"><div class="stat-label">Total Volume</div><div class="stat-value green" id="statTotalVolume">0</div><div class="stat-sub">lbs total</div></div>
@@ -164,7 +162,7 @@
                     <div class="form-group"><label>Sets</label><input type="number" id="logSets" placeholder="3" required min="1" value="3"></div>
                     <div class="form-group"><label>Reps</label><input type="number" id="logReps" placeholder="5" required min="1" value="5"></div>
                 </div>
-                <div class="form-row mt-2" style="grid-template-columns: 1fr auto; margin-top: 12px;">
+                <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
                     <div class="form-group"><label>Date</label><input type="date" id="logDate" required></div>
                     <button type="submit" class="btn btn-primary" style="height:42px;">✅ Log Set</button>
                 </div>
@@ -173,45 +171,33 @@
         </div>
     </div>
 
-    <!-- HISTORY -->
     <div class="page" id="page-history"><div class="card"><div class="card-header">📋 Workout History</div><div class="filter-bar"><select id="historyFilter" onchange="renderHistory()"><option value="all">All Exercises</option></select></div><div class="table-wrapper"><table><thead><tr><th>Date</th><th>Exercise</th><th>Weight</th><th>Sets</th><th>Reps</th><th>Volume</th></tr></thead><tbody id="historyTableBody"><tr><td colspan="6" class="empty-state">No workouts yet</td></tr></tbody></table></div></div></div>
 
-    <!-- PRs -->
     <div class="page" id="page-prs"><div class="card"><div class="card-header">🏆 Personal Records</div><div class="table-wrapper"><table><thead><tr><th>Exercise</th><th>PR Weight</th><th>Date Set</th><th>Status</th></tr></thead><tbody id="prTableBody"><tr><td colspan="4" class="empty-state">No PRs yet</td></tr></tbody></table></div></div></div>
 
-    <!-- LEADERBOARD (global by exercise) -->
     <div class="page" id="page-leaderboard"><div class="card"><div class="card-header">📊 Leaderboard <select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="margin-left:10px; padding:6px; border-radius:8px; background:var(--bg-input); color:var(--text-primary);"><option value="">-- Select Lift --</option></select></div><div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Lift</th><th>PR Weight</th><th>Date</th></tr></thead><tbody id="leaderboardTableBody"><tr><td colspan="5" class="empty-state">Choose an exercise</td></tr></tbody></table></div></div></div>
 </div>
 
-<!-- AUTH MODAL -->
 <div class="modal-overlay hidden" id="authModal"><div class="modal"><h2 id="authModalTitle">🔐 Sign In</h2><form id="authForm"><div class="form-group"><label>Email</label><input type="email" id="authEmail" required></div><div class="form-group"><label>Password</label><input type="password" id="authPassword" required></div><div class="form-group hidden" id="authNameGroup"><label>Display Name</label><input type="text" id="authName" placeholder="Your name"></div><div class="modal-buttons" style="display:flex; gap:8px; margin-top:16px;"><button type="button" class="btn btn-ghost" id="authToggleBtn">Create account</button><button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button></div></form><button class="btn btn-outline" onclick="closeAuthModal()" style="width:100%; margin-top:12px;">Cancel</button></div></div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-    // ======================= SUPABASE CONFIGURATION (USER PROVIDES URL & KEY) =======================
-    // 🔐 IMPORTANT: Replace these with your Supabase project URL and anon/public key.
-    // You can store them in environment variables or ask user at runtime.
-    const SUPABASE_URL = "https://icodhdskantgkgpekqrc.supabase.co";     // <-- PASTE YOUR SUPABASE URL
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljb2RoZHNrYW50Z2tncGVrcXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDIzNTUsImV4cCI6MjA5NjcxODM1NX0.waLt9TYbOP22wPwBXs-cP2ZiDsv-Y44lnFoI5hAtnsg";                  // <-- PASTE YOUR ANON KEY
+    // Supabase configuration (your credentials)
+    const SUPABASE_URL = "https://icodhdskantgkgpekqrc.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljb2RoZHNrYW50Z2tncGVrcXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDIzNTUsImV4cCI6MjA5NjcxODM1NX0.waLt9TYbOP22wPwBXs-cP2ZiDsv-Y44lnFoI5hAtnsg";
     
     let supabase = null;
     let currentUser = null;
-    let entriesCache = [];      // current user's entries
+    let entriesCache = [];
 
-    // Helper: initialize Supabase client (checks if credentials are set)
     function initSupabase() {
-        if (!SUPABASE_URL || SUPABASE_URL === "https://your-project.supabase.co" || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === "your-anon-key") {
-            showToast("⚠️ Supabase not configured: Please edit the code and set SUPABASE_URL and SUPABASE_ANON_KEY inside the script.", true);
-            return false;
-        }
         try {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             return true;
         } catch(e) { console.error(e); return false; }
     }
 
-    // Show toast notification
     function showToast(msg, isError = false) {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
@@ -222,7 +208,6 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
-    // ======================= AUTHENTICATION =======================
     async function signIn(email, password) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -230,7 +215,11 @@
     }
 
     async function signUp(email, password, displayName) {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { display_name: displayName || email.split('@')[0] } } });
+        const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password, 
+            options: { data: { display_name: displayName || email.split('@')[0] } } 
+        });
         if (error) throw error;
         return data.user;
     }
@@ -244,7 +233,6 @@
         showToast("Signed out successfully");
     }
 
-    // fetch entries for current user from 'workout_entries' table
     async function fetchEntries() {
         if (!currentUser) return [];
         const { data, error } = await supabase
@@ -254,7 +242,9 @@
             .order('date', { ascending: false });
         if (error) {
             console.error(error);
-            showToast("Error loading entries: " + error.message, true);
+            if (error.message.includes("relation") && error.message.includes("does not exist")) {
+                showToast("⚠️ Database not set up. Please run the SQL setup script in Supabase.", true);
+            }
             return [];
         }
         entriesCache = data || [];
@@ -270,13 +260,11 @@
             sets: parseInt(entry.sets),
             reps: parseInt(entry.reps),
             date: entry.date,
-            volume: parseFloat(entry.weight) * parseInt(entry.sets) * parseInt(entry.reps)
         }]).select();
         if (error) throw error;
         return data[0];
     }
 
-    // stats helpers
     function calculateStreak(entries) {
         if (!entries.length) return 0;
         const uniqueDates = [...new Set(entries.map(e => e.date))].sort().reverse();
@@ -309,8 +297,10 @@
     function updateExerciseSuggestions() {
         const exercises = [...new Set(entriesCache.map(e => e.exercise))].sort();
         const datalist = document.getElementById('exerciseSuggestions');
-        datalist.innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
+        datalist.innerHTML = exercises.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}">`).join('');
     }
+
+    function escapeHTML(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
     async function renderHistory() {
         await fetchEntries();
@@ -319,11 +309,19 @@
         if (filter !== 'all') filtered = entriesCache.filter(e => e.exercise === filter);
         const tbody = document.getElementById('historyTableBody');
         if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entries</td></tr>'; return; }
-        tbody.innerHTML = filtered.map(e => `<tr><td>${new Date(e.date).toLocaleDateString()}</td><td><strong>${escapeHTML(e.exercise)}</strong></td><td class="num-cell">${e.weight} lbs</td><td>${e.sets}</td><td>${e.reps}</td><td class="num-cell">${(e.weight*e.sets*e.reps).toLocaleString()}</td></tr>`).join('');
-        // update filter dropdown options
+        tbody.innerHTML = filtered.map(e => `
+            <tr>
+                <td>${new Date(e.date).toLocaleDateString()}</td>
+                <td><strong>${escapeHTML(e.exercise)}</strong></td>
+                <td class="num-cell">${e.weight} lbs</td>
+                <td>${e.sets}</td>
+                <td>${e.reps}</td>
+                <td class="num-cell">${(e.weight*e.sets*e.reps).toLocaleString()}</td>
+            </tr>
+        `).join('');
         const select = document.getElementById('historyFilter');
         const allEx = [...new Set(entriesCache.map(e => e.exercise))];
-        select.innerHTML = '<option value="all">All Exercises</option>' + allEx.map(ex => `<option value="${ex}" ${ex===filter?'selected':''}>${ex}</option>`).join('');
+        select.innerHTML = '<option value="all">All Exercises</option>' + allEx.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}" ${ex===filter?'selected':''}>${escapeHTML(ex)}</option>`).join('');
     }
 
     async function renderPRs() {
@@ -336,39 +334,49 @@
         const prs = Array.from(bestMap.values()).sort((a,b)=>b.weight - a.weight);
         const tbody = document.getElementById('prTableBody');
         if (!prs.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No PRs yet</td></tr>'; return; }
-        tbody.innerHTML = prs.map(pr => `<tr><td><strong>${escapeHTML(pr.exercise)}</strong></td><td class="num-cell highlight-pr">${pr.weight} lbs</td><td>${new Date(pr.date).toLocaleDateString()}</td><td><span class="badge badge-green">🏆 PR</span></td></tr>`).join('');
+        tbody.innerHTML = prs.map(pr => `
+            <tr>
+                <td><strong>${escapeHTML(pr.exercise)}</strong></td>
+                <td class="num-cell highlight-pr">${pr.weight} lbs</td>
+                <td>${new Date(pr.date).toLocaleDateString()}</td>
+                <td><span class="badge badge-green">🏆 PR</span></td>
+            </tr>
+        `).join('');
     }
 
     async function renderLeaderboard() {
         if (!supabase) return;
         const spotlight = document.getElementById('spotlightLiftSelect').value;
         if (!spotlight) { document.getElementById('leaderboardTableBody').innerHTML = '<tr><td colspan="5" class="empty-state">Select an exercise</td></tr>'; return; }
-        // Fetch all users' best PR for the selected exercise
+        
         const { data, error } = await supabase
             .from('workout_entries')
-            .select(`
-                user_id,
-                weight,
-                date,
-                exercise,
-                users:user_id (email, raw_user_meta_data)
-            `)
-            .eq('exercise', spotlight)
-            .order('weight', { ascending: false });
+            .select(`user_id, weight, date, exercise, users:user_id (email, raw_user_meta_data)`)
+            .eq('exercise', spotlight);
+        
         if (error) { console.error(error); return; }
-        // group by user_id, pick max weight
+        
         const userBest = new Map();
         data?.forEach(record => {
             const uid = record.user_id;
             if (!userBest.has(uid) || record.weight > userBest.get(uid).weight) {
                 let displayName = record.users?.raw_user_meta_data?.display_name || record.users?.email?.split('@')[0] || "Athlete";
-                userBest.set(uid, { name: displayName, weight: record.weight, date: record.date, exercise: record.exercise });
+                userBest.set(uid, { name: displayName, weight: record.weight, date: record.date });
             }
         });
+        
         const rankings = Array.from(userBest.entries()).map(([_, v]) => v).sort((a,b)=>b.weight - a.weight);
         const tbody = document.getElementById('leaderboardTableBody');
         if (!rankings.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No lifts logged for this exercise</td></tr>'; return; }
-        tbody.innerHTML = rankings.map((r, idx) => `<tr><td class="num-cell">${idx+1}${idx===0?' 🥇':idx===1?' 🥈':idx===2?' 🥉':''}</td><td><strong>${escapeHTML(r.name)}</strong></td><td>${escapeHTML(spotlight)}</td><td class="num-cell highlight-pr">${r.weight} lbs</td><td>${new Date(r.date).toLocaleDateString()}</td></tr>`).join('');
+        tbody.innerHTML = rankings.map((r, idx) => `
+            <tr>
+                <td class="num-cell">${idx+1}${idx===0?' 🥇':idx===1?' 🥈':idx===2?' 🥉':''}</td>
+                <td><strong>${escapeHTML(r.name)}</strong></td>
+                <td>${escapeHTML(spotlight)}</td>
+                <td class="num-cell highlight-pr">${r.weight} lbs</td>
+                <td>${new Date(r.date).toLocaleDateString()}</td>
+            </tr>
+        `).join('');
     }
 
     async function updateSpotlightOptions() {
@@ -377,10 +385,10 @@
         if (error) return;
         const exercises = [...new Set(data.map(d => d.exercise))].sort();
         const select = document.getElementById('spotlightLiftSelect');
-        select.innerHTML = '<option value="">-- Select Lift --</option>' + exercises.map(ex => `<option value="${ex}">${ex}</option>`).join('');
+        select.innerHTML = '<option value="">-- Select Lift --</option>' + exercises.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}">${escapeHTML(ex)}</option>`).join('');
     }
 
-    // ======================= LOG FORM HANDLER =======================
+    // Form handler
     document.getElementById('logForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!currentUser) { showToast("Please sign in first", true); openAuthModal(); return; }
@@ -405,7 +413,7 @@
         } catch(err) { showToast("Error: " + err.message, true); }
     });
 
-    // ======================= AUTH UI =======================
+    // Auth UI
     let authMode = 'signin';
     function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); updateAuthModalUI(); }
     function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
@@ -417,94 +425,7 @@
         document.getElementById('authToggleBtn').innerText = isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up";
         document.getElementById('authNameGroup').classList.toggle('hidden', !isSignUp);
     }
+    
     document.getElementById('authForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('authEmail').value.trim();
-        const password = document.getElementById('authPassword').value;
-        if (!email || !password) { showToast("Email and password required", true); return; }
-        try {
-            if (authMode === 'signup') {
-                const name = document.getElementById('authName').value.trim();
-                await signUp(email, password, name);
-                showToast("Account created! Please check email confirmation (if required) or sign in.");
-                authMode = 'signin';
-                updateAuthModalUI();
-            } else {
-                await signIn(email, password);
-                closeAuthModal();
-                currentUser = (await supabase.auth.getUser()).data.user;
-                await updateStats();
-                await updateSpotlightOptions();
-                updateUIForAuth();
-                showToast(`Welcome ${currentUser.user_metadata?.display_name || currentUser.email}`);
-                navigateTo('log');
-            }
-        } catch(err) { showToast(err.message, true); }
-    });
-
-    function updateUIForAuth() {
-        const indicator = document.getElementById('userIndicator');
-        if (currentUser) {
-            const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0];
-            indicator.style.display = "flex";
-            indicator.innerHTML = `<span class="avatar-mini">🏋️</span> ${escapeHTML(name)} <button class="btn btn-ghost btn-sm" onclick="window.signOutUser()" style="margin-left:6px;">🚪</button>`;
-        } else {
-            indicator.style.display = "none";
-            indicator.innerHTML = '';
-        }
-        const leaderboardTab = document.getElementById('navLeaderboard');
-        if(leaderboardTab) leaderboardTab.classList.remove('hidden'); // always visible with global leaderboard
-    }
-    window.signOutUser = async () => { await signOut(); updateUIForAuth(); renderHistory(); renderPRs(); updateStats(); };
-
-    // Navigation & theme
-    function navigateTo(pageName) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        document.getElementById(`page-${pageName}`).classList.add('active');
-        const tab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
-        if(tab) tab.classList.add('active');
-        if(pageName === 'history') renderHistory();
-        if(pageName === 'prs') renderPRs();
-        if(pageName === 'leaderboard') { updateSpotlightOptions(); renderLeaderboard(); }
-        if(pageName === 'log') updateStats();
-    }
-    function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('topset_theme', isDark ? 'light' : 'dark');
-    }
-    function escapeHTML(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-
-    // Load initial theme and supabase check
-    (async function bootstrap() {
-        const savedTheme = localStorage.getItem('topset_theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        if (!initSupabase()) { showToast("⚠️ Please set Supabase URL and anon key in the script source code.", true); return; }
-        // check existing session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            currentUser = session.user;
-            await updateStats();
-            await updateSpotlightOptions();
-            updateUIForAuth();
-        } else {
-            // anonymous mode? show login prompt but allow browsing limited?
-            updateUIForAuth();
-        }
-        document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
-        // attach global functions
-        window.navigateTo = navigateTo;
-        window.toggleTheme = toggleTheme;
-        window.openAuthModal = openAuthModal;
-        window.closeAuthModal = closeAuthModal;
-        window.toggleAuthMode = toggleAuthMode;
-        window.renderHistory = renderHistory;
-        window.renderPRs = renderPRs;
-        window.renderLeaderboard = renderLeaderboard;
-        window.updateStats = updateStats;
-    })();
-</script>
-</body>
-</html>
-   
+        const email = document.getElementById
