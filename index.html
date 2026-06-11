@@ -2,12 +2,12 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOPSET — Strength Log (Powered by Supabase)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TOPSET — Strength Training Log</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -19,14 +19,14 @@
         }
 
         :root {
-            --bg: #0b0b0b;
-            --bg-card: #161616;
-            --bg-card-hover: #1e1e1e;
-            --bg-input: #1f1f1f;
-            --bg-modal: #1a1a1a;
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --bg-card-hover: #1c1c1c;
+            --bg-input: #1e1e1e;
+            --bg-modal: #141414;
             --border: #2a2a2a;
             --border-focus: #4ade80;
-            --text-primary: #f4f4f4;
+            --text-primary: #f0f0f0;
             --text-secondary: #a0a0a0;
             --text-muted: #6b6b6b;
             --accent-green: #4ade80;
@@ -34,34 +34,32 @@
             --accent-yellow: #fbbf24;
             --danger: #ef4444;
             --danger-bg: rgba(239, 68, 68, 0.1);
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --radius: 10px;
-            --radius-sm: 6px;
-            --radius-lg: 16px;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 20px;
+            --transition: all 0.2s ease;
             --font-display: 'Bebas Neue', 'Impact', sans-serif;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --green-glow: 0 0 24px rgba(74, 222, 128, 0.25);
-            --overlay: rgba(0, 0, 0, 0.7);
+            --green-glow: 0 0 20px rgba(74, 222, 128, 0.2);
         }
 
         [data-theme="light"] {
-            --bg: #f5f5f5;
+            --bg: #f0f0f0;
             --bg-card: #ffffff;
-            --bg-card-hover: #f9fafb;
-            --bg-input: #f0f0f0;
+            --bg-card-hover: #f8f9fa;
+            --bg-input: #f5f5f5;
             --bg-modal: #ffffff;
             --border: #e0e0e0;
             --text-primary: #1a1a1a;
-            --text-secondary: #525252;
-            --text-muted: #9ca3af;
+            --text-secondary: #666666;
+            --text-muted: #999999;
             --accent-green: #16a34a;
             --accent-green-dark: #15803d;
             --accent-yellow: #d97706;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-            --green-glow: 0 0 20px rgba(22, 163, 74, 0.2);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
         }
 
         body {
@@ -70,113 +68,558 @@
             color: var(--text-primary);
             min-height: 100vh;
             transition: background var(--transition), color var(--transition);
-            line-height: 1.5;
+            padding-bottom: 20px;
         }
 
-        .header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
-        .logo { font-family: var(--font-display); font-size: 32px; letter-spacing: 2px; display: flex; align-items: center; gap: 2px; cursor: pointer; }
+        /* Header */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 28px;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
         .logo .top { color: var(--accent-green); }
         .logo .set { color: var(--accent-yellow); }
-        .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-green); margin-left: 4px; animation: pulse-dot 2s ease-in-out infinite; }
-        @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.6); } 50% { box-shadow: 0 0 0 12px rgba(74,222,128,0); } }
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        .btn { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: var(--radius-sm); border: 1px solid transparent; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; gap: 6px; }
-        .btn-primary { background: var(--accent-green); color: #0b0b0b; border-color: var(--accent-green); font-weight: 700; }
-        .btn-primary:hover { background: var(--accent-green-dark); box-shadow: var(--green-glow); transform: translateY(-1px); }
-        .btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
-        .btn-outline:hover { border-color: var(--accent-green); color: var(--accent-green); }
-        .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
-        .btn-ghost:hover { color: var(--text-primary); background: var(--bg-card-hover); }
-        .nav-tabs { display: flex; gap: 4px; background: var(--bg-card); border-radius: var(--radius); padding: 4px; border: 1px solid var(--border); }
-        .nav-tab { font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: var(--radius-sm); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
-        .nav-tab.active { background: var(--accent-green); color: #0b0b0b; font-weight: 700; box-shadow: var(--green-glow); }
-        .main-container { max-width: 900px; margin: 0 auto; padding: 24px 16px 40px; }
-        .page { display: none; animation: fadeSlideIn 0.3s ease; }
-        .page.active { display: block; }
-        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; transition: all var(--transition); box-shadow: var(--shadow); }
-        .stat-card:hover { border-color: var(--accent-green); box-shadow: var(--green-glow); }
-        .stat-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
-        .stat-value { font-family: var(--font-display); font-size: 42px; line-height: 1; color: var(--text-primary); }
-        .stat-value.green { color: var(--accent-green); }
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
-        .card-header { font-family: var(--font-display); font-size: 24px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-        .form-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; align-items: end; }
-        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr 1fr; } .nav-tab { padding: 7px 10px; font-size: 11px; } .stat-value { font-size: 30px; } }
-        .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
-        .form-group input, .form-group select { font-family: var(--font-body); font-size: 15px; padding: 10px 14px; border-radius: var(--radius-sm); border: 2px solid var(--border); background: var(--bg-input); color: var(--text-primary); transition: all var(--transition); }
-        .form-group input:focus { outline: none; border-color: var(--accent-green); box-shadow: var(--green-glow); }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border); }
-        td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-weight: 500; }
-        .num-cell { font-family: var(--font-display); font-size: 20px; }
-        .highlight-pr { color: var(--accent-green); font-weight: 700; }
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-        .badge-green { background: rgba(74, 222, 128, 0.15); color: var(--accent-green); }
-        .modal-overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 200; display: flex; align-items: center; justify-content: center; }
-        .modal { background: var(--bg-modal); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; width: 90%; max-width: 440px; box-shadow: var(--shadow-lg); }
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-        .toast { background: var(--bg-card); border-left: 4px solid var(--accent-green); border-radius: var(--radius-sm); padding: 12px 18px; font-weight: 600; font-size: 13px; box-shadow: var(--shadow-lg); animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
-        @keyframes slideInRight { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .hidden { display: none !important; }
-        .user-indicator { font-size: 13px; font-weight: 600; background: var(--bg-card-hover); padding: 5px 12px; border-radius: 40px; display: flex; align-items: center; gap: 8px; }
-        .avatar-mini { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-green); display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
-        .stat-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-        .mt-2 { margin-top: 8px; }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: #0a0a0a;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-green-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--green-glow);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-green);
+            color: #0a0a0a;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 16px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 36px;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .stat-value.green {
+            color: var(--accent-green);
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            font-family: var(--font-display);
+            font-size: 22px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Forms */
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .form-group input,
+        .form-group select {
+            font-family: var(--font-body);
+            font-size: 15px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: var(--green-glow);
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* User Indicator */
+        .user-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-card-hover);
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select {
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--bg-modal);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal h2 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent-green);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-pr {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-green);
+        }
+
+        .num-cell {
+            font-family: var(--font-display);
+            font-size: 20px;
+        }
+
+        .highlight-pr {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tab {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 0 12px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <header class="header">
-    <div class="logo" onclick="window.navigateTo('log')"><span class="top">TOP</span><span class="set">SET</span><span class="logo-dot"></span></div>
+    <div class="logo" onclick="app.navigateTo('log')">
+        <span class="top">TOP</span><span class="set">SET</span>
+    </div>
     <div class="header-right">
-        <span class="user-indicator" id="userIndicator" style="display:none;"></span>
-        <nav class="nav-tabs">
-            <button class="nav-tab active" data-page="log" onclick="window.navigateTo('log')">📝 Log</button>
-            <button class="nav-tab" data-page="history" onclick="window.navigateTo('history')">📋 History</button>
-            <button class="nav-tab" data-page="prs" onclick="window.navigateTo('prs')">🏆 PRs</button>
-            <button class="nav-tab" data-page="leaderboard" onclick="window.navigateTo('leaderboard')">📊 Board</button>
-        </nav>
-        <button class="btn btn-ghost" onclick="window.toggleTheme()">🌓</button>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-page="log" onclick="app.navigateTo('log')">💪 Log</button>
+            <button class="nav-tab" data-page="history" onclick="app.navigateTo('history')">📋 History</button>
+            <button class="nav-tab" data-page="prs" onclick="app.navigateTo('prs')">🏆 PRs</button>
+            <button class="nav-tab" data-page="leaderboard" onclick="app.navigateTo('leaderboard')">📊 Board</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="app.toggleTheme()">🌓</button>
     </div>
 </header>
 
-<div class="main-container">
-    <div class="page active" id="page-log">
+<main class="main-container">
+    <!-- Log Page -->
+    <div id="page-log" class="page active">
         <div class="stats-row">
-            <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value green" id="statStreak">0</div><div class="stat-sub">days</div></div>
-            <div class="stat-card"><div class="stat-label">Total Workouts</div><div class="stat-value" id="statTotalWorkouts">0</div><div class="stat-sub">sessions</div></div>
-            <div class="stat-card"><div class="stat-label">Total Volume</div><div class="stat-value green" id="statTotalVolume">0</div><div class="stat-sub">lbs total</div></div>
-            <div class="stat-card"><div class="stat-label">Exercises</div><div class="stat-value" id="statUniqueExercises">0</div><div class="stat-sub">unique lifts</div></div>
+            <div class="stat-card">
+                <div class="stat-label">Current Streak</div>
+                <div class="stat-value green" id="statStreak">0</div>
+                <div class="stat-sub">days</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Workouts</div>
+                <div class="stat-value" id="statWorkouts">0</div>
+                <div class="stat-sub">sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Volume</div>
+                <div class="stat-value green" id="statVolume">0</div>
+                <div class="stat-sub">lbs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Exercises</div>
+                <div class="stat-value" id="statExercises">0</div>
+                <div class="stat-sub">unique</div>
+            </div>
         </div>
-        <div class="card"><div class="card-header"><span>💪</span> Log a Set</div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>💪</span> Log Your Set
+            </div>
             <form id="logForm">
                 <div class="form-row">
-                    <div class="form-group"><label>Exercise</label><input type="text" id="logExercise" placeholder="Bench Press" required list="exerciseSuggestions"></div>
-                    <div class="form-group"><label>Weight (lbs)</label><input type="number" id="logWeight" placeholder="225" required min="0" step="0.5"></div>
-                    <div class="form-group"><label>Sets</label><input type="number" id="logSets" placeholder="3" required min="1" value="3"></div>
-                    <div class="form-group"><label>Reps</label><input type="number" id="logReps" placeholder="5" required min="1" value="5"></div>
+                    <div class="form-group">
+                        <label>Exercise</label>
+                        <input type="text" id="exerciseInput" placeholder="e.g., Bench Press" required list="exerciseList">
+                        <datalist id="exerciseList"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" id="weightInput" placeholder="225" required step="0.5" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Sets x Reps</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="setsInput" placeholder="3" required min="1" value="3" style="width: 50%;">
+                            <input type="number" id="repsInput" placeholder="5" required min="1" value="5" style="width: 50%;">
+                        </div>
+                    </div>
                 </div>
-                <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
-                    <div class="form-group"><label>Date</label><input type="date" id="logDate" required></div>
-                    <button type="submit" class="btn btn-primary" style="height:42px;">✅ Log Set</button>
+                <div class="form-row" style="margin-top: 12px; grid-template-columns: 1fr auto;">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="dateInput" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="align-self: flex-end;">✅ Log Set</button>
                 </div>
-                <datalist id="exerciseSuggestions"></datalist>
             </form>
         </div>
     </div>
 
-    <div class="page" id="page-history">
+    <!-- History Page -->
+    <div id="page-history" class="page">
         <div class="card">
             <div class="card-header">📋 Workout History</div>
             <div class="filter-bar">
-                <label style="font-weight:700;font-size:12px;text-transform:uppercase;">Filter:</label>
-                <select id="historyFilter" onchange="window.renderHistory()">
+                <select id="historyFilter" onchange="app.renderHistory()">
                     <option value="all">All Exercises</option>
                 </select>
             </div>
@@ -185,121 +628,106 @@
                     <thead>
                         <tr><th>Date</th><th>Exercise</th><th>Weight</th><th>Sets</th><th>Reps</th><th>Volume</th></tr>
                     </thead>
-                    <tbody id="historyTableBody">
-                        <tr><td colspan="6" class="empty-state">No workouts yet</td></tr>
+                    <tbody id="historyBody">
+                        <tr><td colspan="6" class="empty-state">No workouts yet. Start logging!</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div class="page" id="page-prs">
+    <!-- PRs Page -->
+    <div id="page-prs" class="page">
         <div class="card">
             <div class="card-header">🏆 Personal Records</div>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th>Exercise</th><th>PR Weight</th><th>Date Set</th><th>Status</th></tr></thead>
-                    <tbody id="prTableBody">
-                        <tr><td colspan="4" class="empty-state">No PRs yet</td></tr>
+                    <thead>
+                        <tr><th>Exercise</th><th>PR Weight</th><th>Date</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="prsBody">
+                        <tr><td colspan="4" class="empty-state">No PRs yet. Keep lifting!</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div class="page" id="page-leaderboard">
+    <!-- Leaderboard Page -->
+    <div id="page-leaderboard" class="page">
         <div class="card">
             <div class="card-header">
-                📊 Leaderboard 
-                <select id="spotlightLiftSelect" onchange="window.renderLeaderboard()" style="margin-left:10px; padding:6px; border-radius:8px; background:var(--bg-input); color:var(--text-primary);">
-                    <option value="">-- Select Lift --</option>
+                📊 Leaderboard
+                <select id="leaderboardExercise" onchange="app.renderLeaderboard()" style="margin-left: auto; padding: 8px; border-radius: 8px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border);">
+                    <option value="">Select Exercise</option>
                 </select>
             </div>
             <div class="table-wrapper">
                 <table>
-                    <thead><tr><th>Rank</th><th>User</th><th>Lift</th><th>PR Weight</th><th>Date</th></tr></thead>
-                    <tbody id="leaderboardTableBody">
-                        <tr><td colspan="5" class="empty-state">Choose an exercise</td></tr>
+                    <thead>
+                        <tr><th>Rank</th><th>Athlete</th><th>Weight</th><th>Date</th></tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr><td colspan="4" class="empty-state">Select an exercise to see rankings</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<div class="modal-overlay hidden" id="authModal">
+<!-- Auth Modal -->
+<div id="authModal" class="modal-overlay hidden">
     <div class="modal">
-        <h2 id="authModalTitle">🔐 Sign In</h2>
+        <h2 id="authTitle">🔐 Sign In</h2>
         <form id="authForm">
-            <div class="form-group"><label>Email</label><input type="email" id="authEmail" required></div>
-            <div class="form-group"><label>Password</label><input type="password" id="authPassword" required></div>
-            <div class="form-group hidden" id="authNameGroup"><label>Display Name</label><input type="text" id="authName" placeholder="Your name"></div>
-            <div class="modal-buttons" style="display:flex; gap:8px; margin-top:16px;">
-                <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="window.toggleAuthMode()">Create account</button>
-                <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="authEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="authPassword" required>
+            </div>
+            <div id="authNameGroup" class="form-group hidden">
+                <label>Display Name</label>
+                <input type="text" id="authName" placeholder="Your name">
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="authToggleBtn" class="btn btn-outline">Create Account</button>
+                <button type="submit" id="authSubmitBtn" class="btn btn-primary">Sign In</button>
             </div>
         </form>
-        <button class="btn btn-outline" onclick="window.closeAuthModal()" style="width:100%; margin-top:12px;">Cancel</button>
+        <div style="margin-top: 12px; text-align: center;">
+            <button onclick="app.closeAuthModal()" class="btn btn-ghost btn-sm">Cancel</button>
+        </div>
     </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div id="toastContainer" class="toast-container"></div>
 
 <script>
-    // Supabase configuration
+    // ==================== SUPABASE CONFIG ====================
+    // ⚠️ REPLACE THESE WITH YOUR SUPABASE CREDENTIALS ⚠️
     const SUPABASE_URL = "https://icodhdskantgkgpekqrc.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljb2RoZHNrYW50Z2tncGVrcXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDIzNTUsImV4cCI6MjA5NjcxODM1NX0.waLt9TYbOP22wPwBXs-cP2ZiDsv-Y44lnFoI5hAtnsg";
-    
-    let supabase = null;
-    let currentUser = null;
-    let entriesCache = [];
 
-    function initSupabase() {
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log("✅ Supabase initialized");
-            return true;
-        } catch(e) { 
-            console.error(e); 
+    // ==================== APP STATE ====================
+    let supabase;
+    let currentUser = null;
+    let entries = [];
+
+    // ==================== INITIALIZATION ====================
+    async function initSupabase() {
+        if (SUPABASE_URL === "https://your-project.supabase.co" || SUPABASE_ANON_KEY === "your-anon-key") {
+            app.showToast("⚠️ Please configure Supabase URL and Anon Key in the script", true);
             return false;
         }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return true;
     }
 
-    function showToast(msg, isError = false) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.style.borderLeftColor = isError ? '#ef4444' : 'var(--accent-green)';
-        toast.textContent = msg;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    async function signIn(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        return data.user;
-    }
-
-    async function signUp(email, password, displayName) {
-        const { data, error } = await supabase.auth.signUp({ 
-            email, 
-            password, 
-            options: { data: { display_name: displayName || email.split('@')[0] } } 
-        });
-        if (error) throw error;
-        return data.user;
-    }
-
-    async function signOut() {
-        await supabase.auth.signOut();
-        currentUser = null;
-        entriesCache = [];
-        updateUIForAuth();
-        navigateTo('log');
-        showToast("Signed out successfully");
-    }
-
+    // ==================== DATABASE OPERATIONS ====================
     async function fetchEntries() {
         if (!currentUser) return [];
         const { data, error } = await supabase
@@ -309,203 +737,239 @@
             .order('date', { ascending: false });
         if (error) {
             console.error(error);
-            if (error.message.includes("relation") && error.message.includes("does not exist")) {
-                showToast("⚠️ Database not set up. Please run the SQL setup script in Supabase.", true);
-            }
+            app.showToast("Error loading data: " + error.message, true);
             return [];
         }
-        entriesCache = data || [];
-        return entriesCache;
+        entries = data || [];
+        return entries;
     }
 
-    async function addEntryToDB(entry) {
+    async function addEntry(entry) {
         if (!currentUser) throw new Error("Not authenticated");
-        const { data, error } = await supabase.from('workout_entries').insert([{
+        const { error } = await supabase.from('workout_entries').insert([{
             user_id: currentUser.id,
             exercise: entry.exercise.trim(),
             weight: parseFloat(entry.weight),
             sets: parseInt(entry.sets),
             reps: parseInt(entry.reps),
-            date: entry.date,
-        }]).select();
+            date: entry.date
+        }]);
         if (error) throw error;
-        return data[0];
     }
 
-    function calculateStreak(entries) {
-        if (!entries.length) return 0;
-        const uniqueDates = [...new Set(entries.map(e => e.date))].sort().reverse();
+    // ==================== AUTHENTICATION ====================
+    async function signIn(email, password) {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        return data.user;
+    }
+
+    async function signUp(email, password, name) {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: name || email.split('@')[0] } }
+        });
+        if (error) throw error;
+        return data.user;
+    }
+
+    async function signOut() {
+        await supabase.auth.signOut();
+        currentUser = null;
+        entries = [];
+        app.updateAuthUI();
+        app.navigateTo('log');
+        app.showToast("Signed out");
+    }
+
+    // ==================== STATS & CALCULATIONS ====================
+    function calculateStreak(entriesList) {
+        if (!entriesList.length) return 0;
+        const dates = [...new Set(entriesList.map(e => e.date))].sort().reverse();
         let streak = 0;
         const today = new Date().toISOString().split('T')[0];
-        if (uniqueDates[0] !== today && (new Date(today) - new Date(uniqueDates[0])) > 86400000) return 0;
-        for (let i = 0; i < uniqueDates.length; i++) {
-            const expectedDate = new Date();
-            expectedDate.setDate(expectedDate.getDate() - i);
-            const expStr = expectedDate.toISOString().split('T')[0];
-            if (uniqueDates[i] === expStr) streak++;
+        if (dates[0] !== today) return 0;
+        for (let i = 0; i < dates.length; i++) {
+            const expected = new Date();
+            expected.setDate(expected.getDate() - i);
+            const expectedStr = expected.toISOString().split('T')[0];
+            if (dates[i] === expectedStr) streak++;
             else break;
         }
         return streak;
     }
 
-    function getTotalVolume(entries) { return entries.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0); }
-    function getUniqueExercises(entries) { return new Set(entries.map(e => e.exercise.toLowerCase())).size; }
-    function getTotalWorkoutDays(entries) { return new Set(entries.map(e => e.date)).size; }
+    function getTotalVolume(entriesList) {
+        return entriesList.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
+    }
 
+    function getUniqueExercises(entriesList) {
+        return new Set(entriesList.map(e => e.exercise.toLowerCase())).size;
+    }
+
+    function getWorkoutDays(entriesList) {
+        return new Set(entriesList.map(e => e.date)).size;
+    }
+
+    function getPRs(entriesList) {
+        const prMap = new Map();
+        entriesList.forEach(e => {
+            const key = e.exercise.toLowerCase();
+            if (!prMap.has(key) || e.weight > prMap.get(key).weight) {
+                prMap.set(key, { exercise: e.exercise, weight: e.weight, date: e.date });
+            }
+        });
+        return Array.from(prMap.values()).sort((a, b) => b.weight - a.weight);
+    }
+
+    // ==================== RENDER FUNCTIONS ====================
     async function updateStats() {
         await fetchEntries();
-        document.getElementById('statStreak').innerText = calculateStreak(entriesCache);
-        document.getElementById('statTotalWorkouts').innerText = getTotalWorkoutDays(entriesCache);
-        document.getElementById('statTotalVolume').innerText = getTotalVolume(entriesCache).toLocaleString();
-        document.getElementById('statUniqueExercises').innerText = getUniqueExercises(entriesCache);
-        updateExerciseSuggestions();
-    }
-
-    function updateExerciseSuggestions() {
-        const exercises = [...new Set(entriesCache.map(e => e.exercise))].sort();
-        const datalist = document.getElementById('exerciseSuggestions');
-        datalist.innerHTML = exercises.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}">`).join('');
-    }
-
-    function escapeHTML(str) { 
-        if(!str) return ''; 
-        return str.replace(/[&<>]/g, function(m){
-            if(m==='&') return '&amp;'; 
-            if(m==='<') return '&lt;'; 
-            if(m==='>') return '&gt;'; 
-            return m;
-        }); 
+        document.getElementById('statStreak').innerText = calculateStreak(entries);
+        document.getElementById('statWorkouts').innerText = getWorkoutDays(entries);
+        document.getElementById('statVolume').innerText = getTotalVolume(entries).toLocaleString();
+        document.getElementById('statExercises').innerText = getUniqueExercises(entries);
+        
+        // Update datalist
+        const exercises = [...new Set(entries.map(e => e.exercise))];
+        document.getElementById('exerciseList').innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
     }
 
     async function renderHistory() {
-        console.log("Rendering history...");
         await fetchEntries();
         const filter = document.getElementById('historyFilter').value;
-        let filtered = entriesCache;
-        if (filter !== 'all') filtered = entriesCache.filter(e => e.exercise === filter);
-        const tbody = document.getElementById('historyTableBody');
-        if (!filtered.length) { 
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entries</td></tr>'; 
-            return; 
+        let filtered = entries;
+        if (filter !== 'all') filtered = entries.filter(e => e.exercise === filter);
+        
+        const tbody = document.getElementById('historyBody');
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entries found</td></tr>';
+            return;
         }
+        
         tbody.innerHTML = filtered.map(e => `
             <tr>
                 <td>${new Date(e.date).toLocaleDateString()}</td>
-                <td><strong>${escapeHTML(e.exercise)}</strong></td>
+                <td><strong>${app.escapeHtml(e.exercise)}</strong></td>
                 <td class="num-cell">${e.weight} lbs</td>
                 <td>${e.sets}</td>
                 <td>${e.reps}</td>
-                <td class="num-cell">${(e.weight*e.sets*e.reps).toLocaleString()}</td>
+                <td class="num-cell">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
             </tr>
         `).join('');
         
         // Update filter dropdown
+        const exercises = [...new Set(entries.map(e => e.exercise))];
         const select = document.getElementById('historyFilter');
-        const allEx = [...new Set(entriesCache.map(e => e.exercise))];
-        select.innerHTML = '<option value="all">All Exercises</option>' + allEx.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}" ${ex===filter?'selected':''}>${escapeHTML(ex)}</option>`).join('');
+        select.innerHTML = '<option value="all">All Exercises</option>' + 
+            exercises.map(ex => `<option value="${ex}" ${ex === filter ? 'selected' : ''}>${ex}</option>`).join('');
     }
 
     async function renderPRs() {
-        console.log("Rendering PRs...");
         await fetchEntries();
-        const bestMap = new Map();
-        entriesCache.forEach(e => {
-            const key = e.exercise.toLowerCase();
-            if (!bestMap.has(key) || e.weight > bestMap.get(key).weight) bestMap.set(key, { exercise: e.exercise, weight: e.weight, date: e.date });
-        });
-        const prs = Array.from(bestMap.values()).sort((a,b)=>b.weight - a.weight);
-        const tbody = document.getElementById('prTableBody');
-        if (!prs.length) { 
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No PRs yet</td></tr>'; 
-            return; 
+        const prs = getPRs(entries);
+        const tbody = document.getElementById('prsBody');
+        if (!prs.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No PRs yet</td></tr>';
+            return;
         }
         tbody.innerHTML = prs.map(pr => `
             <tr>
-                <td><strong>${escapeHTML(pr.exercise)}</strong></td>
+                <td><strong>${app.escapeHtml(pr.exercise)}</strong></td>
                 <td class="num-cell highlight-pr">${pr.weight} lbs</td>
                 <td>${new Date(pr.date).toLocaleDateString()}</td>
-                <td><span class="badge badge-green">🏆 PR</span></td>
+                <td><span class="badge badge-pr">🏆 PR</span></td>
             </tr>
         `).join('');
     }
 
     async function renderLeaderboard() {
-        console.log("Rendering leaderboard...");
         if (!supabase) return;
-        const spotlight = document.getElementById('spotlightLiftSelect').value;
-        if (!spotlight) { 
-            document.getElementById('leaderboardTableBody').innerHTML = '<tr><td colspan="5" class="empty-state">Select an exercise</td></tr>'; 
-            return; 
+        const exercise = document.getElementById('leaderboardExercise').value;
+        if (!exercise) {
+            document.getElementById('leaderboardBody').innerHTML = '<tr><td colspan="4" class="empty-state">Select an exercise</td></tr>';
+            return;
         }
         
         const { data, error } = await supabase
             .from('workout_entries')
-            .select(`user_id, weight, date, exercise, users:user_id (email, raw_user_meta_data)`)
-            .eq('exercise', spotlight);
+            .select('user_id, weight, date, users!inner(email, raw_user_meta_data)')
+            .eq('exercise', exercise);
         
-        if (error) { 
-            console.error(error); 
-            return; 
+        if (error) {
+            console.error(error);
+            return;
         }
         
         const userBest = new Map();
         data?.forEach(record => {
-            const uid = record.user_id;
-            if (!userBest.has(uid) || record.weight > userBest.get(uid).weight) {
-                let displayName = record.users?.raw_user_meta_data?.display_name || record.users?.email?.split('@')[0] || "Athlete";
-                userBest.set(uid, { name: displayName, weight: record.weight, date: record.date });
+            const userId = record.user_id;
+            if (!userBest.has(userId) || record.weight > userBest.get(userId).weight) {
+                const name = record.users?.raw_user_meta_data?.display_name || 
+                           record.users?.email?.split('@')[0] || 
+                           "Athlete";
+                userBest.set(userId, { name, weight: record.weight, date: record.date });
             }
         });
         
-        const rankings = Array.from(userBest.entries()).map(([_, v]) => v).sort((a,b)=>b.weight - a.weight);
-        const tbody = document.getElementById('leaderboardTableBody');
-        if (!rankings.length) { 
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No lifts logged for this exercise</td></tr>'; 
-            return; 
+        const rankings = Array.from(userBest.values()).sort((a, b) => b.weight - a.weight);
+        const tbody = document.getElementById('leaderboardBody');
+        if (!rankings.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No lifts for this exercise</td></tr>';
+            return;
         }
+        
         tbody.innerHTML = rankings.map((r, idx) => `
             <tr>
-                <td class="num-cell">${idx+1}${idx===0?' 🥇':idx===1?' 🥈':idx===2?' 🥉':''}</td>
-                <td><strong>${escapeHTML(r.name)}</strong></td>
-                <td>${escapeHTML(spotlight)}</td>
+                <td class="num-cell">${idx + 1}${idx === 0 ? ' 🥇' : idx === 1 ? ' 🥈' : idx === 2 ? ' 🥉' : ''}</td>
+                <td><strong>${app.escapeHtml(r.name)}</strong></td>
                 <td class="num-cell highlight-pr">${r.weight} lbs</td>
                 <td>${new Date(r.date).toLocaleDateString()}</td>
             </tr>
         `).join('');
     }
 
-    async function updateSpotlightOptions() {
+    async function updateLeaderboardOptions() {
         if (!supabase) return;
-        const { data, error } = await supabase.from('workout_entries').select('exercise').not('exercise', 'is', null);
-        if (error) return;
-        const exercises = [...new Set(data.map(d => d.exercise))].sort();
-        const select = document.getElementById('spotlightLiftSelect');
-        select.innerHTML = '<option value="">-- Select Lift --</option>' + exercises.map(ex => `<option value="${ex.replace(/"/g, '&quot;')}">${escapeHTML(ex)}</option>`).join('');
+        const { data } = await supabase.from('workout_entries').select('exercise');
+        if (data) {
+            const exercises = [...new Set(data.map(d => d.exercise))].sort();
+            const select = document.getElementById('leaderboardExercise');
+            select.innerHTML = '<option value="">Select Exercise</option>' + 
+                exercises.map(ex => `<option value="${ex}">${ex}</option>`).join('');
+        }
     }
 
-    // Navigation function
-    async function navigateTo(pageName) {
-        console.log("Navigating to:", pageName);
+    // ==================== UI HELPERS ====================
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showToast(message, isError = false) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.borderLeftColor = isError ? '#ef4444' : 'var(--accent-green)';
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function updateAuthUI() {
+        const indicator = document.querySelector('.header-right');
+        const existingIndicator = document.getElementById('userIndicator');
+        if (existingIndicator) existingIndicator.remove();
         
-        // Update page visibility
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(`page-${pageName}`).classList.add('active');
-        
-        // Update tab active states
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const activeTab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
-        if (activeTab) activeTab.classList.add('active');
-        
-        // Load data based on page
-        if (pageName === 'log') {
-            await updateStats();
-        } else if (pageName === 'history') {
-            await renderHistory();
-        } else if (pageName === 'prs') {
-            await renderPRs();
-        } else if (pageName === 'leaderboard') {
-            await updateSpotlightOptions();
-            await renderLeaderboard();
+        if (currentUser) {
+            const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0];
+            const indicatorDiv = document.createElement('div');
+            indicatorDiv.id = 'userIndicator';
+            indicatorDiv.className = 'user-indicator';
+            indicatorDiv.innerHTML = `<div class="avatar">🏋️</div><span>${escapeHtml(name)}</span><button class="btn btn-ghost btn-sm" onclick="app.signOut()">🚪</button>`;
+            indicator.insertBefore(indicatorDiv, indicator.firstChild);
         }
     }
 
@@ -515,147 +979,138 @@
         localStorage.setItem('topset_theme', isDark ? 'light' : 'dark');
     }
 
-    // Auth UI functions
-    let authMode = 'signin';
-    function openAuthModal() { 
-        document.getElementById('authModal').classList.remove('hidden'); 
-        updateAuthModalUI(); 
-    }
-    function closeAuthModal() { 
-        document.getElementById('authModal').classList.add('hidden'); 
-    }
-    function toggleAuthMode() { 
-        authMode = authMode === 'signin' ? 'signup' : 'signin'; 
-        updateAuthModalUI(); 
-    }
-    function updateAuthModalUI() {
-        const isSignUp = authMode === 'signup';
-        document.getElementById('authModalTitle').innerText = isSignUp ? "🆕 Create Account" : "🔐 Sign In";
-        document.getElementById('authSubmitBtn').innerText = isSignUp ? "Sign Up" : "Sign In";
-        document.getElementById('authToggleBtn').innerText = isSignUp ? "Already have an account? Sign In" : "Need an account? Sign Up";
-        document.getElementById('authNameGroup').classList.toggle('hidden', !isSignUp);
-    }
-    
-    function updateUIForAuth() {
-        const indicator = document.getElementById('userIndicator');
-        if (currentUser) {
-            const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0];
-            indicator.style.display = "flex";
-            indicator.innerHTML = `<span class="avatar-mini">🏋️</span> ${escapeHTML(name)} <button class="btn btn-ghost" onclick="window.signOutUser()" style="margin-left:6px; padding:2px 8px;">🚪</button>`;
-        } else {
-            indicator.style.display = "none";
-            indicator.innerHTML = '';
+    function navigateTo(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`page-${page}`).classList.add('active');
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        const activeTab = document.querySelector(`.nav-tab[data-page="${page}"]`);
+        if (activeTab) activeTab.classList.add('active');
+        
+        if (page === 'log') updateStats();
+        else if (page === 'history') renderHistory();
+        else if (page === 'prs') renderPRs();
+        else if (page === 'leaderboard') {
+            updateLeaderboardOptions();
+            renderLeaderboard();
         }
     }
-    
-    window.signOutUser = async () => { 
-        await signOut(); 
-        updateUIForAuth(); 
-        await renderHistory(); 
-        await renderPRs(); 
-        await updateStats(); 
-    };
 
-    // Form handler
+    // ==================== AUTH MODAL ====================
+    let authMode = 'signin';
+    function openAuthModal() {
+        document.getElementById('authModal').classList.remove('hidden');
+        updateAuthModal();
+    }
+    function closeAuthModal() {
+        document.getElementById('authModal').classList.add('hidden');
+    }
+    function toggleAuthMode() {
+        authMode = authMode === 'signin' ? 'signup' : 'signin';
+        updateAuthModal();
+    }
+    function updateAuthModal() {
+        const isSignup = authMode === 'signup';
+        document.getElementById('authTitle').innerText = isSignup ? '🆕 Create Account' : '🔐 Sign In';
+        document.getElementById('authSubmitBtn').innerText = isSignup ? 'Sign Up' : 'Sign In';
+        document.getElementById('authToggleBtn').innerText = isSignup ? '← Back to Sign In' : 'Create Account';
+        document.getElementById('authNameGroup').classList.toggle('hidden', !isSignup);
+    }
+
+    // ==================== EVENT HANDLERS ====================
     document.getElementById('logForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!currentUser) { 
-            showToast("Please sign in first", true); 
-            openAuthModal(); 
-            return; 
+        if (!currentUser) {
+            showToast('Please sign in first', true);
+            openAuthModal();
+            return;
         }
-        const exercise = document.getElementById('logExercise').value;
-        const weight = document.getElementById('logWeight').value;
-        const sets = document.getElementById('logSets').value;
-        const reps = document.getElementById('logReps').value;
-        const date = document.getElementById('logDate').value || new Date().toISOString().split('T')[0];
-        if (!exercise || !weight) { 
-            showToast("Fill all fields", true); 
-            return; 
+        
+        const exercise = document.getElementById('exerciseInput').value;
+        const weight = document.getElementById('weightInput').value;
+        const sets = document.getElementById('setsInput').value;
+        const reps = document.getElementById('repsInput').value;
+        const date = document.getElementById('dateInput').value;
+        
+        if (!exercise || !weight || !sets || !reps) {
+            showToast('Please fill all fields', true);
+            return;
         }
+        
         try {
-            await addEntryToDB({ exercise, weight, sets, reps, date });
-            showToast(`✅ ${exercise}: ${weight}lbs × ${sets}×${reps} logged!`);
-            document.getElementById('logExercise').value = '';
-            document.getElementById('logWeight').value = '';
-            document.getElementById('logSets').value = '3';
-            document.getElementById('logReps').value = '5';
-            document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
-            await updateStats();
-            await updateSpotlightOptions();
-        } catch(err) { 
-            showToast("Error: " + err.message, true); 
+            await addEntry({ exercise, weight, sets, reps, date });
+            showToast(`✅ ${exercise}: ${weight}lbs × ${sets}×${reps}`);
+            document.getElementById('exerciseInput').value = '';
+            document.getElementById('weightInput').value = '';
+            document.getElementById('setsInput').value = '3';
+            document.getElementById('repsInput').value = '5';
+            document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+            updateStats();
+            updateLeaderboardOptions();
+        } catch (err) {
+            showToast(err.message, true);
         }
     });
-    
-    // Auth form handler
+
     document.getElementById('authForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('authEmail').value.trim();
         const password = document.getElementById('authPassword').value;
-        if (!email || !password) { 
-            showToast("Email and password required", true); 
-            return; 
+        if (!email || !password) {
+            showToast('Email and password required', true);
+            return;
         }
+        
         try {
             if (authMode === 'signup') {
                 const name = document.getElementById('authName').value.trim();
                 await signUp(email, password, name);
-                showToast("Account created! Please sign in.");
+                showToast('Account created! Please sign in.');
                 authMode = 'signin';
-                updateAuthModalUI();
+                updateAuthModal();
             } else {
-                await signIn(email, password);
+                const user = await signIn(email, password);
+                currentUser = user;
                 closeAuthModal();
-                currentUser = (await supabase.auth.getUser()).data.user;
-                await updateStats();
-                await updateSpotlightOptions();
-                updateUIForAuth();
-                showToast(`Welcome ${currentUser.user_metadata?.display_name || currentUser.email}`);
+                updateAuthUI();
+                updateStats();
+                updateLeaderboardOptions();
+                showToast(`Welcome back, ${user.user_metadata?.display_name || user.email?.split('@')[0]}!`);
                 navigateTo('log');
             }
-        } catch(err) { 
-            showToast(err.message, true); 
+        } catch (err) {
+            showToast(err.message, true);
         }
     });
 
-    // Expose all functions to window for inline handlers
-    window.navigateTo = navigateTo;
-    window.toggleTheme = toggleTheme;
-    window.renderHistory = renderHistory;
-    window.renderPRs = renderPRs;
-    window.renderLeaderboard = renderLeaderboard;
-    window.updateStats = updateStats;
-    window.openAuthModal = openAuthModal;
-    window.closeAuthModal = closeAuthModal;
-    window.toggleAuthMode = toggleAuthMode;
-    window.signOutUser = window.signOutUser;
-    window.showToast = showToast;
+    document.getElementById('authToggleBtn').onclick = () => toggleAuthMode();
+    document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
 
-    // Initialize
+    // ==================== EXPOSE APP API ====================
+    const app = {
+        navigateTo, toggleTheme, renderHistory, renderPRs, renderLeaderboard,
+        updateStats, showToast, signOut, closeAuthModal, escapeHtml
+    };
+    window.app = app;
+
+    // ==================== BOOTSTRAP ====================
     (async function bootstrap() {
         const savedTheme = localStorage.getItem('topset_theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         
-        if (!initSupabase()) { 
-            showToast("⚠️ Supabase initialization failed", true); 
-            return; 
-        }
+        if (!await initSupabase()) return;
         
-        // Check existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
             currentUser = session.user;
+            updateAuthUI();
             await updateStats();
-            await updateSpotlightOptions();
-            updateUIForAuth();
+            await updateLeaderboardOptions();
         } else {
-            updateUIForAuth();
-            showToast("👋 Sign in to start logging your workouts!");
+            // Show login prompt after a brief delay
+            setTimeout(() => {
+                if (!currentUser) openAuthModal();
+            }, 500);
         }
-        
-        document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
-        console.log("✅ TOPSET Ready!");
     })();
 </script>
 </body>
