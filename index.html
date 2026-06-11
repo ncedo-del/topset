@@ -2,64 +2,75 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TOPSET — Strength Training Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOPSET — Strength Log</title>
 
+    <!-- Google Fonts: Bebas Neue for bold numbers, Inter for clean body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --bg: #0a0a0a;
-            --bg-card: #141414;
-            --bg-card-hover: #1c1c1c;
-            --bg-input: #1e1e1e;
-            --bg-modal: #141414;
+            /* Dark Theme (default) */
+            --bg: #0b0b0b;
+            --bg-card: #161616;
+            --bg-card-hover: #1e1e1e;
+            --bg-input: #1f1f1f;
+            --bg-modal: #1a1a1a;
             --border: #2a2a2a;
             --border-focus: #4ade80;
-            --text-primary: #f0f0f0;
+            --text-primary: #f4f4f4;
             --text-secondary: #a0a0a0;
             --text-muted: #6b6b6b;
             --accent-green: #4ade80;
             --accent-green-dark: #22c55e;
             --accent-yellow: #fbbf24;
+            --accent-yellow-dark: #f59e0b;
+            --accent-gold: #f5c518;
             --danger: #ef4444;
             --danger-bg: rgba(239, 68, 68, 0.1);
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-            --radius: 12px;
-            --radius-sm: 8px;
-            --radius-lg: 20px;
-            --transition: all 0.2s ease;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --radius-lg: 16px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             --font-display: 'Bebas Neue', 'Impact', sans-serif;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --green-glow: 0 0 20px rgba(74, 222, 128, 0.2);
+            --green-glow: 0 0 24px rgba(74, 222, 128, 0.25);
+            --yellow-glow: 0 0 24px rgba(251, 191, 36, 0.25);
+            --overlay: rgba(0, 0, 0, 0.7);
         }
 
         [data-theme="light"] {
-            --bg: #f0f0f0;
+            --bg: #f5f5f5;
             --bg-card: #ffffff;
-            --bg-card-hover: #f8f9fa;
-            --bg-input: #f5f5f5;
+            --bg-card-hover: #f9fafb;
+            --bg-input: #f0f0f0;
             --bg-modal: #ffffff;
             --border: #e0e0e0;
+            --border-focus: #16a34a;
             --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --text-muted: #999999;
+            --text-secondary: #525252;
+            --text-muted: #9ca3af;
             --accent-green: #16a34a;
             --accent-green-dark: #15803d;
             --accent-yellow: #d97706;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
+            --accent-yellow-dark: #b45309;
+            --accent-gold: #c88a04;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --green-glow: 0 0 20px rgba(22, 163, 74, 0.2);
+            --yellow-glow: 0 0 20px rgba(217, 119, 6, 0.2);
+            --overlay: rgba(0, 0, 0, 0.4);
+            --danger-bg: rgba(239, 68, 68, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -68,14 +79,16 @@
             color: var(--text-primary);
             min-height: 100vh;
             transition: background var(--transition), color var(--transition);
-            padding-bottom: 20px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Header */
+        /* ─── HEADER ─────────────────────────── */
         .header {
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
-            padding: 0 20px;
+            padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -83,81 +96,122 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            transition: background var(--transition), border var(--transition);
         }
 
         .logo {
             font-family: var(--font-display);
-            font-size: 28px;
-            letter-spacing: 1px;
-            cursor: pointer;
+            font-size: 32px;
+            letter-spacing: 2px;
             display: flex;
             align-items: center;
             gap: 2px;
+            user-select: none;
+            cursor: pointer;
         }
-
-        .logo .top { color: var(--accent-green); }
-        .logo .set { color: var(--accent-yellow); }
+        .logo .top {
+            color: var(--accent-green);
+            transition: color var(--transition);
+        }
+        .logo .set {
+            color: var(--accent-yellow);
+            transition: color var(--transition);
+        }
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            margin-left: 4px;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(74, 222, 128, 0);
+            }
+        }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-
-        /* Buttons */
-        .btn {
-            font-family: var(--font-body);
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            border: none;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
             gap: 8px;
         }
 
+        .btn {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
         .btn-primary {
             background: var(--accent-green);
-            color: #0a0a0a;
+            color: #0b0b0b;
+            border-color: var(--accent-green);
+            font-weight: 700;
         }
-
         .btn-primary:hover {
             background: var(--accent-green-dark);
-            transform: translateY(-1px);
+            border-color: var(--accent-green-dark);
             box-shadow: var(--green-glow);
+            transform: translateY(-1px);
         }
-
         .btn-outline {
             background: transparent;
-            border: 1px solid var(--border);
+            border-color: var(--border);
             color: var(--text-primary);
         }
-
         .btn-outline:hover {
             border-color: var(--accent-green);
             color: var(--accent-green);
         }
-
         .btn-ghost {
             background: transparent;
+            border-color: transparent;
             color: var(--text-secondary);
         }
-
         .btn-ghost:hover {
             color: var(--text-primary);
             background: var(--bg-card-hover);
         }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
+        .btn-accent {
+            background: var(--accent-yellow);
+            color: #0b0b0b;
+            border-color: var(--accent-yellow);
+            font-weight: 700;
+        }
+        .btn-accent:hover {
+            background: var(--accent-yellow-dark);
+            border-color: var(--accent-yellow-dark);
+            box-shadow: var(--yellow-glow);
+        }
+        .btn-danger {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .btn-danger:hover {
+            background: var(--danger-bg);
         }
 
-        /* Navigation Tabs */
+        /* ─── NAV TABS ──────────────────────── */
         .nav-tabs {
             display: flex;
             gap: 4px;
@@ -165,48 +219,48 @@
             border-radius: var(--radius);
             padding: 4px;
             border: 1px solid var(--border);
+            transition: all var(--transition);
         }
-
         .nav-tab {
+            font-family: var(--font-body);
             font-size: 13px;
             font-weight: 600;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: var(--radius-sm);
+            border: none;
             background: transparent;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: var(--transition);
-            border: none;
+            transition: all var(--transition);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
         }
-
         .nav-tab:hover {
             color: var(--text-primary);
             background: var(--bg-card-hover);
         }
-
         .nav-tab.active {
             background: var(--accent-green);
-            color: #0a0a0a;
+            color: #0b0b0b;
+            font-weight: 700;
+            box-shadow: var(--green-glow);
         }
 
-        /* Main Container */
+        /* ─── MAIN CONTENT ──────────────────── */
         .main-container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px 16px;
+            padding: 24px 16px 40px;
         }
 
-        /* Pages */
         .page {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeSlideIn 0.3s ease;
         }
-
         .page.active {
             display: block;
         }
-
-        @keyframes fadeIn {
+        @keyframes fadeSlideIn {
             from {
                 opacity: 0;
                 transform: translateY(10px);
@@ -217,84 +271,117 @@
             }
         }
 
-        /* Stats Row */
+        /* ─── STAT CARDS ROW ────────────────── */
         .stats-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 12px;
             margin-bottom: 24px;
         }
-
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 16px;
-            transition: var(--transition);
+            padding: 16px 18px;
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
         }
-
         .stat-card:hover {
             border-color: var(--accent-green);
-            transform: translateY(-2px);
+            box-shadow: var(--green-glow);
         }
-
         .stat-label {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--text-muted);
             margin-bottom: 4px;
         }
-
         .stat-value {
             font-family: var(--font-display);
-            font-size: 36px;
+            font-size: 42px;
             line-height: 1;
             color: var(--text-primary);
+            letter-spacing: 1px;
         }
-
         .stat-value.green {
             color: var(--accent-green);
         }
-
+        .stat-value.yellow {
+            color: var(--accent-yellow);
+        }
         .stat-sub {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        /* Cards */
+        /* ─── CARDS & FORMS ─────────────────── */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 24px;
             margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
         }
-
         .card-header {
             font-family: var(--font-display);
-            font-size: 22px;
+            font-size: 24px;
+            letter-spacing: 1px;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: var(--text-primary);
         }
-
-        /* Forms */
+        .card-header .icon {
+            font-size: 28px;
+        }
         .form-row {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 12px;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
         }
-
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-row .full-width-mobile {
+                grid-column: 1 / -1;
+            }
+            .nav-tabs {
+                gap: 1px;
+                padding: 3px;
+            }
+            .nav-tab {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+            .header {
+                padding: 0 10px;
+                height: 50px;
+            }
+            .logo {
+                font-size: 24px;
+            }
+            .stat-value {
+                font-size: 30px;
+            }
+            .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
-
         .form-group label {
             font-size: 11px;
             font-weight: 700;
@@ -302,164 +389,203 @@
             letter-spacing: 1px;
             color: var(--text-muted);
         }
-
         .form-group input,
         .form-group select {
             font-family: var(--font-body);
             font-size: 15px;
-            padding: 12px;
+            padding: 10px 14px;
             border-radius: var(--radius-sm);
             border: 2px solid var(--border);
             background: var(--bg-input);
             color: var(--text-primary);
-            transition: var(--transition);
+            transition: all var(--transition);
+            font-weight: 500;
+            width: 100%;
         }
-
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--accent-green);
             box-shadow: var(--green-glow);
         }
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
 
-        /* Tables */
+        /* ─── TABLE ─────────────────────────── */
         .table-wrapper {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 14px;
         }
-
         th {
-            text-align: left;
-            padding: 12px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             color: var(--text-muted);
+            text-align: left;
+            padding: 10px 12px;
             border-bottom: 2px solid var(--border);
         }
-
         td {
-            padding: 12px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
-        }
-
-        /* User Indicator */
-        .user-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-card-hover);
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 13px;
             font-weight: 500;
         }
+        .num-cell {
+            font-family: var(--font-display);
+            font-size: 20px;
+            letter-spacing: 0.5px;
+        }
+        .highlight-pr {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .badge-green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-green);
+        }
+        .badge-yellow {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-yellow);
+        }
+        .badge-new {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--accent-green);
+            animation: pulse-badge 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
 
-        .avatar {
-            width: 32px;
-            height: 32px;
+        /* ─── LEADERBOARD ──────────────────── */
+        .leaderboard-rank {
+            font-family: var(--font-display);
+            font-size: 28px;
+            text-align: center;
+            width: 50px;
+        }
+        .leaderboard-rank.gold {
+            color: #f5c518;
+        }
+        .leaderboard-rank.silver {
+            color: #c0c0c0;
+        }
+        .leaderboard-rank.bronze {
+            color: #cd7f32;
+        }
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: var(--accent-green);
+            background: var(--bg-input);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            border: 2px solid var(--border);
         }
 
-        /* Filter Bar */
-        .filter-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar select {
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        /* Modal */
+        /* ─── MODAL ─────────────────────────── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(4px);
+            background: var(--overlay);
             z-index: 200;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            animation: fadeIn 0.2s ease;
         }
-
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
         .modal {
             background: var(--bg-modal);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 28px;
-            width: 100%;
-            max-width: 420px;
-            animation: modalIn 0.2s ease;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.25s ease;
         }
-
-        @keyframes modalIn {
+        @keyframes scaleIn {
             from {
+                transform: scale(0.9);
                 opacity: 0;
-                transform: scale(0.95);
             }
             to {
-                opacity: 1;
                 transform: scale(1);
+                opacity: 1;
             }
         }
-
         .modal h2 {
             font-family: var(--font-display);
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 26px;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
         }
-
+        .modal .form-group {
+            margin-bottom: 12px;
+        }
         .modal-buttons {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             margin-top: 20px;
             justify-content: flex-end;
         }
 
-        /* Toast */
+        /* ─── TOAST ─────────────────────────── */
         .toast-container {
             position: fixed;
-            bottom: 20px;
+            top: 20px;
             right: 20px;
             z-index: 300;
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         .toast {
             background: var(--bg-card);
-            border-left: 3px solid var(--accent-green);
+            border: 1px solid var(--accent-green);
             border-radius: var(--radius-sm);
-            padding: 12px 16px;
+            padding: 12px 18px;
+            font-weight: 600;
             font-size: 13px;
-            font-weight: 500;
+            color: var(--text-primary);
             box-shadow: var(--shadow-lg);
-            animation: slideIn 0.3s ease;
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            max-width: 350px;
         }
-
-        @keyframes slideIn {
+        @keyframes slideInRight {
             from {
-                transform: translateX(100%);
+                transform: translateX(120%);
                 opacity: 0;
             }
             to {
@@ -467,651 +593,2605 @@
                 opacity: 1;
             }
         }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
         }
 
-        .badge-pr {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--accent-green);
-        }
-
-        .num-cell {
-            font-family: var(--font-display);
-            font-size: 20px;
-        }
-
-        .highlight-pr {
-            color: var(--accent-green);
-            font-weight: 700;
-        }
-
+        /* ─── EMPTY STATE ──────────────────── */
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             color: var(--text-muted);
         }
+        .empty-state .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
 
+        /* ─── FILTER BAR ───────────────────── */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .filter-bar select {
+            font-family: var(--font-body);
+            font-size: 13px;
+            padding: 7px 12px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .filter-bar select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        /* ─── MISC ──────────────────────────── */
+        .text-muted {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .text-green {
+            color: var(--accent-green);
+        }
+        .text-yellow {
+            color: var(--accent-yellow);
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        .mt-4 {
+            margin-top: 16px;
+        }
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+        .gap-2 {
+            gap: 8px;
+        }
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
         .hidden {
             display: none !important;
         }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-tab {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-
-            .stat-value {
-                font-size: 28px;
-            }
-
-            .card {
-                padding: 16px;
-            }
-
-            .header {
-                padding: 0 12px;
-            }
-
-            .logo {
-                font-size: 24px;
-            }
+        .user-indicator {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
     </style>
 </head>
 <body>
 
-<header class="header">
-    <div class="logo" onclick="app.navigateTo('log')">
-        <span class="top">TOP</span><span class="set">SET</span>
-    </div>
-    <div class="header-right">
-        <div class="nav-tabs">
-            <button class="nav-tab active" data-page="log" onclick="app.navigateTo('log')">💪 Log</button>
-            <button class="nav-tab" data-page="history" onclick="app.navigateTo('history')">📋 History</button>
-            <button class="nav-tab" data-page="prs" onclick="app.navigateTo('prs')">🏆 PRs</button>
-            <button class="nav-tab" data-page="leaderboard" onclick="app.navigateTo('leaderboard')">📊 Board</button>
+    <!-- ═══════════ HEADER ═══════════════════ -->
+    <header class="header">
+        <div class="logo" onclick="navigateTo('log')" title="TOPSET — Home">
+            <span class="top">TOP</span><span class="set">SET</span>
+            <span class="logo-dot"></span>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="app.toggleTheme()">🌓</button>
-    </div>
-</header>
-
-<main class="main-container">
-    <!-- Log Page -->
-    <div id="page-log" class="page active">
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-label">Current Streak</div>
-                <div class="stat-value green" id="statStreak">0</div>
-                <div class="stat-sub">days</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Workouts</div>
-                <div class="stat-value" id="statWorkouts">0</div>
-                <div class="stat-sub">sessions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Total Volume</div>
-                <div class="stat-value green" id="statVolume">0</div>
-                <div class="stat-sub">lbs</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Exercises</div>
-                <div class="stat-value" id="statExercises">0</div>
-                <div class="stat-sub">unique</div>
-            </div>
+        <div class="header-right">
+            <span class="user-indicator" id="userIndicator" style="display:none;"></span>
+            <nav class="nav-tabs" id="navTabs">
+                <button class="nav-tab active" data-page="log">📝 Log</button>
+                <button class="nav-tab" data-page="history">📋 History</button>
+                <button class="nav-tab" data-page="prs">🏆 PRs</button>
+                <button class="nav-tab hidden" data-page="leaderboard" id="navLeaderboard">📊 Board</button>
+            </nav>
+            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="openSettings()" title="Settings">⚙️</button>
         </div>
+    </header>
 
-        <div class="card">
-            <div class="card-header">
-                <span>💪</span> Log Your Set
+    <!-- ═══════════ MAIN CONTENT ═════════════ -->
+    <div class="main-container">
+
+        <!-- ─── LOG PAGE ──────────────────────── -->
+        <div class="page active" id="page-log">
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-label">Current Streak</div>
+                    <div class="stat-value green" id="statStreak">0</div>
+                    <div class="stat-sub">days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Workouts</div>
+                    <div class="stat-value" id="statTotalWorkouts">0</div>
+                    <div class="stat-sub">sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Volume</div>
+                    <div class="stat-value yellow" id="statTotalVolume">0</div>
+                    <div class="stat-sub">lbs total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Exercises Tracked</div>
+                    <div class="stat-value green" id="statUniqueExercises">0</div>
+                    <div class="stat-sub">unique lifts</div>
+                </div>
             </div>
-            <form id="logForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Exercise</label>
-                        <input type="text" id="exerciseInput" placeholder="e.g., Bench Press" required list="exerciseList">
-                        <datalist id="exerciseList"></datalist>
-                    </div>
-                    <div class="form-group">
-                        <label>Weight (lbs)</label>
-                        <input type="number" id="weightInput" placeholder="225" required step="0.5" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Sets x Reps</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="number" id="setsInput" placeholder="3" required min="1" value="3" style="width: 50%;">
-                            <input type="number" id="repsInput" placeholder="5" required min="1" value="5" style="width: 50%;">
+
+            <div class="card">
+                <div class="card-header"><span class="icon">💪</span> Log a Set</div>
+                <form id="logForm" onsubmit="handleLogSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group full-width-mobile">
+                            <label>Exercise Name</label>
+                            <input type="text" id="logExercise" placeholder="e.g. Bench Press" required list="exerciseSuggestions" autocomplete="off">
+                            <datalist id="exerciseSuggestions"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (lbs)</label>
+                            <input type="number" id="logWeight" placeholder="225" required min="0" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Sets</label>
+                            <input type="number" id="logSets" placeholder="3" required min="1" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Reps</label>
+                            <input type="number" id="logReps" placeholder="5" required min="1" value="5">
                         </div>
                     </div>
-                </div>
-                <div class="form-row" style="margin-top: 12px; grid-template-columns: 1fr auto;">
-                    <div class="form-group">
-                        <label>Date</label>
-                        <input type="date" id="dateInput" required>
+                    <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="logDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="align-self: flex-end; height: 42px; padding: 0 24px;">
+                            ✅ Log Set
+                        </button>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="align-self: flex-end;">✅ Log Set</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ─── HISTORY PAGE ──────────────────── -->
+        <div class="page" id="page-history">
+            <div class="card">
+                <div class="card-header"><span class="icon">📋</span> Workout History</div>
+                <div class="filter-bar">
+                    <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Filter:</label>
+                    <select id="historyFilter" onchange="renderHistory()">
+                        <option value="all">All Exercises</option>
+                    </select>
                 </div>
-            </form>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Exercise</th>
+                                <th>Weight</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No workouts logged yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── PRs PAGE ──────────────────────── -->
+        <div class="page" id="page-prs">
+            <div class="card">
+                <div class="card-header"><span class="icon">🏆</span> Personal Records</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>PR Weight</th>
+                                <th>Date Set</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prTableBody">
+                            <tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── LEADERBOARD PAGE ──────────────── -->
+        <div class="page" id="page-leaderboard">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📊</span> Leaderboard
+                    <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">
+                        Spotlight Lift:
+                    </span>
+                    <select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:6px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;cursor:pointer;">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>User</th>
+                                <th>Lift</th>
+                                <th>PR Weight</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTableBody">
+                            <tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- History Page -->
-    <div id="page-history" class="page">
-        <div class="card">
-            <div class="card-header">📋 Workout History</div>
-            <div class="filter-bar">
-                <select id="historyFilter" onchange="app.renderHistory()">
-                    <option value="all">All Exercises</option>
-                </select>
-            </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Date</th><th>Exercise</th><th>Weight</th><th>Sets</th><th>Reps</th><th>Volume</th></tr>
-                    </thead>
-                    <tbody id="historyBody">
-                        <tr><td colspan="6" class="empty-state">No workouts yet. Start logging!</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- PRs Page -->
-    <div id="page-prs" class="page">
-        <div class="card">
-            <div class="card-header">🏆 Personal Records</div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Exercise</th><th>PR Weight</th><th>Date</th><th>Status</th></tr>
-                    </thead>
-                    <tbody id="prsBody">
-                        <tr><td colspan="4" class="empty-state">No PRs yet. Keep lifting!</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Leaderboard Page -->
-    <div id="page-leaderboard" class="page">
-        <div class="card">
-            <div class="card-header">
-                📊 Leaderboard
-                <select id="leaderboardExercise" onchange="app.renderLeaderboard()" style="margin-left: auto; padding: 8px; border-radius: 8px; background: var(--bg-input); color: var(--text-primary); border: 1px solid var(--border);">
-                    <option value="">Select Exercise</option>
-                </select>
-            </div>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr><th>Rank</th><th>Athlete</th><th>Weight</th><th>Date</th></tr>
-                    </thead>
-                    <tbody id="leaderboardBody">
-                        <tr><td colspan="4" class="empty-state">Select an exercise to see rankings</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</main>
-
-<!-- Auth Modal -->
-<div id="authModal" class="modal-overlay hidden">
-    <div class="modal">
-        <h2 id="authTitle">🔐 Sign In</h2>
-        <form id="authForm">
+    <!-- ═══════════ SETTINGS MODAL ════════════ -->
+    <div class="modal-overlay hidden" id="settingsModal">
+        <div class="modal">
+            <h2>⚙️ Settings</h2>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="authEmail" required>
+                <label>App Mode</label>
+                <select id="appModeSelect" onchange="handleModeChange()">
+                    <option value="single">Single User (Default)</option>
+                    <option value="multi">Multi-User / Leaderboard Mode</option>
+                </select>
+                <span class="text-muted mt-2">Multi-user mode enables profiles & leaderboard.</span>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="authPassword" required>
-            </div>
-            <div id="authNameGroup" class="form-group hidden">
-                <label>Display Name</label>
-                <input type="text" id="authName" placeholder="Your name">
+            <div id="multiUserSettings" class="hidden mt-4">
+                <p style="font-weight:600;color:var(--accent-yellow);">⚠️ Switching to multi-user mode requires creating a profile.</p>
             </div>
             <div class="modal-buttons">
-                <button type="button" id="authToggleBtn" class="btn btn-outline">Create Account</button>
-                <button type="submit" id="authSubmitBtn" class="btn btn-primary">Sign In</button>
+                <button class="btn btn-outline" onclick="closeSettings()">Close</button>
+                <button class="btn btn-primary" onclick="applySettings()">Save</button>
             </div>
-        </form>
-        <div style="margin-top: 12px; text-align: center;">
-            <button onclick="app.closeAuthModal()" class="btn btn-ghost btn-sm">Cancel</button>
         </div>
     </div>
-</div>
 
-<div id="toastContainer" class="toast-container"></div>
+    <!-- ═══════════ AUTH MODAL ════════════════ -->
+    <div class="modal-overlay hidden" id="authModal">
+        <div class="modal">
+            <h2 id="authModalTitle">🔐 Sign In</h2>
+            <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" required minlength="4">
+                </div>
+                <div class="form-group hidden" id="authNameGroup">
+                    <label>Display Name</label>
+                    <input type="text" id="authName" placeholder="Your name" maxlength="30">
+                </div>
+                <div class="form-group hidden" id="authAvatarGroup">
+                    <label>Avatar (emoji)</label>
+                    <input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button>
+                    <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
+                </div>
+            </form>
+            <button class="btn btn-outline btn-sm mt-2" onclick="closeAuthModal()" style="width:100%;">Cancel</button>
+        </div>
+    </div>
 
-<script>
-    // ==================== SUPABASE CONFIG ====================
-    // ⚠️ REPLACE THESE WITH YOUR SUPABASE CREDENTIALS ⚠️
-    const SUPABASE_URL = "https://icodhdskantgkgpekqrc.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljb2RoZHNrYW50Z2tncGVrcXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNDIzNTUsImV4cCI6MjA5NjcxODM1NX0.waLt9TYbOP22wPwBXs-cP2ZiDsv-Y44lnFoI5hAtnsg";
+    <!-- ═══════════ TOAST CONTAINER ═══════════ -->
+    <div class="toast-container" id="toastContainer"></div>
 
-    // ==================== APP STATE ====================
-    let supabase;
-    let currentUser = null;
-    let entries = [];
+    <!-- ═══════════ SCRIPTS ═══════════════════ -->
+    <script>
+        (function() {
+            // ─── CONSTANTS ──────────────────────────
+            const STORAGE_PREFIX = 'topset_';
+            const KEYS = {
+                theme: STORAGE_PREFIX + 'theme',
+                appMode: STORAGE_PREFIX + 'mode',
+                entriesSingle: STORAGE_PREFIX + 'entries_single',
+                users: STORAGE_PREFIX + 'users',
+                currentUserId: STORAGE_PREFIX + 'current_user_id',
+                spotlightLift: STORAGE_PREFIX + 'spotlight_lift',
+            };
 
-    // ==================== INITIALIZATION ====================
-    async function initSupabase() {
-        if (SUPABASE_URL === "https://your-project.supabase.co" || SUPABASE_ANON_KEY === "your-anon-key") {
-            app.showToast("⚠️ Please configure Supabase URL and Anon Key in the script", true);
-            return false;
-        }
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        return true;
-    }
+            // ─── STATE ─────────────────────────────
+            let appState = {
+                mode: 'single', // 'single' | 'multi'
+                currentUserId: null, // set in multi mode
+                theme: 'dark',
+                entries: [], // loaded entries for current context
+                allUsers: [], // multi-mode user list
+                spotlightLift: '',
+            };
 
-    // ==================== DATABASE OPERATIONS ====================
-    async function fetchEntries() {
-        if (!currentUser) return [];
-        const { data, error } = await supabase
-            .from('workout_entries')
-            .select('*')
-            .eq('user_id', currentUser.id)
-            .order('date', { ascending: false });
-        if (error) {
-            console.error(error);
-            app.showToast("Error loading data: " + error.message, true);
-            return [];
-        }
-        entries = data || [];
-        return entries;
-    }
+            // ─── DOM REFS ──────────────────────────
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
 
-    async function addEntry(entry) {
-        if (!currentUser) throw new Error("Not authenticated");
-        const { error } = await supabase.from('workout_entries').insert([{
-            user_id: currentUser.id,
-            exercise: entry.exercise.trim(),
-            weight: parseFloat(entry.weight),
-            sets: parseInt(entry.sets),
-            reps: parseInt(entry.reps),
-            date: entry.date
-        }]);
-        if (error) throw error;
-    }
-
-    // ==================== AUTHENTICATION ====================
-    async function signIn(email, password) {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        return data.user;
-    }
-
-    async function signUp(email, password, name) {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { display_name: name || email.split('@')[0] } }
-        });
-        if (error) throw error;
-        return data.user;
-    }
-
-    async function signOut() {
-        await supabase.auth.signOut();
-        currentUser = null;
-        entries = [];
-        app.updateAuthUI();
-        app.navigateTo('log');
-        app.showToast("Signed out");
-    }
-
-    // ==================== STATS & CALCULATIONS ====================
-    function calculateStreak(entriesList) {
-        if (!entriesList.length) return 0;
-        const dates = [...new Set(entriesList.map(e => e.date))].sort().reverse();
-        let streak = 0;
-        const today = new Date().toISOString().split('T')[0];
-        if (dates[0] !== today) return 0;
-        for (let i = 0; i < dates.length; i++) {
-            const expected = new Date();
-            expected.setDate(expected.getDate() - i);
-            const expectedStr = expected.toISOString().split('T')[0];
-            if (dates[i] === expectedStr) streak++;
-            else break;
-        }
-        return streak;
-    }
-
-    function getTotalVolume(entriesList) {
-        return entriesList.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
-    }
-
-    function getUniqueExercises(entriesList) {
-        return new Set(entriesList.map(e => e.exercise.toLowerCase())).size;
-    }
-
-    function getWorkoutDays(entriesList) {
-        return new Set(entriesList.map(e => e.date)).size;
-    }
-
-    function getPRs(entriesList) {
-        const prMap = new Map();
-        entriesList.forEach(e => {
-            const key = e.exercise.toLowerCase();
-            if (!prMap.has(key) || e.weight > prMap.get(key).weight) {
-                prMap.set(key, { exercise: e.exercise, weight: e.weight, date: e.date });
+            // ─── UTILS ─────────────────────────────
+            function uid() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
             }
-        });
-        return Array.from(prMap.values()).sort((a, b) => b.weight - a.weight);
-    }
 
-    // ==================== RENDER FUNCTIONS ====================
-    async function updateStats() {
-        await fetchEntries();
-        document.getElementById('statStreak').innerText = calculateStreak(entries);
-        document.getElementById('statWorkouts').innerText = getWorkoutDays(entries);
-        document.getElementById('statVolume').innerText = getTotalVolume(entries).toLocaleString();
-        document.getElementById('statExercises').innerText = getUniqueExercises(entries);
-        
-        // Update datalist
-        const exercises = [...new Set(entries.map(e => e.exercise))];
-        document.getElementById('exerciseList').innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
-    }
-
-    async function renderHistory() {
-        await fetchEntries();
-        const filter = document.getElementById('historyFilter').value;
-        let filtered = entries;
-        if (filter !== 'all') filtered = entries.filter(e => e.exercise === filter);
-        
-        const tbody = document.getElementById('historyBody');
-        if (!filtered.length) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No entries found</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = filtered.map(e => `
-            <tr>
-                <td>${new Date(e.date).toLocaleDateString()}</td>
-                <td><strong>${app.escapeHtml(e.exercise)}</strong></td>
-                <td class="num-cell">${e.weight} lbs</td>
-                <td>${e.sets}</td>
-                <td>${e.reps}</td>
-                <td class="num-cell">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
-            </tr>
-        `).join('');
-        
-        // Update filter dropdown
-        const exercises = [...new Set(entries.map(e => e.exercise))];
-        const select = document.getElementById('historyFilter');
-        select.innerHTML = '<option value="all">All Exercises</option>' + 
-            exercises.map(ex => `<option value="${ex}" ${ex === filter ? 'selected' : ''}>${ex}</option>`).join('');
-    }
-
-    async function renderPRs() {
-        await fetchEntries();
-        const prs = getPRs(entries);
-        const tbody = document.getElementById('prsBody');
-        if (!prs.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No PRs yet</td></tr>';
-            return;
-        }
-        tbody.innerHTML = prs.map(pr => `
-            <tr>
-                <td><strong>${app.escapeHtml(pr.exercise)}</strong></td>
-                <td class="num-cell highlight-pr">${pr.weight} lbs</td>
-                <td>${new Date(pr.date).toLocaleDateString()}</td>
-                <td><span class="badge badge-pr">🏆 PR</span></td>
-            </tr>
-        `).join('');
-    }
-
-    async function renderLeaderboard() {
-        if (!supabase) return;
-        const exercise = document.getElementById('leaderboardExercise').value;
-        if (!exercise) {
-            document.getElementById('leaderboardBody').innerHTML = '<tr><td colspan="4" class="empty-state">Select an exercise</td></tr>';
-            return;
-        }
-        
-        const { data, error } = await supabase
-            .from('workout_entries')
-            .select('user_id, weight, date, users!inner(email, raw_user_meta_data)')
-            .eq('exercise', exercise);
-        
-        if (error) {
-            console.error(error);
-            return;
-        }
-        
-        const userBest = new Map();
-        data?.forEach(record => {
-            const userId = record.user_id;
-            if (!userBest.has(userId) || record.weight > userBest.get(userId).weight) {
-                const name = record.users?.raw_user_meta_data?.display_name || 
-                           record.users?.email?.split('@')[0] || 
-                           "Athlete";
-                userBest.set(userId, { name, weight: record.weight, date: record.date });
+            function todayStr() {
+                return new Date().toISOString().split('T')[0];
             }
-        });
-        
-        const rankings = Array.from(userBest.values()).sort((a, b) => b.weight - a.weight);
-        const tbody = document.getElementById('leaderboardBody');
-        if (!rankings.length) {
-            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No lifts for this exercise</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = rankings.map((r, idx) => `
-            <tr>
-                <td class="num-cell">${idx + 1}${idx === 0 ? ' 🥇' : idx === 1 ? ' 🥈' : idx === 2 ? ' 🥉' : ''}</td>
-                <td><strong>${app.escapeHtml(r.name)}</strong></td>
-                <td class="num-cell highlight-pr">${r.weight} lbs</td>
-                <td>${new Date(r.date).toLocaleDateString()}</td>
-            </tr>
-        `).join('');
-    }
 
-    async function updateLeaderboardOptions() {
-        if (!supabase) return;
-        const { data } = await supabase.from('workout_entries').select('exercise');
-        if (data) {
-            const exercises = [...new Set(data.map(d => d.exercise))].sort();
-            const select = document.getElementById('leaderboardExercise');
-            select.innerHTML = '<option value="">Select Exercise</option>' + 
-                exercises.map(ex => `<option value="${ex}">${ex}</option>`).join('');
-        }
-    }
+            function formatDate(dateStr) {
+                const d = new Date(dateStr + 'T00:00:00');
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
 
-    // ==================== UI HELPERS ====================
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+            function daysAgo(dateStr) {
+                const d = new Date(dateStr + 'T00:00:00');
+                const now = new Date();
+                now.setHours(0, 0, 0, 0);
+                return Math.floor((now - d) / (1000 * 60 * 60 * 24));
+            }
 
-    function showToast(message, isError = false) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.style.borderLeftColor = isError ? '#ef4444' : 'var(--accent-green)';
-        toast.textContent = message;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
+            function showToast(msg) {
+                const container = $('#toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
 
-    function updateAuthUI() {
-        const indicator = document.querySelector('.header-right');
-        const existingIndicator = document.getElementById('userIndicator');
-        if (existingIndicator) existingIndicator.remove();
-        
-        if (currentUser) {
-            const name = currentUser.user_metadata?.display_name || currentUser.email?.split('@')[0];
-            const indicatorDiv = document.createElement('div');
-            indicatorDiv.id = 'userIndicator';
-            indicatorDiv.className = 'user-indicator';
-            indicatorDiv.innerHTML = `<div class="avatar">🏋️</div><span>${escapeHtml(name)}</span><button class="btn btn-ghost btn-sm" onclick="app.signOut()">🚪</button>`;
-            indicator.insertBefore(indicatorDiv, indicator.firstChild);
-        }
-    }
+            // ─── THEME ──────────────────────────────
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                appState.theme = theme;
+                localStorage.setItem(KEYS.theme, theme);
+                $('#themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
 
-    function toggleTheme() {
-        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('topset_theme', isDark ? 'light' : 'dark');
-    }
+            function toggleTheme() {
+                const next = appState.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+            }
 
-    function navigateTo(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(`page-${page}`).classList.add('active');
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const activeTab = document.querySelector(`.nav-tab[data-page="${page}"]`);
-        if (activeTab) activeTab.classList.add('active');
-        
-        if (page === 'log') updateStats();
-        else if (page === 'history') renderHistory();
-        else if (page === 'prs') renderPRs();
-        else if (page === 'leaderboard') {
-            updateLeaderboardOptions();
-            renderLeaderboard();
-        }
-    }
+            // ─── DATA PERSISTENCE ──────────────────
+            function getEntriesKey() {
+                if (appState.mode === 'multi' && appState.currentUserId) {
+                    return STORAGE_PREFIX + 'entries_' + appState.currentUserId;
+                }
+                return KEYS.entriesSingle;
+            }
 
-    // ==================== AUTH MODAL ====================
-    let authMode = 'signin';
-    function openAuthModal() {
-        document.getElementById('authModal').classList.remove('hidden');
-        updateAuthModal();
-    }
-    function closeAuthModal() {
-        document.getElementById('authModal').classList.add('hidden');
-    }
-    function toggleAuthMode() {
-        authMode = authMode === 'signin' ? 'signup' : 'signin';
-        updateAuthModal();
-    }
-    function updateAuthModal() {
-        const isSignup = authMode === 'signup';
-        document.getElementById('authTitle').innerText = isSignup ? '🆕 Create Account' : '🔐 Sign In';
-        document.getElementById('authSubmitBtn').innerText = isSignup ? 'Sign Up' : 'Sign In';
-        document.getElementById('authToggleBtn').innerText = isSignup ? '← Back to Sign In' : 'Create Account';
-        document.getElementById('authNameGroup').classList.toggle('hidden', !isSignup);
-    }
+            function loadEntries() {
+                const key = getEntriesKey();
+                const raw = localStorage.getItem(key);
+                try {
+                    appState.entries = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    appState.entries = [];
+                }
+                // Ensure all entries have ids
+                appState.entries = appState.entries.map(e => ({
+                    ...e,
+                    id: e.id || uid(),
+                    date: e.date || todayStr(),
+                    exercise: e.exercise || 'Unknown',
+                    weight: parseFloat(e.weight) || 0,
+                    sets: parseInt(e.sets) || 1,
+                    reps: parseInt(e.reps) || 1,
+                }));
+            }
 
-    // ==================== EVENT HANDLERS ====================
-    document.getElementById('logForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-            showToast('Please sign in first', true);
-            openAuthModal();
-            return;
-        }
-        
-        const exercise = document.getElementById('exerciseInput').value;
-        const weight = document.getElementById('weightInput').value;
-        const sets = document.getElementById('setsInput').value;
-        const reps = document.getElementById('repsInput').value;
-        const date = document.getElementById('dateInput').value;
-        
-        if (!exercise || !weight || !sets || !reps) {
-            showToast('Please fill all fields', true);
-            return;
-        }
-        
-        try {
-            await addEntry({ exercise, weight, sets, reps, date });
-            showToast(`✅ ${exercise}: ${weight}lbs × ${sets}×${reps}`);
-            document.getElementById('exerciseInput').value = '';
-            document.getElementById('weightInput').value = '';
-            document.getElementById('setsInput').value = '3';
-            document.getElementById('repsInput').value = '5';
-            document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
-            updateStats();
-            updateLeaderboardOptions();
-        } catch (err) {
-            showToast(err.message, true);
-        }
-    });
+            function saveEntries() {
+                const key = getEntriesKey();
+                localStorage.setItem(key, JSON.stringify(appState.entries));
+            }
 
-    document.getElementById('authForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('authEmail').value.trim();
-        const password = document.getElementById('authPassword').value;
-        if (!email || !password) {
-            showToast('Email and password required', true);
-            return;
-        }
-        
-        try {
-            if (authMode === 'signup') {
-                const name = document.getElementById('authName').value.trim();
-                await signUp(email, password, name);
-                showToast('Account created! Please sign in.');
-                authMode = 'signin';
-                updateAuthModal();
-            } else {
-                const user = await signIn(email, password);
-                currentUser = user;
-                closeAuthModal();
-                updateAuthUI();
-                updateStats();
-                updateLeaderboardOptions();
-                showToast(`Welcome back, ${user.user_metadata?.display_name || user.email?.split('@')[0]}!`);
+            function addEntry(entryData) {
+                const entry = {
+                    id: uid(),
+                    exercise: entryData.exercise.trim(),
+                    weight: parseFloat(entryData.weight),
+                    sets: parseInt(entryData.sets),
+                    reps: parseInt(entryData.reps),
+                    date: entryData.date || todayStr(),
+                    timestamp: Date.now(),
+                };
+                appState.entries.unshift(entry);
+                saveEntries();
+                return entry;
+            }
+
+            function deleteEntry(entryId) {
+                appState.entries = appState.entries.filter(e => e.id !== entryId);
+                saveEntries();
+            }
+
+            function loadUsers() {
+                const raw = localStorage.getItem(KEYS.users);
+                try {
+                    appState.allUsers = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    appState.allUsers = [];
+                }
+            }
+
+            function saveUsers() {
+                localStorage.setItem(KEYS.users, JSON.stringify(appState.allUsers));
+            }
+
+            function getCurrentUser() {
+                if (appState.mode !== 'multi' || !appState.currentUserId) return null;
+                return appState.allUsers.find(u => u.id === appState.currentUserId) || null;
+            }
+
+            // ─── STREAK CALCULATION ────────────────
+            function calculateStreak(entries) {
+                if (!entries.length) return 0;
+                const dates = [...new Set(entries.map(e => e.date))].sort().reverse();
+                if (dates[0] !== todayStr() && daysAgo(dates[0]) > 1) return 0;
+                let streak = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                for (let i = 0; i < dates.length; i++) {
+                    const d = new Date(dates[i] + 'T00:00:00');
+                    const expected = new Date(today);
+                    expected.setDate(expected.getDate() - i);
+                    if (d.getTime() === expected.getTime()) {
+                        streak++;
+                    } else if (i === 0 && daysAgo(dates[i]) === 1) {
+                        // Started yesterday
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        if (d.getTime() === yesterday.getTime()) {
+                            streak = 1;
+                            const checkToday = new Date(today);
+                            for (let j = 1; j < dates.length; j++) {
+                                const dd = new Date(dates[j] + 'T00:00:00');
+                                const exp = new Date(yesterday);
+                                exp.setDate(exp.getDate() - j);
+                                if (dd.getTime() === exp.getTime()) streak++;
+                                else break;
+                            }
+                            return streak;
+                        }
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                return streak;
+            }
+
+            // ─── PR CALCULATION ────────────────────
+            function getPersonalBests(entries) {
+                const bestMap = {};
+                entries.forEach(e => {
+                    const key = e.exercise.toLowerCase().trim();
+                    if (!bestMap[key] || e.weight > bestMap[key].weight) {
+                        bestMap[key] = {
+                            exercise: e.exercise.trim(),
+                            weight: e.weight,
+                            date: e.date,
+                            id: e.id,
+                        };
+                    } else if (bestMap[key] && e.weight === bestMap[key].weight && e.date > bestMap[key].date) {
+                        bestMap[key].date = e.date;
+                        bestMap[key].id = e.id;
+                    }
+                });
+                return Object.values(bestMap).sort((a, b) => b.weight - a.weight);
+            }
+
+            function getTotalVolume(entries) {
+                return entries.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
+            }
+
+            function getUniqueExercises(entries) {
+                return [...new Set(entries.map(e => e.exercise.toLowerCase().trim()))].length;
+            }
+
+            function getTotalWorkoutDays(entries) {
+                return [...new Set(entries.map(e => e.date))].length;
+            }
+
+            // ─── NAVIGATION ────────────────────────
+            function navigateTo(pageName) {
+                $$('.page').forEach(p => p.classList.remove('active'));
+                $$('.nav-tab').forEach(t => t.classList.remove('active'));
+                const page = $('#page-' + pageName);
+                if (page) page.classList.add('active');
+                const tab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
+                if (tab) tab.classList.add('active');
+                if (pageName === 'history') renderHistory();
+                if (pageName === 'prs') renderPRs();
+                if (pageName === 'leaderboard') renderLeaderboard();
+                if (pageName === 'log') updateStatsRow();
+            }
+
+            // ─── RENDER FUNCTIONS ──────────────────
+            function updateStatsRow() {
+                loadEntries();
+                const streak = calculateStreak(appState.entries);
+                const totalWorkouts = getTotalWorkoutDays(appState.entries);
+                const totalVolume = getTotalVolume(appState.entries);
+                const uniqueEx = getUniqueExercises(appState.entries);
+                $('#statStreak').textContent = streak;
+                $('#statTotalWorkouts').textContent = totalWorkouts;
+                $('#statTotalVolume').textContent = totalVolume.toLocaleString();
+                $('#statUniqueExercises').textContent = uniqueEx;
+                updateExerciseSuggestions();
+            }
+
+            function updateExerciseSuggestions() {
+                const datalist = $('#exerciseSuggestions');
+                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
+                datalist.innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
+            }
+
+            function renderHistory() {
+                loadEntries();
+                const filterVal = $('#historyFilter').value;
+                updateHistoryFilterOptions();
+                let filtered = appState.entries;
+                if (filterVal && filterVal !== 'all') {
+                    filtered = filtered.filter(e => e.exercise.toLowerCase().trim() === filterVal.toLowerCase().trim());
+                }
+                const tbody = $('#historyTableBody');
+                if (!filtered.length) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No entries found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = filtered.map((e, i) => `
+                <tr>
+                  <td>${formatDate(e.date)}</td>
+                  <td><strong>${escapeHTML(e.exercise)}</strong></td>
+                  <td class="num-cell">${e.weight} <span class="text-muted">lbs</span></td>
+                  <td>${e.sets}</td>
+                  <td>${e.reps}</td>
+                  <td class="num-cell" style="font-size:16px;">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
+                </tr>
+              `).join('');
+            }
+
+            function updateHistoryFilterOptions() {
+                const select = $('#historyFilter');
+                const currentVal = select.value;
+                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
+                select.innerHTML = '<option value="all">All Exercises</option>' +
+                    exercises.map(ex => `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`)
+                    .join('');
+            }
+
+            function renderPRs() {
+                loadEntries();
+                const prs = getPersonalBests(appState.entries);
+                const tbody = $('#prTableBody');
+                if (!prs.length) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = prs.map(pr => {
+                    const isRecent = daysAgo(pr.date) <= 7;
+                    const badgeClass = isRecent ? 'badge badge-new' : 'badge badge-green';
+                    const badgeText = isRecent ? '🔥 RECENT' : 'PR';
+                    return `
+                  <tr>
+                    <td><strong>${escapeHTML(pr.exercise)}</strong></td>
+                    <td class="num-cell highlight-pr">${pr.weight} <span class="text-muted">lbs</span></td>
+                    <td>${formatDate(pr.date)}</td>
+                    <td><span class="${badgeClass}">${badgeText}</span></td>
+                  </tr>
+                `;
+                }).join('');
+            }
+
+            function renderLeaderboard() {
+                if (appState.mode !== 'multi') {
+                    $('#leaderboardTableBody').innerHTML =
+                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🔒</span>Enable multi-user mode in Settings to use the leaderboard.</td></tr>';
+                    updateSpotlightSelect();
+                    return;
+                }
+                loadUsers();
+                const spotlight = $('#spotlightLiftSelect').value || appState.spotlightLift;
+                if (!spotlight) {
+                    $('#leaderboardTableBody').innerHTML =
+                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>';
+                    updateSpotlightSelect();
+                    return;
+                }
+                appState.spotlightLift = spotlight;
+                localStorage.setItem(KEYS.spotlightLift, spotlight);
+                updateSpotlightSelect();
+
+                // Gather all users' PBs for the spotlight lift
+                const rankings = [];
+                appState.allUsers.forEach(user => {
+                    const key = STORAGE_PREFIX + 'entries_' + user.id;
+                    const raw = localStorage.getItem(key);
+                    let userEntries = [];
+                    try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
+                    const matching = userEntries.filter(e =>
+                        e.exercise.toLowerCase().trim() === spotlight.toLowerCase().trim()
+                    );
+                    if (matching.length > 0) {
+                        const best = matching.reduce((max, e) => e.weight > max.weight ? e : max,
+                        matching[0]);
+                        rankings.push({
+                            userId: user.id,
+                            name: user.name,
+                            avatar: user.avatar || '🏋️',
+                            exercise: best.exercise.trim(),
+                            weight: best.weight,
+                            date: best.date,
+                        });
+                    }
+                });
+                rankings.sort((a, b) => b.weight - a.weight);
+                const tbody = $('#leaderboardTableBody');
+                if (!rankings.length) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" class="empty-state"><span class="emoji">📭</span>No entries for "${escapeHTML(spotlight)}" yet.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = rankings.map((r, i) => {
+                    let rankClass = '';
+                    if (i === 0) rankClass = 'gold';
+                    else if (i === 1) rankClass = 'silver';
+                    else if (i === 2) rankClass = 'bronze';
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    return `
+                  <tr>
+                    <td class="leaderboard-rank ${rankClass}">${medal} ${i + 1}</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="avatar-circle">${r.avatar}</span>
+                        <strong>${escapeHTML(r.name)}</strong>
+                      </div>
+                    </td>
+                    <td>${escapeHTML(r.exercise)}</td>
+                    <td class="num-cell highlight-pr">${r.weight} <span class="text-muted">lbs</span></td>
+                    <td>${formatDate(r.date)}</td>
+                  </tr>
+                `;
+                }).join('');
+            }
+
+            function updateSpotlightSelect() {
+                const select = $('#spotlightLiftSelect');
+                const currentVal = select.value || appState.spotlightLift;
+                // Collect all exercises from all users
+                const allExercises = new Set();
+                if (appState.mode === 'multi') {
+                    appState.allUsers.forEach(user => {
+                        const key = STORAGE_PREFIX + 'entries_' + user.id;
+                        const raw = localStorage.getItem(key);
+                        let userEntries = [];
+                        try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
+                        userEntries.forEach(e => allExercises.add(e.exercise.trim()));
+                    });
+                } else {
+                    loadEntries();
+                    appState.entries.forEach(e => allExercises.add(e.exercise.trim()));
+                }
+                const sorted = [...allExercises].sort();
+                select.innerHTML = '<option value="">-- Select --</option>' +
+                    sorted.map(ex =>
+                        `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`
+                    ).join('');
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ─── EVENT HANDLERS ────────────────────
+            function handleLogSubmit(event) {
+                event.preventDefault();
+                const entryData = {
+                    exercise: $('#logExercise').value,
+                    weight: $('#logWeight').value,
+                    sets: $('#logSets').value,
+                    reps: $('#logReps').value,
+                    date: $('#logDate').value || todayStr(),
+                };
+                const entry = addEntry(entryData);
+                showToast(`✅ ${entry.exercise}: ${entry.weight}lbs × ${entry.sets}×${entry.reps} logged!`);
+                $('#logExercise').value = '';
+                $('#logWeight').value = '';
+                $('#logSets').value = '3';
+                $('#logReps').value = '5';
+                $('#logDate').value = todayStr();
+                updateStatsRow();
+                updateExerciseSuggestions();
+                $('#logExercise').focus();
+            }
+
+            function handleModeChange() {
+                const newMode = $('#appModeSelect').value;
+                if (newMode === 'multi') {
+                    $('#multiUserSettings').classList.remove('hidden');
+                } else {
+                    $('#multiUserSettings').classList.add('hidden');
+                }
+            }
+
+            function applySettings() {
+                const newMode = $('#appModeSelect').value;
+                if (newMode === appState.mode) {
+                    closeSettings();
+                    return;
+                }
+                if (newMode === 'multi') {
+                    // Switching to multi-user mode
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeSettings();
+                    openAuthModal('signup');
+                } else {
+                    // Switching to single-user mode
+                    appState.mode = 'single';
+                    appState.currentUserId = null;
+                    localStorage.setItem(KEYS.appMode, 'single');
+                    localStorage.removeItem(KEYS.currentUserId);
+                    updateUIForMode();
+                    closeSettings();
+                    showToast('Switched to single-user mode.');
+                }
                 navigateTo('log');
+                updateStatsRow();
             }
-        } catch (err) {
-            showToast(err.message, true);
-        }
-    });
 
-    document.getElementById('authToggleBtn').onclick = () => toggleAuthMode();
-    document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+            function openSettings() {
+                $('#appModeSelect').value = appState.mode;
+                $('#multiUserSettings').classList.toggle('hidden', appState.mode !== 'multi');
+                $('#settingsModal').classList.remove('hidden');
+            }
 
-    // ==================== EXPOSE APP API ====================
-    const app = {
-        navigateTo, toggleTheme, renderHistory, renderPRs, renderLeaderboard,
-        updateStats, showToast, signOut, closeAuthModal, escapeHtml
-    };
-    window.app = app;
+            function closeSettings() {
+                $('#settingsModal').classList.add('hidden');
+            }
 
-    // ==================== BOOTSTRAP ====================
-    (async function bootstrap() {
-        const savedTheme = localStorage.getItem('topset_theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        
-        if (!await initSupabase()) return;
-        
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            currentUser = session.user;
-            updateAuthUI();
-            await updateStats();
-            await updateLeaderboardOptions();
-        } else {
-            // Show login prompt after a brief delay
-            setTimeout(() => {
-                if (!currentUser) openAuthModal();
-            }, 500);
-        }
-    })();
-</script>
+            // ─── AUTH ──────────────────────────────
+            let authMode = 'signin'; // 'signin' | 'signup'
+
+            function openAuthModal(mode = 'signin') {
+                authMode = mode;
+                $('#authModal').classList.remove('hidden');
+                updateAuthModalUI();
+            }
+
+            function closeAuthModal() {
+                $('#authModal').classList.add('hidden');
+                // If in multi mode but not logged in, revert to single
+                if (appState.mode === 'multi' && !appState.currentUserId) {
+                    appState.mode = 'single';
+                    localStorage.setItem(KEYS.appMode, 'single');
+                    updateUIForMode();
+                }
+            }
+
+            function toggleAuthMode() {
+                authMode = authMode === 'signin' ? 'signup' : 'signin';
+                updateAuthModalUI();
+            }
+
+            function updateAuthModalUI() {
+                if (authMode === 'signin') {
+                    $('#authModalTitle').textContent = '🔐 Sign In';
+                    $('#authSubmitBtn').textContent = 'Sign In';
+                    $('#authToggleBtn').textContent = 'Need an account? Sign Up';
+                    $('#authNameGroup').classList.add('hidden');
+                    $('#authAvatarGroup').classList.add('hidden');
+                } else {
+                    $('#authModalTitle').textContent = '🆕 Create Profile';
+                    $('#authSubmitBtn').textContent = 'Sign Up';
+                    $('#authToggleBtn').textContent = 'Already have an account? Sign In';
+                    $('#authNameGroup').classList.remove('hidden');
+                    $('#authAvatarGroup').classList.remove('hidden');
+                }
+                $('#authEmail').value = '';
+                $('#authPassword').value = '';
+                $('#authName').value = '';
+                $('#authAvatar').value = '🏋️';
+            }
+
+            function handleAuthSubmit(event) {
+                event.preventDefault();
+                const email = $('#authEmail').value.trim().toLowerCase();
+                const password = $('#authPassword').value;
+                loadUsers();
+
+                if (authMode === 'signup') {
+                    const name = $('#authName').value.trim() || email.split('@')[0];
+                    const avatar = $('#authAvatar').value.trim() || '🏋️';
+                    // Check if email exists
+                    if (appState.allUsers.find(u => u.email === email)) {
+                        showToast('❌ An account with this email already exists.');
+                        return;
+                    }
+                    const newUser = {
+                        id: uid(),
+                        name,
+                        email,
+                        password: btoa(password), // Simple encoding (NOT secure — use backend for production)
+                        avatar,
+                        createdAt: new Date().toISOString(),
+                    };
+                    appState.allUsers.push(newUser);
+                    saveUsers();
+                    appState.currentUserId = newUser.id;
+                    localStorage.setItem(KEYS.currentUserId, newUser.id);
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeAuthModal();
+                    updateUIForMode();
+                    showToast(`✅ Welcome, ${name}! Multi-user mode active.`);
+                    navigateTo('log');
+                    updateStatsRow();
+                } else {
+                    // Sign in
+                    const user = appState.allUsers.find(u => u.email === email && u.password === btoa(password));
+                    if (!user) {
+                        showToast('❌ Invalid email or password.');
+                        return;
+                    }
+                    appState.currentUserId = user.id;
+                    localStorage.setItem(KEYS.currentUserId, user.id);
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeAuthModal();
+                    updateUIForMode();
+                    showToast(`👋 Welcome back, ${user.name}!`);
+                    navigateTo('log');
+                    updateStatsRow();
+                }
+            }
+
+            function handleLogout() {
+                appState.currentUserId = null;
+                localStorage.removeItem(KEYS.currentUserId);
+                appState.mode = 'single';
+                localStorage.setItem(KEYS.appMode, 'single');
+                updateUIForMode();
+                showToast('👋 Signed out. Switched to single-user mode.');
+                navigateTo('log');
+                updateStatsRow();
+            }
+
+            // ─── UI STATE MANAGEMENT ──────────────
+            function updateUIForMode() {
+                const isMulti = appState.mode === 'multi' && appState.currentUserId;
+                $('#navLeaderboard').classList.toggle('hidden', !isMulti);
+                $('#userIndicator').style.display = isMulti ? 'flex' : 'none';
+                if (isMulti) {
+                    const user = getCurrentUser();
+                    if (user) {
+                        $('#userIndicator').innerHTML =
+                            `${user.avatar || '🏋️'} ${escapeHTML(user.name)} <button class="btn btn-ghost btn-sm" onclick="handleLogout()" style="margin-left:4px;font-size:10px;">✕</button>`;
+                    }
+                } else {
+                    $('#userIndicator').innerHTML = '';
+                }
+                // If on leaderboard page but mode is single, redirect
+                if (!isMulti && $('#page-leaderboard').classList.contains('active')) {
+                    navigateTo('log');
+                }
+                $('#appModeSelect').value = appState.mode;
+                loadEntries();
+                updateStatsRow();
+                updateSpotlightSelect();
+                if ($('#page-leaderboard').classList.contains('active')) renderLeaderboard();
+            }
+
+            // Expose logout to global scope for inline onclick
+            window.handleLogout = handleLogout;
+
+            // ─── INITIALIZATION ────────────────────
+            function init() {
+                // Load theme
+                const savedTheme = localStorage.getItem(KEYS.theme) || 'dark';
+                applyTheme(savedTheme);
+
+                // Load app mode
+                const savedMode = localStorage.getItem(KEYS.appMode) || 'single';
+                appState.mode = savedMode;
+
+                // Load spotlight lift
+                appState.spotlightLift = localStorage.getItem(KEYS.spotlightLift) || '';
+
+                if (appState.mode === 'multi') {
+                    const savedUserId = localStorage.getItem(KEYS.currentUserId);
+                    loadUsers();
+                    if (savedUserId && appState.allUsers.find(u => u.id === savedUserId)) {
+                        appState.currentUserId = savedUserId;
+                    } else {
+                        // Invalid session, revert to single
+                        appState.mode = 'single';
+                        localStorage.setItem(KEYS.appMode, 'single');
+                        localStorage.removeItem(KEYS.currentUserId);
+                        appState.currentUserId = null;
+                    }
+                }
+
+                updateUIForMode();
+                loadEntries();
+                updateStatsRow();
+                updateExerciseSuggestions();
+                $('#logDate').value = todayStr();
+                $('#spotlightLiftSelect').value = appState.spotlightLift;
+
+                // Set up nav tab clicks
+                $$('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const page = tab.getAttribute('data-page');
+                        navigateTo(page);
+                    });
+                });
+
+                // Close modals on overlay click
+                $('#settingsModal').addEventListener('click', function(e) {
+                    if (e.target === this) closeSettings();
+                });
+                $('#authModal').addEventListener('click', function(e) {
+                    if (e.target === this) closeAuthModal();
+                });
+
+                // Keyboard shortcut: Escape to close modals
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (!$('#settingsModal').classList.contains('hidden')) closeSettings();
+                        if (!$('#authModal').classList.contains('hidden')) closeAuthModal();
+                    }
+                });
+
+                // Initial leaderboard render if needed
+                updateSpotlightSelect();
+
+                console.log('🏋️ TOPSET initialized — Mode:', appState.mode, '| Theme:', appState.theme);
+                console.log('💡 Tip: Toggle multi-user mode in Settings for leaderboard features.');
+            }
+
+            // ─── START APP ─────────────────────────
+            init();
+
+            // Expose functions needed by inline handlers
+            window.navigateTo = navigateTo;
+            window.toggleTheme = toggleTheme;
+            window.openSettings = openSettings;
+            window.closeSettings = closeSettings;
+            window.applySettings = applySettings;
+            window.handleModeChange = handleModeChange;
+            window.openAuthModal = openAuthModal;
+            window.closeAuthModal = closeAuthModal;
+            window.toggleAuthMode = toggleAuthMode;
+            window.handleAuthSubmit = handleAuthSubmit;
+            window.handleLogSubmit = handleLogSubmit;
+            window.renderHistory = renderHistory;
+            window.renderPRs = renderPRs;
+            window.renderLeaderboard = renderLeaderboard;
+            window.handleLogout = handleLogout;
+        })();
+    </script>
 </body>
-</html>
+                    </html><!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOPSET — Strength Log</title>
+
+    <!-- Google Fonts: Bebas Neue for bold numbers, Inter for clean body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Dark Theme (default) */
+            --bg: #0b0b0b;
+            --bg-card: #161616;
+            --bg-card-hover: #1e1e1e;
+            --bg-input: #1f1f1f;
+            --bg-modal: #1a1a1a;
+            --border: #2a2a2a;
+            --border-focus: #4ade80;
+            --text-primary: #f4f4f4;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6b6b6b;
+            --accent-green: #4ade80;
+            --accent-green-dark: #22c55e;
+            --accent-yellow: #fbbf24;
+            --accent-yellow-dark: #f59e0b;
+            --accent-gold: #f5c518;
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.1);
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --radius-lg: 16px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-display: 'Bebas Neue', 'Impact', sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --green-glow: 0 0 24px rgba(74, 222, 128, 0.25);
+            --yellow-glow: 0 0 24px rgba(251, 191, 36, 0.25);
+            --overlay: rgba(0, 0, 0, 0.7);
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f9fafb;
+            --bg-input: #f0f0f0;
+            --bg-modal: #ffffff;
+            --border: #e0e0e0;
+            --border-focus: #16a34a;
+            --text-primary: #1a1a1a;
+            --text-secondary: #525252;
+            --text-muted: #9ca3af;
+            --accent-green: #16a34a;
+            --accent-green-dark: #15803d;
+            --accent-yellow: #d97706;
+            --accent-yellow-dark: #b45309;
+            --accent-gold: #c88a04;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --green-glow: 0 0 20px rgba(22, 163, 74, 0.2);
+            --yellow-glow: 0 0 20px rgba(217, 119, 6, 0.2);
+            --overlay: rgba(0, 0, 0, 0.4);
+            --danger-bg: rgba(239, 68, 68, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background var(--transition), color var(--transition);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ─── HEADER ─────────────────────────── */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            transition: background var(--transition), border var(--transition);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 32px;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            user-select: none;
+            cursor: pointer;
+        }
+        .logo .top {
+            color: var(--accent-green);
+            transition: color var(--transition);
+        }
+        .logo .set {
+            color: var(--accent-yellow);
+            transition: color var(--transition);
+        }
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            margin-left: 4px;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 12px rgba(74, 222, 128, 0);
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
+        .btn-primary {
+            background: var(--accent-green);
+            color: #0b0b0b;
+            border-color: var(--accent-green);
+            font-weight: 700;
+        }
+        .btn-primary:hover {
+            background: var(--accent-green-dark);
+            border-color: var(--accent-green-dark);
+            box-shadow: var(--green-glow);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        .btn-ghost {
+            background: transparent;
+            border-color: transparent;
+            color: var(--text-secondary);
+        }
+        .btn-ghost:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+        .btn-accent {
+            background: var(--accent-yellow);
+            color: #0b0b0b;
+            border-color: var(--accent-yellow);
+            font-weight: 700;
+        }
+        .btn-accent:hover {
+            background: var(--accent-yellow-dark);
+            border-color: var(--accent-yellow-dark);
+            box-shadow: var(--yellow-glow);
+        }
+        .btn-danger {
+            background: transparent;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .btn-danger:hover {
+            background: var(--danger-bg);
+        }
+
+        /* ─── NAV TABS ──────────────────────── */
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 4px;
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+        .nav-tab {
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-card-hover);
+        }
+        .nav-tab.active {
+            background: var(--accent-green);
+            color: #0b0b0b;
+            font-weight: 700;
+            box-shadow: var(--green-glow);
+        }
+
+        /* ─── MAIN CONTENT ──────────────────── */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─── STAT CARDS ROW ────────────────── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            transition: all var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .stat-card:hover {
+            border-color: var(--accent-green);
+            box-shadow: var(--green-glow);
+        }
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 42px;
+            line-height: 1;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+        }
+        .stat-value.green {
+            color: var(--accent-green);
+        }
+        .stat-value.yellow {
+            color: var(--accent-yellow);
+        }
+        .stat-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ─── CARDS & FORMS ─────────────────── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            transition: all var(--transition);
+        }
+        .card-header {
+            font-family: var(--font-display);
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-primary);
+        }
+        .card-header .icon {
+            font-size: 28px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-row .full-width-mobile {
+                grid-column: 1 / -1;
+            }
+            .nav-tabs {
+                gap: 1px;
+                padding: 3px;
+            }
+            .nav-tab {
+                padding: 7px 10px;
+                font-size: 11px;
+            }
+            .header {
+                padding: 0 10px;
+                height: 50px;
+            }
+            .logo {
+                font-size: 24px;
+            }
+            .stat-value {
+                font-size: 30px;
+            }
+            .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+        .form-group input,
+        .form-group select {
+            font-family: var(--font-body);
+            font-size: 15px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: all var(--transition);
+            font-weight: 500;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: var(--green-glow);
+        }
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ─── TABLE ─────────────────────────── */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+        .num-cell {
+            font-family: var(--font-display);
+            font-size: 20px;
+            letter-spacing: 0.5px;
+        }
+        .highlight-pr {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .badge-green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-green);
+        }
+        .badge-yellow {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-yellow);
+        }
+        .badge-new {
+            background: rgba(74, 222, 128, 0.2);
+            color: var(--accent-green);
+            animation: pulse-badge 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-badge {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* ─── LEADERBOARD ──────────────────── */
+        .leaderboard-rank {
+            font-family: var(--font-display);
+            font-size: 28px;
+            text-align: center;
+            width: 50px;
+        }
+        .leaderboard-rank.gold {
+            color: #f5c518;
+        }
+        .leaderboard-rank.silver {
+            color: #c0c0c0;
+        }
+        .leaderboard-rank.bronze {
+            color: #cd7f32;
+        }
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-input);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            border: 2px solid var(--border);
+        }
+
+        /* ─── MODAL ─────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: var(--bg-modal);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.25s ease;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .modal h2 {
+            font-family: var(--font-display);
+            font-size: 26px;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        .modal .form-group {
+            margin-bottom: 12px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        /* ─── TOAST ─────────────────────────── */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-green);
+            border-radius: var(--radius-sm);
+            padding: 12px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+            max-width: 350px;
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ─── EMPTY STATE ──────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* ─── FILTER BAR ───────────────────── */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .filter-bar select {
+            font-family: var(--font-body);
+            font-size: 13px;
+            padding: 7px 12px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .filter-bar select:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        /* ─── MISC ──────────────────────────── */
+        .text-muted {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .text-green {
+            color: var(--accent-green);
+        }
+        .text-yellow {
+            color: var(--accent-yellow);
+        }
+        .mt-2 {
+            margin-top: 8px;
+        }
+        .mt-4 {
+            margin-top: 16px;
+        }
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+        .gap-2 {
+            gap: 8px;
+        }
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .user-indicator {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════ HEADER ═══════════════════ -->
+    <header class="header">
+        <div class="logo" onclick="navigateTo('log')" title="TOPSET — Home">
+            <span class="top">TOP</span><span class="set">SET</span>
+            <span class="logo-dot"></span>
+        </div>
+        <div class="header-right">
+            <span class="user-indicator" id="userIndicator" style="display:none;"></span>
+            <nav class="nav-tabs" id="navTabs">
+                <button class="nav-tab active" data-page="log">📝 Log</button>
+                <button class="nav-tab" data-page="history">📋 History</button>
+                <button class="nav-tab" data-page="prs">🏆 PRs</button>
+                <button class="nav-tab hidden" data-page="leaderboard" id="navLeaderboard">📊 Board</button>
+            </nav>
+            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="openSettings()" title="Settings">⚙️</button>
+        </div>
+    </header>
+
+    <!-- ═══════════ MAIN CONTENT ═════════════ -->
+    <div class="main-container">
+
+        <!-- ─── LOG PAGE ──────────────────────── -->
+        <div class="page active" id="page-log">
+            <div class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-label">Current Streak</div>
+                    <div class="stat-value green" id="statStreak">0</div>
+                    <div class="stat-sub">days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Workouts</div>
+                    <div class="stat-value" id="statTotalWorkouts">0</div>
+                    <div class="stat-sub">sessions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Volume</div>
+                    <div class="stat-value yellow" id="statTotalVolume">0</div>
+                    <div class="stat-sub">lbs total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Exercises Tracked</div>
+                    <div class="stat-value green" id="statUniqueExercises">0</div>
+                    <div class="stat-sub">unique lifts</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><span class="icon">💪</span> Log a Set</div>
+                <form id="logForm" onsubmit="handleLogSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group full-width-mobile">
+                            <label>Exercise Name</label>
+                            <input type="text" id="logExercise" placeholder="e.g. Bench Press" required list="exerciseSuggestions" autocomplete="off">
+                            <datalist id="exerciseSuggestions"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (lbs)</label>
+                            <input type="number" id="logWeight" placeholder="225" required min="0" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Sets</label>
+                            <input type="number" id="logSets" placeholder="3" required min="1" value="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Reps</label>
+                            <input type="number" id="logReps" placeholder="5" required min="1" value="5">
+                        </div>
+                    </div>
+                    <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="logDate" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="align-self: flex-end; height: 42px; padding: 0 24px;">
+                            ✅ Log Set
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ─── HISTORY PAGE ──────────────────── -->
+        <div class="page" id="page-history">
+            <div class="card">
+                <div class="card-header"><span class="icon">📋</span> Workout History</div>
+                <div class="filter-bar">
+                    <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Filter:</label>
+                    <select id="historyFilter" onchange="renderHistory()">
+                        <option value="all">All Exercises</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Exercise</th>
+                                <th>Weight</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No workouts logged yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── PRs PAGE ──────────────────────── -->
+        <div class="page" id="page-prs">
+            <div class="card">
+                <div class="card-header"><span class="icon">🏆</span> Personal Records</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exercise</th>
+                                <th>PR Weight</th>
+                                <th>Date Set</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prTableBody">
+                            <tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── LEADERBOARD PAGE ──────────────── -->
+        <div class="page" id="page-leaderboard">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon">📊</span> Leaderboard
+                    <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">
+                        Spotlight Lift:
+                    </span>
+                    <select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:6px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;cursor:pointer;">
+                        <option value="">-- Select --</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>User</th>
+                                <th>Lift</th>
+                                <th>PR Weight</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTableBody">
+                            <tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ SETTINGS MODAL ════════════ -->
+    <div class="modal-overlay hidden" id="settingsModal">
+        <div class="modal">
+            <h2>⚙️ Settings</h2>
+            <div class="form-group">
+                <label>App Mode</label>
+                <select id="appModeSelect" onchange="handleModeChange()">
+                    <option value="single">Single User (Default)</option>
+                    <option value="multi">Multi-User / Leaderboard Mode</option>
+                </select>
+                <span class="text-muted mt-2">Multi-user mode enables profiles & leaderboard.</span>
+            </div>
+            <div id="multiUserSettings" class="hidden mt-4">
+                <p style="font-weight:600;color:var(--accent-yellow);">⚠️ Switching to multi-user mode requires creating a profile.</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-outline" onclick="closeSettings()">Close</button>
+                <button class="btn btn-primary" onclick="applySettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ AUTH MODAL ════════════════ -->
+    <div class="modal-overlay hidden" id="authModal">
+        <div class="modal">
+            <h2 id="authModalTitle">🔐 Sign In</h2>
+            <form id="authForm" onsubmit="handleAuthSubmit(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" required minlength="4">
+                </div>
+                <div class="form-group hidden" id="authNameGroup">
+                    <label>Display Name</label>
+                    <input type="text" id="authName" placeholder="Your name" maxlength="30">
+                </div>
+                <div class="form-group hidden" id="authAvatarGroup">
+                    <label>Avatar (emoji)</label>
+                    <input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️">
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button>
+                    <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
+                </div>
+            </form>
+            <button class="btn btn-outline btn-sm mt-2" onclick="closeAuthModal()" style="width:100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ═══════════ TOAST CONTAINER ═══════════ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ═══════════ SCRIPTS ═══════════════════ -->
+    <script>
+        (function() {
+            // ─── CONSTANTS ──────────────────────────
+            const STORAGE_PREFIX = 'topset_';
+            const KEYS = {
+                theme: STORAGE_PREFIX + 'theme',
+                appMode: STORAGE_PREFIX + 'mode',
+                entriesSingle: STORAGE_PREFIX + 'entries_single',
+                users: STORAGE_PREFIX + 'users',
+                currentUserId: STORAGE_PREFIX + 'current_user_id',
+                spotlightLift: STORAGE_PREFIX + 'spotlight_lift',
+            };
+
+            // ─── STATE ─────────────────────────────
+            let appState = {
+                mode: 'single', // 'single' | 'multi'
+                currentUserId: null, // set in multi mode
+                theme: 'dark',
+                entries: [], // loaded entries for current context
+                allUsers: [], // multi-mode user list
+                spotlightLift: '',
+            };
+
+            // ─── DOM REFS ──────────────────────────
+            const $ = (sel) => document.querySelector(sel);
+            const $$ = (sel) => document.querySelectorAll(sel);
+
+            // ─── UTILS ─────────────────────────────
+            function uid() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+            }
+
+            function todayStr() {
+                return new Date().toISOString().split('T')[0];
+            }
+
+            function formatDate(dateStr) {
+                const d = new Date(dateStr + 'T00:00:00');
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            function daysAgo(dateStr) {
+                const d = new Date(dateStr + 'T00:00:00');
+                const now = new Date();
+                now.setHours(0, 0, 0, 0);
+                return Math.floor((now - d) / (1000 * 60 * 60 * 24));
+            }
+
+            function showToast(msg) {
+                const container = $('#toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            // ─── THEME ──────────────────────────────
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                appState.theme = theme;
+                localStorage.setItem(KEYS.theme, theme);
+                $('#themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+
+            function toggleTheme() {
+                const next = appState.theme === 'dark' ? 'light' : 'dark';
+                applyTheme(next);
+            }
+
+            // ─── DATA PERSISTENCE ──────────────────
+            function getEntriesKey() {
+                if (appState.mode === 'multi' && appState.currentUserId) {
+                    return STORAGE_PREFIX + 'entries_' + appState.currentUserId;
+                }
+                return KEYS.entriesSingle;
+            }
+
+            function loadEntries() {
+                const key = getEntriesKey();
+                const raw = localStorage.getItem(key);
+                try {
+                    appState.entries = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    appState.entries = [];
+                }
+                // Ensure all entries have ids
+                appState.entries = appState.entries.map(e => ({
+                    ...e,
+                    id: e.id || uid(),
+                    date: e.date || todayStr(),
+                    exercise: e.exercise || 'Unknown',
+                    weight: parseFloat(e.weight) || 0,
+                    sets: parseInt(e.sets) || 1,
+                    reps: parseInt(e.reps) || 1,
+                }));
+            }
+
+            function saveEntries() {
+                const key = getEntriesKey();
+                localStorage.setItem(key, JSON.stringify(appState.entries));
+            }
+
+            function addEntry(entryData) {
+                const entry = {
+                    id: uid(),
+                    exercise: entryData.exercise.trim(),
+                    weight: parseFloat(entryData.weight),
+                    sets: parseInt(entryData.sets),
+                    reps: parseInt(entryData.reps),
+                    date: entryData.date || todayStr(),
+                    timestamp: Date.now(),
+                };
+                appState.entries.unshift(entry);
+                saveEntries();
+                return entry;
+            }
+
+            function deleteEntry(entryId) {
+                appState.entries = appState.entries.filter(e => e.id !== entryId);
+                saveEntries();
+            }
+
+            function loadUsers() {
+                const raw = localStorage.getItem(KEYS.users);
+                try {
+                    appState.allUsers = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    appState.allUsers = [];
+                }
+            }
+
+            function saveUsers() {
+                localStorage.setItem(KEYS.users, JSON.stringify(appState.allUsers));
+            }
+
+            function getCurrentUser() {
+                if (appState.mode !== 'multi' || !appState.currentUserId) return null;
+                return appState.allUsers.find(u => u.id === appState.currentUserId) || null;
+            }
+
+            // ─── STREAK CALCULATION ────────────────
+            function calculateStreak(entries) {
+                if (!entries.length) return 0;
+                const dates = [...new Set(entries.map(e => e.date))].sort().reverse();
+                if (dates[0] !== todayStr() && daysAgo(dates[0]) > 1) return 0;
+                let streak = 0;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                for (let i = 0; i < dates.length; i++) {
+                    const d = new Date(dates[i] + 'T00:00:00');
+                    const expected = new Date(today);
+                    expected.setDate(expected.getDate() - i);
+                    if (d.getTime() === expected.getTime()) {
+                        streak++;
+                    } else if (i === 0 && daysAgo(dates[i]) === 1) {
+                        // Started yesterday
+                        const yesterday = new Date(today);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        if (d.getTime() === yesterday.getTime()) {
+                            streak = 1;
+                            const checkToday = new Date(today);
+                            for (let j = 1; j < dates.length; j++) {
+                                const dd = new Date(dates[j] + 'T00:00:00');
+                                const exp = new Date(yesterday);
+                                exp.setDate(exp.getDate() - j);
+                                if (dd.getTime() === exp.getTime()) streak++;
+                                else break;
+                            }
+                            return streak;
+                        }
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                return streak;
+            }
+
+            // ─── PR CALCULATION ────────────────────
+            function getPersonalBests(entries) {
+                const bestMap = {};
+                entries.forEach(e => {
+                    const key = e.exercise.toLowerCase().trim();
+                    if (!bestMap[key] || e.weight > bestMap[key].weight) {
+                        bestMap[key] = {
+                            exercise: e.exercise.trim(),
+                            weight: e.weight,
+                            date: e.date,
+                            id: e.id,
+                        };
+                    } else if (bestMap[key] && e.weight === bestMap[key].weight && e.date > bestMap[key].date) {
+                        bestMap[key].date = e.date;
+                        bestMap[key].id = e.id;
+                    }
+                });
+                return Object.values(bestMap).sort((a, b) => b.weight - a.weight);
+            }
+
+            function getTotalVolume(entries) {
+                return entries.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
+            }
+
+            function getUniqueExercises(entries) {
+                return [...new Set(entries.map(e => e.exercise.toLowerCase().trim()))].length;
+            }
+
+            function getTotalWorkoutDays(entries) {
+                return [...new Set(entries.map(e => e.date))].length;
+            }
+
+            // ─── NAVIGATION ────────────────────────
+            function navigateTo(pageName) {
+                $$('.page').forEach(p => p.classList.remove('active'));
+                $$('.nav-tab').forEach(t => t.classList.remove('active'));
+                const page = $('#page-' + pageName);
+                if (page) page.classList.add('active');
+                const tab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
+                if (tab) tab.classList.add('active');
+                if (pageName === 'history') renderHistory();
+                if (pageName === 'prs') renderPRs();
+                if (pageName === 'leaderboard') renderLeaderboard();
+                if (pageName === 'log') updateStatsRow();
+            }
+
+            // ─── RENDER FUNCTIONS ──────────────────
+            function updateStatsRow() {
+                loadEntries();
+                const streak = calculateStreak(appState.entries);
+                const totalWorkouts = getTotalWorkoutDays(appState.entries);
+                const totalVolume = getTotalVolume(appState.entries);
+                const uniqueEx = getUniqueExercises(appState.entries);
+                $('#statStreak').textContent = streak;
+                $('#statTotalWorkouts').textContent = totalWorkouts;
+                $('#statTotalVolume').textContent = totalVolume.toLocaleString();
+                $('#statUniqueExercises').textContent = uniqueEx;
+                updateExerciseSuggestions();
+            }
+
+            function updateExerciseSuggestions() {
+                const datalist = $('#exerciseSuggestions');
+                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
+                datalist.innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
+            }
+
+            function renderHistory() {
+                loadEntries();
+                const filterVal = $('#historyFilter').value;
+                updateHistoryFilterOptions();
+                let filtered = appState.entries;
+                if (filterVal && filterVal !== 'all') {
+                    filtered = filtered.filter(e => e.exercise.toLowerCase().trim() === filterVal.toLowerCase().trim());
+                }
+                const tbody = $('#historyTableBody');
+                if (!filtered.length) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No entries found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = filtered.map((e, i) => `
+                <tr>
+                  <td>${formatDate(e.date)}</td>
+                  <td><strong>${escapeHTML(e.exercise)}</strong></td>
+                  <td class="num-cell">${e.weight} <span class="text-muted">lbs</span></td>
+                  <td>${e.sets}</td>
+                  <td>${e.reps}</td>
+                  <td class="num-cell" style="font-size:16px;">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
+                </tr>
+              `).join('');
+            }
+
+            function updateHistoryFilterOptions() {
+                const select = $('#historyFilter');
+                const currentVal = select.value;
+                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
+                select.innerHTML = '<option value="all">All Exercises</option>' +
+                    exercises.map(ex => `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`)
+                    .join('');
+            }
+
+            function renderPRs() {
+                loadEntries();
+                const prs = getPersonalBests(appState.entries);
+                const tbody = $('#prTableBody');
+                if (!prs.length) {
+                    tbody.innerHTML =
+                        '<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = prs.map(pr => {
+                    const isRecent = daysAgo(pr.date) <= 7;
+                    const badgeClass = isRecent ? 'badge badge-new' : 'badge badge-green';
+                    const badgeText = isRecent ? '🔥 RECENT' : 'PR';
+                    return `
+                  <tr>
+                    <td><strong>${escapeHTML(pr.exercise)}</strong></td>
+                    <td class="num-cell highlight-pr">${pr.weight} <span class="text-muted">lbs</span></td>
+                    <td>${formatDate(pr.date)}</td>
+                    <td><span class="${badgeClass}">${badgeText}</span></td>
+                  </tr>
+                `;
+                }).join('');
+            }
+
+            function renderLeaderboard() {
+                if (appState.mode !== 'multi') {
+                    $('#leaderboardTableBody').innerHTML =
+                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🔒</span>Enable multi-user mode in Settings to use the leaderboard.</td></tr>';
+                    updateSpotlightSelect();
+                    return;
+                }
+                loadUsers();
+                const spotlight = $('#spotlightLiftSelect').value || appState.spotlightLift;
+                if (!spotlight) {
+                    $('#leaderboardTableBody').innerHTML =
+                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>';
+                    updateSpotlightSelect();
+                    return;
+                }
+                appState.spotlightLift = spotlight;
+                localStorage.setItem(KEYS.spotlightLift, spotlight);
+                updateSpotlightSelect();
+
+                // Gather all users' PBs for the spotlight lift
+                const rankings = [];
+                appState.allUsers.forEach(user => {
+                    const key = STORAGE_PREFIX + 'entries_' + user.id;
+                    const raw = localStorage.getItem(key);
+                    let userEntries = [];
+                    try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
+                    const matching = userEntries.filter(e =>
+                        e.exercise.toLowerCase().trim() === spotlight.toLowerCase().trim()
+                    );
+                    if (matching.length > 0) {
+                        const best = matching.reduce((max, e) => e.weight > max.weight ? e : max,
+                        matching[0]);
+                        rankings.push({
+                            userId: user.id,
+                            name: user.name,
+                            avatar: user.avatar || '🏋️',
+                            exercise: best.exercise.trim(),
+                            weight: best.weight,
+                            date: best.date,
+                        });
+                    }
+                });
+                rankings.sort((a, b) => b.weight - a.weight);
+                const tbody = $('#leaderboardTableBody');
+                if (!rankings.length) {
+                    tbody.innerHTML =
+                        `<tr><td colspan="5" class="empty-state"><span class="emoji">📭</span>No entries for "${escapeHTML(spotlight)}" yet.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = rankings.map((r, i) => {
+                    let rankClass = '';
+                    if (i === 0) rankClass = 'gold';
+                    else if (i === 1) rankClass = 'silver';
+                    else if (i === 2) rankClass = 'bronze';
+                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    return `
+                  <tr>
+                    <td class="leaderboard-rank ${rankClass}">${medal} ${i + 1}</td>
+                    <td>
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="avatar-circle">${r.avatar}</span>
+                        <strong>${escapeHTML(r.name)}</strong>
+                      </div>
+                    </td>
+                    <td>${escapeHTML(r.exercise)}</td>
+                    <td class="num-cell highlight-pr">${r.weight} <span class="text-muted">lbs</span></td>
+                    <td>${formatDate(r.date)}</td>
+                  </tr>
+                `;
+                }).join('');
+            }
+
+            function updateSpotlightSelect() {
+                const select = $('#spotlightLiftSelect');
+                const currentVal = select.value || appState.spotlightLift;
+                // Collect all exercises from all users
+                const allExercises = new Set();
+                if (appState.mode === 'multi') {
+                    appState.allUsers.forEach(user => {
+                        const key = STORAGE_PREFIX + 'entries_' + user.id;
+                        const raw = localStorage.getItem(key);
+                        let userEntries = [];
+                        try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
+                        userEntries.forEach(e => allExercises.add(e.exercise.trim()));
+                    });
+                } else {
+                    loadEntries();
+                    appState.entries.forEach(e => allExercises.add(e.exercise.trim()));
+                }
+                const sorted = [...allExercises].sort();
+                select.innerHTML = '<option value="">-- Select --</option>' +
+                    sorted.map(ex =>
+                        `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`
+                    ).join('');
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ─── EVENT HANDLERS ────────────────────
+            function handleLogSubmit(event) {
+                event.preventDefault();
+                const entryData = {
+                    exercise: $('#logExercise').value,
+                    weight: $('#logWeight').value,
+                    sets: $('#logSets').value,
+                    reps: $('#logReps').value,
+                    date: $('#logDate').value || todayStr(),
+                };
+                const entry = addEntry(entryData);
+                showToast(`✅ ${entry.exercise}: ${entry.weight}lbs × ${entry.sets}×${entry.reps} logged!`);
+                $('#logExercise').value = '';
+                $('#logWeight').value = '';
+                $('#logSets').value = '3';
+                $('#logReps').value = '5';
+                $('#logDate').value = todayStr();
+                updateStatsRow();
+                updateExerciseSuggestions();
+                $('#logExercise').focus();
+            }
+
+            function handleModeChange() {
+                const newMode = $('#appModeSelect').value;
+                if (newMode === 'multi') {
+                    $('#multiUserSettings').classList.remove('hidden');
+                } else {
+                    $('#multiUserSettings').classList.add('hidden');
+                }
+            }
+
+            function applySettings() {
+                const newMode = $('#appModeSelect').value;
+                if (newMode === appState.mode) {
+                    closeSettings();
+                    return;
+                }
+                if (newMode === 'multi') {
+                    // Switching to multi-user mode
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeSettings();
+                    openAuthModal('signup');
+                } else {
+                    // Switching to single-user mode
+                    appState.mode = 'single';
+                    appState.currentUserId = null;
+                    localStorage.setItem(KEYS.appMode, 'single');
+                    localStorage.removeItem(KEYS.currentUserId);
+                    updateUIForMode();
+                    closeSettings();
+                    showToast('Switched to single-user mode.');
+                }
+                navigateTo('log');
+                updateStatsRow();
+            }
+
+            function openSettings() {
+                $('#appModeSelect').value = appState.mode;
+                $('#multiUserSettings').classList.toggle('hidden', appState.mode !== 'multi');
+                $('#settingsModal').classList.remove('hidden');
+            }
+
+            function closeSettings() {
+                $('#settingsModal').classList.add('hidden');
+            }
+
+            // ─── AUTH ──────────────────────────────
+            let authMode = 'signin'; // 'signin' | 'signup'
+
+            function openAuthModal(mode = 'signin') {
+                authMode = mode;
+                $('#authModal').classList.remove('hidden');
+                updateAuthModalUI();
+            }
+
+            function closeAuthModal() {
+                $('#authModal').classList.add('hidden');
+                // If in multi mode but not logged in, revert to single
+                if (appState.mode === 'multi' && !appState.currentUserId) {
+                    appState.mode = 'single';
+                    localStorage.setItem(KEYS.appMode, 'single');
+                    updateUIForMode();
+                }
+            }
+
+            function toggleAuthMode() {
+                authMode = authMode === 'signin' ? 'signup' : 'signin';
+                updateAuthModalUI();
+            }
+
+            function updateAuthModalUI() {
+                if (authMode === 'signin') {
+                    $('#authModalTitle').textContent = '🔐 Sign In';
+                    $('#authSubmitBtn').textContent = 'Sign In';
+                    $('#authToggleBtn').textContent = 'Need an account? Sign Up';
+                    $('#authNameGroup').classList.add('hidden');
+                    $('#authAvatarGroup').classList.add('hidden');
+                } else {
+                    $('#authModalTitle').textContent = '🆕 Create Profile';
+                    $('#authSubmitBtn').textContent = 'Sign Up';
+                    $('#authToggleBtn').textContent = 'Already have an account? Sign In';
+                    $('#authNameGroup').classList.remove('hidden');
+                    $('#authAvatarGroup').classList.remove('hidden');
+                }
+                $('#authEmail').value = '';
+                $('#authPassword').value = '';
+                $('#authName').value = '';
+                $('#authAvatar').value = '🏋️';
+            }
+
+            function handleAuthSubmit(event) {
+                event.preventDefault();
+                const email = $('#authEmail').value.trim().toLowerCase();
+                const password = $('#authPassword').value;
+                loadUsers();
+
+                if (authMode === 'signup') {
+                    const name = $('#authName').value.trim() || email.split('@')[0];
+                    const avatar = $('#authAvatar').value.trim() || '🏋️';
+                    // Check if email exists
+                    if (appState.allUsers.find(u => u.email === email)) {
+                        showToast('❌ An account with this email already exists.');
+                        return;
+                    }
+                    const newUser = {
+                        id: uid(),
+                        name,
+                        email,
+                        password: btoa(password), // Simple encoding (NOT secure — use backend for production)
+                        avatar,
+                        createdAt: new Date().toISOString(),
+                    };
+                    appState.allUsers.push(newUser);
+                    saveUsers();
+                    appState.currentUserId = newUser.id;
+                    localStorage.setItem(KEYS.currentUserId, newUser.id);
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeAuthModal();
+                    updateUIForMode();
+                    showToast(`✅ Welcome, ${name}! Multi-user mode active.`);
+                    navigateTo('log');
+                    updateStatsRow();
+                } else {
+                    // Sign in
+                    const user = appState.allUsers.find(u => u.email === email && u.password === btoa(password));
+                    if (!user) {
+                        showToast('❌ Invalid email or password.');
+                        return;
+                    }
+                    appState.currentUserId = user.id;
+                    localStorage.setItem(KEYS.currentUserId, user.id);
+                    appState.mode = 'multi';
+                    localStorage.setItem(KEYS.appMode, 'multi');
+                    closeAuthModal();
+                    updateUIForMode();
+                    showToast(`👋 Welcome back, ${user.name}!`);
+                    navigateTo('log');
+                    updateStatsRow();
+                }
+            }
+
+            function handleLogout() {
+                appState.currentUserId = null;
+                localStorage.removeItem(KEYS.currentUserId);
+                appState.mode = 'single';
+                localStorage.setItem(KEYS.appMode, 'single');
+                updateUIForMode();
+                showToast('👋 Signed out. Switched to single-user mode.');
+                navigateTo('log');
+                updateStatsRow();
+            }
+
+            // ─── UI STATE MANAGEMENT ──────────────
+            function updateUIForMode() {
+                const isMulti = appState.mode === 'multi' && appState.currentUserId;
+                $('#navLeaderboard').classList.toggle('hidden', !isMulti);
+                $('#userIndicator').style.display = isMulti ? 'flex' : 'none';
+                if (isMulti) {
+                    const user = getCurrentUser();
+                    if (user) {
+                        $('#userIndicator').innerHTML =
+                            `${user.avatar || '🏋️'} ${escapeHTML(user.name)} <button class="btn btn-ghost btn-sm" onclick="handleLogout()" style="margin-left:4px;font-size:10px;">✕</button>`;
+                    }
+                } else {
+                    $('#userIndicator').innerHTML = '';
+                }
+                // If on leaderboard page but mode is single, redirect
+                if (!isMulti && $('#page-leaderboard').classList.contains('active')) {
+                    navigateTo('log');
+                }
+                $('#appModeSelect').value = appState.mode;
+                loadEntries();
+                updateStatsRow();
+                updateSpotlightSelect();
+                if ($('#page-leaderboard').classList.contains('active')) renderLeaderboard();
+            }
+
+            // Expose logout to global scope for inline onclick
+            window.handleLogout = handleLogout;
+
+            // ─── INITIALIZATION ────────────────────
+            function init() {
+                // Load theme
+                const savedTheme = localStorage.getItem(KEYS.theme) || 'dark';
+                applyTheme(savedTheme);
+
+                // Load app mode
+                const savedMode = localStorage.getItem(KEYS.appMode) || 'single';
+                appState.mode = savedMode;
+
+                // Load spotlight lift
+                appState.spotlightLift = localStorage.getItem(KEYS.spotlightLift) || '';
+
+                if (appState.mode === 'multi') {
+                    const savedUserId = localStorage.getItem(KEYS.currentUserId);
+                    loadUsers();
+                    if (savedUserId && appState.allUsers.find(u => u.id === savedUserId)) {
+                        appState.currentUserId = savedUserId;
+                    } else {
+                        // Invalid session, revert to single
+                        appState.mode = 'single';
+                        localStorage.setItem(KEYS.appMode, 'single');
+                        localStorage.removeItem(KEYS.currentUserId);
+                        appState.currentUserId = null;
+                    }
+                }
+
+                updateUIForMode();
+                loadEntries();
+                updateStatsRow();
+                updateExerciseSuggestions();
+                $('#logDate').value = todayStr();
+                $('#spotlightLiftSelect').value = appState.spotlightLift;
+
+                // Set up nav tab clicks
+                $$('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const page = tab.getAttribute('data-page');
+                        navigateTo(page);
+                    });
+                });
+
+                // Close modals on overlay click
+                $('#settingsModal').addEventListener('click', function(e) {
+                    if (e.target === this) closeSettings();
+                });
+                $('#authModal').addEventListener('click', function(e) {
+                    if (e.target === this) closeAuthModal();
+                });
+
+                // Keyboard shortcut: Escape to close modals
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (!$('#settingsModal').classList.contains('hidden')) closeSettings();
+                        if (!$('#authModal').classList.contains('hidden')) closeAuthModal();
+                    }
+                });
+
+                // Initial leaderboard render if needed
+                updateSpotlightSelect();
+
+                console.log('🏋️ TOPSET initialized — Mode:', appState.mode, '| Theme:', appState.theme);
+                console.log('💡 Tip: Toggle multi-user mode in Settings for leaderboard features.');
+            }
+
+            // ─── START APP ─────────────────────────
+            init();
+
+            // Expose functions needed by inline handlers
+            window.navigateTo = navigateTo;
+            window.toggleTheme = toggleTheme;
+            window.openSettings = openSettings;
+            window.closeSettings = closeSettings;
+            window.applySettings = applySettings;
+            window.handleModeChange = handleModeChange;
+            window.openAuthModal = openAuthModal;
+            window.closeAuthModal = closeAuthModal;
+            window.toggleAuthMode = toggleAuthMode;
+            window.handleAuthSubmit = handleAuthSubmit;
+            window.handleLogSubmit = handleLogSubmit;
+            window.renderHistory = renderHistory;
+            window.renderPRs = renderPRs;
+            window.renderLeaderboard = renderLeaderboard;
+            window.handleLogout = handleLogout;
+        })();
+    </script>
+</body>
+                                            </html>
