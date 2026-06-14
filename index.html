@@ -2,17 +2,18 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOPSET — Strength Log</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>TOPSET — Fitness Log</title>
 
-    <!-- Google Fonts: Bebas Neue for bold numbers, Inter for clean body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Dark Theme (default) */
             --bg: #0b0b0b;
             --bg-card: #161616;
             --bg-card-hover: #1e1e1e;
@@ -27,7 +28,6 @@
             --accent-green-dark: #22c55e;
             --accent-yellow: #fbbf24;
             --accent-yellow-dark: #f59e0b;
-            --accent-gold: #f5c518;
             --danger: #ef4444;
             --danger-bg: rgba(239, 68, 68, 0.1);
             --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
@@ -41,6 +41,8 @@
             --green-glow: 0 0 24px rgba(74, 222, 128, 0.25);
             --yellow-glow: 0 0 24px rgba(251, 191, 36, 0.25);
             --overlay: rgba(0, 0, 0, 0.7);
+            --header-height: 56px;
+            --bottom-nav-height: 64px;
         }
 
         [data-theme="light"] {
@@ -58,7 +60,6 @@
             --accent-green-dark: #15803d;
             --accent-yellow: #d97706;
             --accent-yellow-dark: #b45309;
-            --accent-gold: #c88a04;
             --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
             --green-glow: 0 0 20px rgba(22, 163, 74, 0.2);
@@ -71,6 +72,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -78,31 +80,32 @@
             background: var(--bg);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             transition: background var(--transition), color var(--transition);
             line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            padding-bottom: var(--bottom-nav-height);
+            overflow-x: hidden;
         }
 
-        /* ─── HEADER ─────────────────────────── */
         .header {
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
-            padding: 0 24px;
+            padding: 0 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 60px;
+            height: var(--header-height);
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: var(--shadow);
-            transition: background var(--transition), border var(--transition);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .logo {
             font-family: var(--font-display);
-            font-size: 32px;
+            font-size: 26px;
             letter-spacing: 2px;
             display: flex;
             align-items: center;
@@ -110,3088 +113,707 @@
             user-select: none;
             cursor: pointer;
         }
-        .logo .top {
-            color: var(--accent-green);
-            transition: color var(--transition);
-        }
-        .logo .set {
-            color: var(--accent-yellow);
-            transition: color var(--transition);
-        }
+        .logo .top { color: var(--accent-green); }
+        .logo .set { color: var(--accent-yellow); }
         .logo-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px; height: 6px;
             border-radius: 50%;
             background: var(--accent-green);
             margin-left: 4px;
             animation: pulse-dot 2s ease-in-out infinite;
         }
         @keyframes pulse-dot {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(74, 222, 128, 0);
-            }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6); }
+            50% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
         }
 
-        .header-right {
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .btn {
             font-family: var(--font-body);
             font-size: 13px;
             font-weight: 600;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            border-radius: 8px;
             border: 1px solid transparent;
             cursor: pointer;
             transition: all var(--transition);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
             white-space: nowrap;
-            letter-spacing: 0.3px;
+            min-height: 36px;
+            touch-action: manipulation;
         }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 11px;
-        }
-        .btn-primary {
-            background: var(--accent-green);
-            color: #0b0b0b;
-            border-color: var(--accent-green);
-            font-weight: 700;
-        }
-        .btn-primary:hover {
-            background: var(--accent-green-dark);
-            border-color: var(--accent-green-dark);
-            box-shadow: var(--green-glow);
-            transform: translateY(-1px);
-        }
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border);
-            color: var(--text-primary);
-        }
-        .btn-outline:hover {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-        }
-        .btn-ghost {
-            background: transparent;
-            border-color: transparent;
-            color: var(--text-secondary);
-        }
-        .btn-ghost:hover {
-            color: var(--text-primary);
-            background: var(--bg-card-hover);
-        }
-        .btn-accent {
-            background: var(--accent-yellow);
-            color: #0b0b0b;
-            border-color: var(--accent-yellow);
-            font-weight: 700;
-        }
-        .btn-accent:hover {
-            background: var(--accent-yellow-dark);
-            border-color: var(--accent-yellow-dark);
-            box-shadow: var(--yellow-glow);
-        }
-        .btn-danger {
-            background: transparent;
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        .btn-danger:hover {
-            background: var(--danger-bg);
-        }
+        .btn:active { transform: scale(0.97); }
+        .btn-sm { padding: 5px 10px; font-size: 11px; min-height: 30px; }
+        .btn-primary { background: var(--accent-green); color: #0b0b0b; border-color: var(--accent-green); font-weight: 700; }
+        .btn-primary:hover, .btn-primary:active { background: var(--accent-green-dark); border-color: var(--accent-green-dark); box-shadow: var(--green-glow); }
+        .btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
+        .btn-outline:hover, .btn-outline:active { border-color: var(--accent-green); color: var(--accent-green); }
+        .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); padding: 8px 10px; }
+        .btn-ghost:hover, .btn-ghost:active { color: var(--text-primary); background: var(--bg-card-hover); }
+        .btn-block { width: 100%; justify-content: center; }
 
-        /* ─── NAV TABS ──────────────────────── */
-        .nav-tabs {
-            display: flex;
-            gap: 4px;
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 4px;
-            border: 1px solid var(--border);
-            transition: all var(--transition);
-        }
-        .nav-tab {
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition);
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-        .nav-tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-card-hover);
-        }
-        .nav-tab.active {
-            background: var(--accent-green);
-            color: #0b0b0b;
-            font-weight: 700;
-            box-shadow: var(--green-glow);
-        }
-
-        /* ─── MAIN CONTENT ──────────────────── */
-        .main-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px 16px 40px;
-        }
-
-        .page {
-            display: none;
-            animation: fadeSlideIn 0.3s ease;
-        }
-        .page.active {
-            display: block;
-        }
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ─── STAT CARDS ROW ────────────────── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 18px;
-            transition: all var(--transition);
-            box-shadow: var(--shadow);
-        }
-        .stat-card:hover {
-            border-color: var(--accent-green);
-            box-shadow: var(--green-glow);
-        }
-        .stat-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-        .stat-value {
-            font-family: var(--font-display);
-            font-size: 42px;
-            line-height: 1;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-        }
-        .stat-value.green {
-            color: var(--accent-green);
-        }
-        .stat-value.yellow {
-            color: var(--accent-yellow);
-        }
-        .stat-sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        /* ─── CARDS & FORMS ─────────────────── */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            transition: all var(--transition);
-        }
-        .card-header {
-            font-family: var(--font-display);
-            font-size: 24px;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-primary);
-        }
-        .card-header .icon {
-            font-size: 28px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 10px;
-            align-items: end;
-            flex-wrap: wrap;
-        }
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr;
-            }
-            .form-row .full-width-mobile {
-                grid-column: 1 / -1;
-            }
-            .nav-tabs {
-                gap: 1px;
-                padding: 3px;
-            }
-            .nav-tab {
-                padding: 7px 10px;
-                font-size: 11px;
-            }
-            .header {
-                padding: 0 10px;
-                height: 50px;
-            }
-            .logo {
-                font-size: 24px;
-            }
-            .stat-value {
-                font-size: 30px;
-            }
-            .btn {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .form-group label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-        }
-        .form-group input,
-        .form-group select {
-            font-family: var(--font-body);
-            font-size: 15px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            transition: all var(--transition);
-            font-weight: 500;
-            width: 100%;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-            box-shadow: var(--green-glow);
-        }
-        .form-group input::placeholder {
-            color: var(--text-muted);
-        }
-
-        /* ─── TABLE ─────────────────────────── */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        th {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-align: left;
-            padding: 10px 12px;
-            border-bottom: 2px solid var(--border);
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--border);
-            font-weight: 500;
-        }
-        .num-cell {
-            font-family: var(--font-display);
-            font-size: 20px;
-            letter-spacing: 0.5px;
-        }
-        .highlight-pr {
-            color: var(--accent-green);
-            font-weight: 700;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .badge-green {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--accent-green);
-        }
-        .badge-yellow {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--accent-yellow);
-        }
-        .badge-new {
-            background: rgba(74, 222, 128, 0.2);
-            color: var(--accent-green);
-            animation: pulse-badge 1.5s ease-in-out infinite;
-        }
-        @keyframes pulse-badge {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        /* ─── LEADERBOARD ──────────────────── */
-        .leaderboard-rank {
-            font-family: var(--font-display);
-            font-size: 28px;
-            text-align: center;
-            width: 50px;
-        }
-        .leaderboard-rank.gold {
-            color: #f5c518;
-        }
-        .leaderboard-rank.silver {
-            color: #c0c0c0;
-        }
-        .leaderboard-rank.bronze {
-            color: #cd7f32;
-        }
-        .avatar-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--bg-input);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-            border: 2px solid var(--border);
-        }
-
-        /* ─── MODAL ─────────────────────────── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--overlay);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .modal {
-            background: var(--bg-modal);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            width: 90%;
-            max-width: 440px;
-            box-shadow: var(--shadow-lg);
-            animation: scaleIn 0.25s ease;
-        }
-        @keyframes scaleIn {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        .modal h2 {
-            font-family: var(--font-display);
-            font-size: 26px;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-        .modal .form-group {
-            margin-bottom: 12px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
-
-        /* ─── TOAST ─────────────────────────── */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--accent-green);
-            border-radius: var(--radius-sm);
-            padding: 12px 18px;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-lg);
-            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            max-width: 350px;
-        }
-        @keyframes slideInRight {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-        }
-
-        /* ─── EMPTY STATE ──────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .emoji {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        /* ─── FILTER BAR ───────────────────── */
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-            align-items: center;
-        }
-        .filter-bar select {
-            font-family: var(--font-body);
-            font-size: 13px;
-            padding: 7px 12px;
-            border-radius: var(--radius-sm);
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .filter-bar select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-        }
-
-        /* ─── MISC ──────────────────────────── */
-        .text-muted {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-        .text-green {
-            color: var(--accent-green);
-        }
-        .text-yellow {
-            color: var(--accent-yellow);
-        }
-        .mt-2 {
-            margin-top: 8px;
-        }
-        .mt-4 {
-            margin-top: 16px;
-        }
-        .mb-4 {
-            margin-bottom: 16px;
-        }
-        .gap-2 {
-            gap: 8px;
-        }
-        .flex-wrap {
-            flex-wrap: wrap;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .user-indicator {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--accent-green);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- ═══════════ HEADER ═══════════════════ -->
-    <header class="header">
-        <div class="logo" onclick="navigateTo('log')" title="TOPSET — Home">
-            <span class="top">TOP</span><span class="set">SET</span>
-            <span class="logo-dot"></span>
-        </div>
-        <div class="header-right">
-            <span class="user-indicator" id="userIndicator" style="display:none;"></span>
-            <nav class="nav-tabs" id="navTabs">
-                <button class="nav-tab active" data-page="log">📝 Log</button>
-                <button class="nav-tab" data-page="history">📋 History</button>
-                <button class="nav-tab" data-page="prs">🏆 PRs</button>
-                <button class="nav-tab hidden" data-page="leaderboard" id="navLeaderboard">📊 Board</button>
-            </nav>
-            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">
-                <span id="themeIcon">🌙</span>
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="openSettings()" title="Settings">⚙️</button>
-        </div>
-    </header>
-
-    <!-- ═══════════ MAIN CONTENT ═════════════ -->
-    <div class="main-container">
-
-        <!-- ─── LOG PAGE ──────────────────────── -->
-        <div class="page active" id="page-log">
-            <div class="stats-row" id="statsRow">
-                <div class="stat-card">
-                    <div class="stat-label">Current Streak</div>
-                    <div class="stat-value green" id="statStreak">0</div>
-                    <div class="stat-sub">days</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Workouts</div>
-                    <div class="stat-value" id="statTotalWorkouts">0</div>
-                    <div class="stat-sub">sessions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Volume</div>
-                    <div class="stat-value yellow" id="statTotalVolume">0</div>
-                    <div class="stat-sub">lbs total</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Exercises Tracked</div>
-                    <div class="stat-value green" id="statUniqueExercises">0</div>
-                    <div class="stat-sub">unique lifts</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="icon">💪</span> Log a Set</div>
-                <form id="logForm" onsubmit="handleLogSubmit(event)">
-                    <div class="form-row">
-                        <div class="form-group full-width-mobile">
-                            <label>Exercise Name</label>
-                            <input type="text" id="logExercise" placeholder="e.g. Bench Press" required list="exerciseSuggestions" autocomplete="off">
-                            <datalist id="exerciseSuggestions"></datalist>
-                        </div>
-                        <div class="form-group">
-                            <label>Weight (lbs)</label>
-                            <input type="number" id="logWeight" placeholder="225" required min="0" step="0.5">
-                        </div>
-                        <div class="form-group">
-                            <label>Sets</label>
-                            <input type="number" id="logSets" placeholder="3" required min="1" value="3">
-                        </div>
-                        <div class="form-group">
-                            <label>Reps</label>
-                            <input type="number" id="logReps" placeholder="5" required min="1" value="5">
-                        </div>
-                    </div>
-                    <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" id="logDate" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="align-self: flex-end; height: 42px; padding: 0 24px;">
-                            ✅ Log Set
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ─── HISTORY PAGE ──────────────────── -->
-        <div class="page" id="page-history">
-            <div class="card">
-                <div class="card-header"><span class="icon">📋</span> Workout History</div>
-                <div class="filter-bar">
-                    <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Filter:</label>
-                    <select id="historyFilter" onchange="renderHistory()">
-                        <option value="all">All Exercises</option>
-                    </select>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Exercise</th>
-                                <th>Weight</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Volume</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No workouts logged yet.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ─── PRs PAGE ──────────────────────── -->
-        <div class="page" id="page-prs">
-            <div class="card">
-                <div class="card-header"><span class="icon">🏆</span> Personal Records</div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>PR Weight</th>
-                                <th>Date Set</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="prTableBody">
-                            <tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ─── LEADERBOARD PAGE ──────────────── -->
-        <div class="page" id="page-leaderboard">
-            <div class="card">
-                <div class="card-header">
-                    <span class="icon">📊</span> Leaderboard
-                    <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">
-                        Spotlight Lift:
-                    </span>
-                    <select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:6px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;cursor:pointer;">
-                        <option value="">-- Select --</option>
-                    </select>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>User</th>
-                                <th>Lift</th>
-                                <th>PR Weight</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardTableBody">
-                            <tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════ SETTINGS MODAL ════════════ -->
-    <div class="modal-overlay hidden" id="settingsModal">
-        <div class="modal">
-            <h2>⚙️ Settings</h2>
-            <div class="form-group">
-                <label>App Mode</label>
-                <select id="appModeSelect" onchange="handleModeChange()">
-                    <option value="single">Single User (Default)</option>
-                    <option value="multi">Multi-User / Leaderboard Mode</option>
-                </select>
-                <span class="text-muted mt-2">Multi-user mode enables profiles & leaderboard.</span>
-            </div>
-            <div id="multiUserSettings" class="hidden mt-4">
-                <p style="font-weight:600;color:var(--accent-yellow);">⚠️ Switching to multi-user mode requires creating a profile.</p>
-            </div>
-            <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="closeSettings()">Close</button>
-                <button class="btn btn-primary" onclick="applySettings()">Save</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════ AUTH MODAL ════════════════ -->
-    <div class="modal-overlay hidden" id="authModal">
-        <div class="modal">
-            <h2 id="authModalTitle">🔐 Sign In</h2>
-            <form id="authForm" onsubmit="handleAuthSubmit(event)">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="authEmail" placeholder="you@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" placeholder="••••••••" required minlength="4">
-                </div>
-                <div class="form-group hidden" id="authNameGroup">
-                    <label>Display Name</label>
-                    <input type="text" id="authName" placeholder="Your name" maxlength="30">
-                </div>
-                <div class="form-group hidden" id="authAvatarGroup">
-                    <label>Avatar (emoji)</label>
-                    <input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button>
-                    <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
-                </div>
-            </form>
-            <button class="btn btn-outline btn-sm mt-2" onclick="closeAuthModal()" style="width:100%;">Cancel</button>
-        </div>
-    </div>
-
-    <!-- ═══════════ TOAST CONTAINER ═══════════ -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- ═══════════ SCRIPTS ═══════════════════ -->
-    <script>
-        (function() {
-            // ─── CONSTANTS ──────────────────────────
-            const STORAGE_PREFIX = 'topset_';
-            const KEYS = {
-                theme: STORAGE_PREFIX + 'theme',
-                appMode: STORAGE_PREFIX + 'mode',
-                entriesSingle: STORAGE_PREFIX + 'entries_single',
-                users: STORAGE_PREFIX + 'users',
-                currentUserId: STORAGE_PREFIX + 'current_user_id',
-                spotlightLift: STORAGE_PREFIX + 'spotlight_lift',
-            };
-
-            // ─── STATE ─────────────────────────────
-            let appState = {
-                mode: 'single', // 'single' | 'multi'
-                currentUserId: null, // set in multi mode
-                theme: 'dark',
-                entries: [], // loaded entries for current context
-                allUsers: [], // multi-mode user list
-                spotlightLift: '',
-            };
-
-            // ─── DOM REFS ──────────────────────────
-            const $ = (sel) => document.querySelector(sel);
-            const $$ = (sel) => document.querySelectorAll(sel);
-
-            // ─── UTILS ─────────────────────────────
-            function uid() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
-            }
-
-            function todayStr() {
-                return new Date().toISOString().split('T')[0];
-            }
-
-            function formatDate(dateStr) {
-                const d = new Date(dateStr + 'T00:00:00');
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            }
-
-            function daysAgo(dateStr) {
-                const d = new Date(dateStr + 'T00:00:00');
-                const now = new Date();
-                now.setHours(0, 0, 0, 0);
-                return Math.floor((now - d) / (1000 * 60 * 60 * 24));
-            }
-
-            function showToast(msg) {
-                const container = $('#toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.textContent = msg;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
-            }
-
-            // ─── THEME ──────────────────────────────
-            function applyTheme(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                appState.theme = theme;
-                localStorage.setItem(KEYS.theme, theme);
-                $('#themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
-            }
-
-            function toggleTheme() {
-                const next = appState.theme === 'dark' ? 'light' : 'dark';
-                applyTheme(next);
-            }
-
-            // ─── DATA PERSISTENCE ──────────────────
-            function getEntriesKey() {
-                if (appState.mode === 'multi' && appState.currentUserId) {
-                    return STORAGE_PREFIX + 'entries_' + appState.currentUserId;
-                }
-                return KEYS.entriesSingle;
-            }
-
-            function loadEntries() {
-                const key = getEntriesKey();
-                const raw = localStorage.getItem(key);
-                try {
-                    appState.entries = raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    appState.entries = [];
-                }
-                // Ensure all entries have ids
-                appState.entries = appState.entries.map(e => ({
-                    ...e,
-                    id: e.id || uid(),
-                    date: e.date || todayStr(),
-                    exercise: e.exercise || 'Unknown',
-                    weight: parseFloat(e.weight) || 0,
-                    sets: parseInt(e.sets) || 1,
-                    reps: parseInt(e.reps) || 1,
-                }));
-            }
-
-            function saveEntries() {
-                const key = getEntriesKey();
-                localStorage.setItem(key, JSON.stringify(appState.entries));
-            }
-
-            function addEntry(entryData) {
-                const entry = {
-                    id: uid(),
-                    exercise: entryData.exercise.trim(),
-                    weight: parseFloat(entryData.weight),
-                    sets: parseInt(entryData.sets),
-                    reps: parseInt(entryData.reps),
-                    date: entryData.date || todayStr(),
-                    timestamp: Date.now(),
-                };
-                appState.entries.unshift(entry);
-                saveEntries();
-                return entry;
-            }
-
-            function deleteEntry(entryId) {
-                appState.entries = appState.entries.filter(e => e.id !== entryId);
-                saveEntries();
-            }
-
-            function loadUsers() {
-                const raw = localStorage.getItem(KEYS.users);
-                try {
-                    appState.allUsers = raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    appState.allUsers = [];
-                }
-            }
-
-            function saveUsers() {
-                localStorage.setItem(KEYS.users, JSON.stringify(appState.allUsers));
-            }
-
-            function getCurrentUser() {
-                if (appState.mode !== 'multi' || !appState.currentUserId) return null;
-                return appState.allUsers.find(u => u.id === appState.currentUserId) || null;
-            }
-
-            // ─── STREAK CALCULATION ────────────────
-            function calculateStreak(entries) {
-                if (!entries.length) return 0;
-                const dates = [...new Set(entries.map(e => e.date))].sort().reverse();
-                if (dates[0] !== todayStr() && daysAgo(dates[0]) > 1) return 0;
-                let streak = 0;
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                for (let i = 0; i < dates.length; i++) {
-                    const d = new Date(dates[i] + 'T00:00:00');
-                    const expected = new Date(today);
-                    expected.setDate(expected.getDate() - i);
-                    if (d.getTime() === expected.getTime()) {
-                        streak++;
-                    } else if (i === 0 && daysAgo(dates[i]) === 1) {
-                        // Started yesterday
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        if (d.getTime() === yesterday.getTime()) {
-                            streak = 1;
-                            const checkToday = new Date(today);
-                            for (let j = 1; j < dates.length; j++) {
-                                const dd = new Date(dates[j] + 'T00:00:00');
-                                const exp = new Date(yesterday);
-                                exp.setDate(exp.getDate() - j);
-                                if (dd.getTime() === exp.getTime()) streak++;
-                                else break;
-                            }
-                            return streak;
-                        }
-                        break;
-                    } else {
-                        break;
-                    }
-                }
-                return streak;
-            }
-
-            // ─── PR CALCULATION ────────────────────
-            function getPersonalBests(entries) {
-                const bestMap = {};
-                entries.forEach(e => {
-                    const key = e.exercise.toLowerCase().trim();
-                    if (!bestMap[key] || e.weight > bestMap[key].weight) {
-                        bestMap[key] = {
-                            exercise: e.exercise.trim(),
-                            weight: e.weight,
-                            date: e.date,
-                            id: e.id,
-                        };
-                    } else if (bestMap[key] && e.weight === bestMap[key].weight && e.date > bestMap[key].date) {
-                        bestMap[key].date = e.date;
-                        bestMap[key].id = e.id;
-                    }
-                });
-                return Object.values(bestMap).sort((a, b) => b.weight - a.weight);
-            }
-
-            function getTotalVolume(entries) {
-                return entries.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
-            }
-
-            function getUniqueExercises(entries) {
-                return [...new Set(entries.map(e => e.exercise.toLowerCase().trim()))].length;
-            }
-
-            function getTotalWorkoutDays(entries) {
-                return [...new Set(entries.map(e => e.date))].length;
-            }
-
-            // ─── NAVIGATION ────────────────────────
-            function navigateTo(pageName) {
-                $$('.page').forEach(p => p.classList.remove('active'));
-                $$('.nav-tab').forEach(t => t.classList.remove('active'));
-                const page = $('#page-' + pageName);
-                if (page) page.classList.add('active');
-                const tab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
-                if (tab) tab.classList.add('active');
-                if (pageName === 'history') renderHistory();
-                if (pageName === 'prs') renderPRs();
-                if (pageName === 'leaderboard') renderLeaderboard();
-                if (pageName === 'log') updateStatsRow();
-            }
-
-            // ─── RENDER FUNCTIONS ──────────────────
-            function updateStatsRow() {
-                loadEntries();
-                const streak = calculateStreak(appState.entries);
-                const totalWorkouts = getTotalWorkoutDays(appState.entries);
-                const totalVolume = getTotalVolume(appState.entries);
-                const uniqueEx = getUniqueExercises(appState.entries);
-                $('#statStreak').textContent = streak;
-                $('#statTotalWorkouts').textContent = totalWorkouts;
-                $('#statTotalVolume').textContent = totalVolume.toLocaleString();
-                $('#statUniqueExercises').textContent = uniqueEx;
-                updateExerciseSuggestions();
-            }
-
-            function updateExerciseSuggestions() {
-                const datalist = $('#exerciseSuggestions');
-                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
-                datalist.innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
-            }
-
-            function renderHistory() {
-                loadEntries();
-                const filterVal = $('#historyFilter').value;
-                updateHistoryFilterOptions();
-                let filtered = appState.entries;
-                if (filterVal && filterVal !== 'all') {
-                    filtered = filtered.filter(e => e.exercise.toLowerCase().trim() === filterVal.toLowerCase().trim());
-                }
-                const tbody = $('#historyTableBody');
-                if (!filtered.length) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No entries found.</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = filtered.map((e, i) => `
-                <tr>
-                  <td>${formatDate(e.date)}</td>
-                  <td><strong>${escapeHTML(e.exercise)}</strong></td>
-                  <td class="num-cell">${e.weight} <span class="text-muted">lbs</span></td>
-                  <td>${e.sets}</td>
-                  <td>${e.reps}</td>
-                  <td class="num-cell" style="font-size:16px;">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
-                </tr>
-              `).join('');
-            }
-
-            function updateHistoryFilterOptions() {
-                const select = $('#historyFilter');
-                const currentVal = select.value;
-                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
-                select.innerHTML = '<option value="all">All Exercises</option>' +
-                    exercises.map(ex => `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`)
-                    .join('');
-            }
-
-            function renderPRs() {
-                loadEntries();
-                const prs = getPersonalBests(appState.entries);
-                const tbody = $('#prTableBody');
-                if (!prs.length) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = prs.map(pr => {
-                    const isRecent = daysAgo(pr.date) <= 7;
-                    const badgeClass = isRecent ? 'badge badge-new' : 'badge badge-green';
-                    const badgeText = isRecent ? '🔥 RECENT' : 'PR';
-                    return `
-                  <tr>
-                    <td><strong>${escapeHTML(pr.exercise)}</strong></td>
-                    <td class="num-cell highlight-pr">${pr.weight} <span class="text-muted">lbs</span></td>
-                    <td>${formatDate(pr.date)}</td>
-                    <td><span class="${badgeClass}">${badgeText}</span></td>
-                  </tr>
-                `;
-                }).join('');
-            }
-
-            function renderLeaderboard() {
-                if (appState.mode !== 'multi') {
-                    $('#leaderboardTableBody').innerHTML =
-                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🔒</span>Enable multi-user mode in Settings to use the leaderboard.</td></tr>';
-                    updateSpotlightSelect();
-                    return;
-                }
-                loadUsers();
-                const spotlight = $('#spotlightLiftSelect').value || appState.spotlightLift;
-                if (!spotlight) {
-                    $('#leaderboardTableBody').innerHTML =
-                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>';
-                    updateSpotlightSelect();
-                    return;
-                }
-                appState.spotlightLift = spotlight;
-                localStorage.setItem(KEYS.spotlightLift, spotlight);
-                updateSpotlightSelect();
-
-                // Gather all users' PBs for the spotlight lift
-                const rankings = [];
-                appState.allUsers.forEach(user => {
-                    const key = STORAGE_PREFIX + 'entries_' + user.id;
-                    const raw = localStorage.getItem(key);
-                    let userEntries = [];
-                    try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
-                    const matching = userEntries.filter(e =>
-                        e.exercise.toLowerCase().trim() === spotlight.toLowerCase().trim()
-                    );
-                    if (matching.length > 0) {
-                        const best = matching.reduce((max, e) => e.weight > max.weight ? e : max,
-                        matching[0]);
-                        rankings.push({
-                            userId: user.id,
-                            name: user.name,
-                            avatar: user.avatar || '🏋️',
-                            exercise: best.exercise.trim(),
-                            weight: best.weight,
-                            date: best.date,
-                        });
-                    }
-                });
-                rankings.sort((a, b) => b.weight - a.weight);
-                const tbody = $('#leaderboardTableBody');
-                if (!rankings.length) {
-                    tbody.innerHTML =
-                        `<tr><td colspan="5" class="empty-state"><span class="emoji">📭</span>No entries for "${escapeHTML(spotlight)}" yet.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = rankings.map((r, i) => {
-                    let rankClass = '';
-                    if (i === 0) rankClass = 'gold';
-                    else if (i === 1) rankClass = 'silver';
-                    else if (i === 2) rankClass = 'bronze';
-                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
-                    return `
-                  <tr>
-                    <td class="leaderboard-rank ${rankClass}">${medal} ${i + 1}</td>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px;">
-                        <span class="avatar-circle">${r.avatar}</span>
-                        <strong>${escapeHTML(r.name)}</strong>
-                      </div>
-                    </td>
-                    <td>${escapeHTML(r.exercise)}</td>
-                    <td class="num-cell highlight-pr">${r.weight} <span class="text-muted">lbs</span></td>
-                    <td>${formatDate(r.date)}</td>
-                  </tr>
-                `;
-                }).join('');
-            }
-
-            function updateSpotlightSelect() {
-                const select = $('#spotlightLiftSelect');
-                const currentVal = select.value || appState.spotlightLift;
-                // Collect all exercises from all users
-                const allExercises = new Set();
-                if (appState.mode === 'multi') {
-                    appState.allUsers.forEach(user => {
-                        const key = STORAGE_PREFIX + 'entries_' + user.id;
-                        const raw = localStorage.getItem(key);
-                        let userEntries = [];
-                        try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
-                        userEntries.forEach(e => allExercises.add(e.exercise.trim()));
-                    });
-                } else {
-                    loadEntries();
-                    appState.entries.forEach(e => allExercises.add(e.exercise.trim()));
-                }
-                const sorted = [...allExercises].sort();
-                select.innerHTML = '<option value="">-- Select --</option>' +
-                    sorted.map(ex =>
-                        `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`
-                    ).join('');
-            }
-
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            // ─── EVENT HANDLERS ────────────────────
-            function handleLogSubmit(event) {
-                event.preventDefault();
-                const entryData = {
-                    exercise: $('#logExercise').value,
-                    weight: $('#logWeight').value,
-                    sets: $('#logSets').value,
-                    reps: $('#logReps').value,
-                    date: $('#logDate').value || todayStr(),
-                };
-                const entry = addEntry(entryData);
-                showToast(`✅ ${entry.exercise}: ${entry.weight}lbs × ${entry.sets}×${entry.reps} logged!`);
-                $('#logExercise').value = '';
-                $('#logWeight').value = '';
-                $('#logSets').value = '3';
-                $('#logReps').value = '5';
-                $('#logDate').value = todayStr();
-                updateStatsRow();
-                updateExerciseSuggestions();
-                $('#logExercise').focus();
-            }
-
-            function handleModeChange() {
-                const newMode = $('#appModeSelect').value;
-                if (newMode === 'multi') {
-                    $('#multiUserSettings').classList.remove('hidden');
-                } else {
-                    $('#multiUserSettings').classList.add('hidden');
-                }
-            }
-
-            function applySettings() {
-                const newMode = $('#appModeSelect').value;
-                if (newMode === appState.mode) {
-                    closeSettings();
-                    return;
-                }
-                if (newMode === 'multi') {
-                    // Switching to multi-user mode
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeSettings();
-                    openAuthModal('signup');
-                } else {
-                    // Switching to single-user mode
-                    appState.mode = 'single';
-                    appState.currentUserId = null;
-                    localStorage.setItem(KEYS.appMode, 'single');
-                    localStorage.removeItem(KEYS.currentUserId);
-                    updateUIForMode();
-                    closeSettings();
-                    showToast('Switched to single-user mode.');
-                }
-                navigateTo('log');
-                updateStatsRow();
-            }
-
-            function openSettings() {
-                $('#appModeSelect').value = appState.mode;
-                $('#multiUserSettings').classList.toggle('hidden', appState.mode !== 'multi');
-                $('#settingsModal').classList.remove('hidden');
-            }
-
-            function closeSettings() {
-                $('#settingsModal').classList.add('hidden');
-            }
-
-            // ─── AUTH ──────────────────────────────
-            let authMode = 'signin'; // 'signin' | 'signup'
-
-            function openAuthModal(mode = 'signin') {
-                authMode = mode;
-                $('#authModal').classList.remove('hidden');
-                updateAuthModalUI();
-            }
-
-            function closeAuthModal() {
-                $('#authModal').classList.add('hidden');
-                // If in multi mode but not logged in, revert to single
-                if (appState.mode === 'multi' && !appState.currentUserId) {
-                    appState.mode = 'single';
-                    localStorage.setItem(KEYS.appMode, 'single');
-                    updateUIForMode();
-                }
-            }
-
-            function toggleAuthMode() {
-                authMode = authMode === 'signin' ? 'signup' : 'signin';
-                updateAuthModalUI();
-            }
-
-            function updateAuthModalUI() {
-                if (authMode === 'signin') {
-                    $('#authModalTitle').textContent = '🔐 Sign In';
-                    $('#authSubmitBtn').textContent = 'Sign In';
-                    $('#authToggleBtn').textContent = 'Need an account? Sign Up';
-                    $('#authNameGroup').classList.add('hidden');
-                    $('#authAvatarGroup').classList.add('hidden');
-                } else {
-                    $('#authModalTitle').textContent = '🆕 Create Profile';
-                    $('#authSubmitBtn').textContent = 'Sign Up';
-                    $('#authToggleBtn').textContent = 'Already have an account? Sign In';
-                    $('#authNameGroup').classList.remove('hidden');
-                    $('#authAvatarGroup').classList.remove('hidden');
-                }
-                $('#authEmail').value = '';
-                $('#authPassword').value = '';
-                $('#authName').value = '';
-                $('#authAvatar').value = '🏋️';
-            }
-
-            function handleAuthSubmit(event) {
-                event.preventDefault();
-                const email = $('#authEmail').value.trim().toLowerCase();
-                const password = $('#authPassword').value;
-                loadUsers();
-
-                if (authMode === 'signup') {
-                    const name = $('#authName').value.trim() || email.split('@')[0];
-                    const avatar = $('#authAvatar').value.trim() || '🏋️';
-                    // Check if email exists
-                    if (appState.allUsers.find(u => u.email === email)) {
-                        showToast('❌ An account with this email already exists.');
-                        return;
-                    }
-                    const newUser = {
-                        id: uid(),
-                        name,
-                        email,
-                        password: btoa(password), // Simple encoding (NOT secure — use backend for production)
-                        avatar,
-                        createdAt: new Date().toISOString(),
-                    };
-                    appState.allUsers.push(newUser);
-                    saveUsers();
-                    appState.currentUserId = newUser.id;
-                    localStorage.setItem(KEYS.currentUserId, newUser.id);
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeAuthModal();
-                    updateUIForMode();
-                    showToast(`✅ Welcome, ${name}! Multi-user mode active.`);
-                    navigateTo('log');
-                    updateStatsRow();
-                } else {
-                    // Sign in
-                    const user = appState.allUsers.find(u => u.email === email && u.password === btoa(password));
-                    if (!user) {
-                        showToast('❌ Invalid email or password.');
-                        return;
-                    }
-                    appState.currentUserId = user.id;
-                    localStorage.setItem(KEYS.currentUserId, user.id);
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeAuthModal();
-                    updateUIForMode();
-                    showToast(`👋 Welcome back, ${user.name}!`);
-                    navigateTo('log');
-                    updateStatsRow();
-                }
-            }
-
-            function handleLogout() {
-                appState.currentUserId = null;
-                localStorage.removeItem(KEYS.currentUserId);
-                appState.mode = 'single';
-                localStorage.setItem(KEYS.appMode, 'single');
-                updateUIForMode();
-                showToast('👋 Signed out. Switched to single-user mode.');
-                navigateTo('log');
-                updateStatsRow();
-            }
-
-            // ─── UI STATE MANAGEMENT ──────────────
-            function updateUIForMode() {
-                const isMulti = appState.mode === 'multi' && appState.currentUserId;
-                $('#navLeaderboard').classList.toggle('hidden', !isMulti);
-                $('#userIndicator').style.display = isMulti ? 'flex' : 'none';
-                if (isMulti) {
-                    const user = getCurrentUser();
-                    if (user) {
-                        $('#userIndicator').innerHTML =
-                            `${user.avatar || '🏋️'} ${escapeHTML(user.name)} <button class="btn btn-ghost btn-sm" onclick="handleLogout()" style="margin-left:4px;font-size:10px;">✕</button>`;
-                    }
-                } else {
-                    $('#userIndicator').innerHTML = '';
-                }
-                // If on leaderboard page but mode is single, redirect
-                if (!isMulti && $('#page-leaderboard').classList.contains('active')) {
-                    navigateTo('log');
-                }
-                $('#appModeSelect').value = appState.mode;
-                loadEntries();
-                updateStatsRow();
-                updateSpotlightSelect();
-                if ($('#page-leaderboard').classList.contains('active')) renderLeaderboard();
-            }
-
-            // Expose logout to global scope for inline onclick
-            window.handleLogout = handleLogout;
-
-            // ─── INITIALIZATION ────────────────────
-            function init() {
-                // Load theme
-                const savedTheme = localStorage.getItem(KEYS.theme) || 'dark';
-                applyTheme(savedTheme);
-
-                // Load app mode
-                const savedMode = localStorage.getItem(KEYS.appMode) || 'single';
-                appState.mode = savedMode;
-
-                // Load spotlight lift
-                appState.spotlightLift = localStorage.getItem(KEYS.spotlightLift) || '';
-
-                if (appState.mode === 'multi') {
-                    const savedUserId = localStorage.getItem(KEYS.currentUserId);
-                    loadUsers();
-                    if (savedUserId && appState.allUsers.find(u => u.id === savedUserId)) {
-                        appState.currentUserId = savedUserId;
-                    } else {
-                        // Invalid session, revert to single
-                        appState.mode = 'single';
-                        localStorage.setItem(KEYS.appMode, 'single');
-                        localStorage.removeItem(KEYS.currentUserId);
-                        appState.currentUserId = null;
-                    }
-                }
-
-                updateUIForMode();
-                loadEntries();
-                updateStatsRow();
-                updateExerciseSuggestions();
-                $('#logDate').value = todayStr();
-                $('#spotlightLiftSelect').value = appState.spotlightLift;
-
-                // Set up nav tab clicks
-                $$('.nav-tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const page = tab.getAttribute('data-page');
-                        navigateTo(page);
-                    });
-                });
-
-                // Close modals on overlay click
-                $('#settingsModal').addEventListener('click', function(e) {
-                    if (e.target === this) closeSettings();
-                });
-                $('#authModal').addEventListener('click', function(e) {
-                    if (e.target === this) closeAuthModal();
-                });
-
-                // Keyboard shortcut: Escape to close modals
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        if (!$('#settingsModal').classList.contains('hidden')) closeSettings();
-                        if (!$('#authModal').classList.contains('hidden')) closeAuthModal();
-                    }
-                });
-
-                // Initial leaderboard render if needed
-                updateSpotlightSelect();
-
-                console.log('🏋️ TOPSET initialized — Mode:', appState.mode, '| Theme:', appState.theme);
-                console.log('💡 Tip: Toggle multi-user mode in Settings for leaderboard features.');
-            }
-
-            // ─── START APP ─────────────────────────
-            init();
-
-            // Expose functions needed by inline handlers
-            window.navigateTo = navigateTo;
-            window.toggleTheme = toggleTheme;
-            window.openSettings = openSettings;
-            window.closeSettings = closeSettings;
-            window.applySettings = applySettings;
-            window.handleModeChange = handleModeChange;
-            window.openAuthModal = openAuthModal;
-            window.closeAuthModal = closeAuthModal;
-            window.toggleAuthMode = toggleAuthMode;
-            window.handleAuthSubmit = handleAuthSubmit;
-            window.handleLogSubmit = handleLogSubmit;
-            window.renderHistory = renderHistory;
-            window.renderPRs = renderPRs;
-            window.renderLeaderboard = renderLeaderboard;
-            window.handleLogout = handleLogout;
-        })();
-    </script>
-</body>
-                    </html><!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOPSET — Strength Log</title>
-
-    <!-- Google Fonts: Bebas Neue for bold numbers, Inter for clean body text -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            /* Dark Theme (default) */
-            --bg: #0b0b0b;
-            --bg-card: #161616;
-            --bg-card-hover: #1e1e1e;
-            --bg-input: #1f1f1f;
-            --bg-modal: #1a1a1a;
-            --border: #2a2a2a;
-            --border-focus: #4ade80;
-            --text-primary: #f4f4f4;
-            --text-secondary: #a0a0a0;
-            --text-muted: #6b6b6b;
-            --accent-green: #4ade80;
-            --accent-green-dark: #22c55e;
-            --accent-yellow: #fbbf24;
-            --accent-yellow-dark: #f59e0b;
-            --accent-gold: #f5c518;
-            --danger: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.1);
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --radius: 10px;
-            --radius-sm: 6px;
-            --radius-lg: 16px;
-            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            --font-display: 'Bebas Neue', 'Impact', sans-serif;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --green-glow: 0 0 24px rgba(74, 222, 128, 0.25);
-            --yellow-glow: 0 0 24px rgba(251, 191, 36, 0.25);
-            --overlay: rgba(0, 0, 0, 0.7);
-        }
-
-        [data-theme="light"] {
-            --bg: #f5f5f5;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f9fafb;
-            --bg-input: #f0f0f0;
-            --bg-modal: #ffffff;
-            --border: #e0e0e0;
-            --border-focus: #16a34a;
-            --text-primary: #1a1a1a;
-            --text-secondary: #525252;
-            --text-muted: #9ca3af;
-            --accent-green: #16a34a;
-            --accent-green-dark: #15803d;
-            --accent-yellow: #d97706;
-            --accent-yellow-dark: #b45309;
-            --accent-gold: #c88a04;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-            --green-glow: 0 0 20px rgba(22, 163, 74, 0.2);
-            --yellow-glow: 0 0 20px rgba(217, 119, 6, 0.2);
-            --overlay: rgba(0, 0, 0, 0.4);
-            --danger-bg: rgba(239, 68, 68, 0.06);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: background var(--transition), color var(--transition);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* ─── HEADER ─────────────────────────── */
-        .header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 60px;
-            position: sticky;
-            top: 0;
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-around;
+            height: var(--bottom-nav-height);
             z-index: 100;
-            box-shadow: var(--shadow);
-            transition: background var(--transition), border var(--transition);
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
+        .bottom-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            padding: 8px 12px; border: none; background: transparent;
+            color: var(--text-muted); font-family: var(--font-body);
+            font-size: 10px; font-weight: 600; cursor: pointer;
+            transition: all var(--transition); border-radius: 8px; min-width: 60px;
+        }
+        .bottom-nav-item .nav-icon { font-size: 20px; }
+        .bottom-nav-item.active { color: var(--accent-green); font-weight: 700; }
+        .bottom-nav-item.active .nav-icon { transform: scale(1.1); }
+        .bottom-nav-item:active { background: var(--bg-card-hover); }
 
-        .logo {
-            font-family: var(--font-display);
-            font-size: 32px;
-            letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            user-select: none;
-            cursor: pointer;
+        @media (min-width: 769px) {
+            body { padding-bottom: 0; }
+            .bottom-nav { display: none; }
+            .header { padding: 0 24px; }
+            .logo { font-size: 30px; }
+            .desktop-nav { display: flex; gap: 4px; background: var(--bg-card); border-radius: var(--radius); padding: 4px; border: 1px solid var(--border); }
+            .nav-tab-desktop { font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); cursor: pointer; transition: all var(--transition); }
+            .nav-tab-desktop:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+            .nav-tab-desktop.active { background: var(--accent-green); color: #0b0b0b; font-weight: 700; box-shadow: var(--green-glow); }
         }
-        .logo .top {
-            color: var(--accent-green);
-            transition: color var(--transition);
-        }
-        .logo .set {
-            color: var(--accent-yellow);
-            transition: color var(--transition);
-        }
-        .logo-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--accent-green);
-            margin-left: 4px;
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(74, 222, 128, 0);
-            }
-        }
+        @media (max-width: 768px) { .desktop-nav { display: none; } }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .main-container { max-width: 900px; margin: 0 auto; padding: 16px 12px 24px; }
+        @media (min-width: 769px) { .main-container { padding: 24px 16px 40px; } }
 
-        .btn {
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: all var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-            letter-spacing: 0.3px;
-        }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 11px;
-        }
-        .btn-primary {
-            background: var(--accent-green);
-            color: #0b0b0b;
-            border-color: var(--accent-green);
-            font-weight: 700;
-        }
-        .btn-primary:hover {
-            background: var(--accent-green-dark);
-            border-color: var(--accent-green-dark);
-            box-shadow: var(--green-glow);
-            transform: translateY(-1px);
-        }
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border);
-            color: var(--text-primary);
-        }
-        .btn-outline:hover {
-            border-color: var(--accent-green);
-            color: var(--accent-green);
-        }
-        .btn-ghost {
-            background: transparent;
-            border-color: transparent;
-            color: var(--text-secondary);
-        }
-        .btn-ghost:hover {
-            color: var(--text-primary);
-            background: var(--bg-card-hover);
-        }
-        .btn-accent {
-            background: var(--accent-yellow);
-            color: #0b0b0b;
-            border-color: var(--accent-yellow);
-            font-weight: 700;
-        }
-        .btn-accent:hover {
-            background: var(--accent-yellow-dark);
-            border-color: var(--accent-yellow-dark);
-            box-shadow: var(--yellow-glow);
-        }
-        .btn-danger {
-            background: transparent;
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        .btn-danger:hover {
-            background: var(--danger-bg);
-        }
+        .page { display: none; animation: fadeSlideIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ─── NAV TABS ──────────────────────── */
-        .nav-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 4px;
-            border: 1px solid var(--border);
-            transition: all var(--transition);
-        }
-        .nav-tab {
-            font-family: var(--font-body);
-            font-size: 13px;
-            font-weight: 600;
-            padding: 8px 18px;
-            border-radius: var(--radius-sm);
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all var(--transition);
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-        .nav-tab:hover {
-            color: var(--text-primary);
-            background: var(--bg-card-hover);
-        }
-        .nav-tab.active {
-            background: var(--accent-green);
-            color: #0b0b0b;
-            font-weight: 700;
-            box-shadow: var(--green-glow);
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+        @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; } }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; box-shadow: var(--shadow); }
+        .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 2px; }
+        .stat-value { font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--text-primary); }
+        .stat-value.green { color: var(--accent-green); }
+        .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        @media (min-width: 600px) { .stat-value { font-size: 38px; } }
 
-        /* ─── MAIN CONTENT ──────────────────── */
-        .main-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px 16px 40px;
-        }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+        @media (min-width: 600px) { .card { padding: 24px; } }
+        .card-header { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
 
-        .page {
-            display: none;
-            animation: fadeSlideIn 0.3s ease;
+        .form-row { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        @media (min-width: 600px) { .form-row { grid-template-columns: 1fr 1fr; } }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .form-group input, .form-group select {
+            font-size: 16px; padding: 10px 12px; border-radius: 8px;
+            border: 2px solid var(--border); background: var(--bg-input);
+            color: var(--text-primary); font-weight: 500; width: 100%;
+            -webkit-appearance: none; appearance: none;
         }
-        .page.active {
-            display: block;
-        }
-        @keyframes fadeSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent-green); box-shadow: var(--green-glow); }
 
-        /* ─── STAT CARDS ROW ────────────────── */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px 18px;
-            transition: all var(--transition);
-            box-shadow: var(--shadow);
-        }
-        .stat-card:hover {
-            border-color: var(--accent-green);
-            box-shadow: var(--green-glow);
-        }
-        .stat-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-        .stat-value {
-            font-family: var(--font-display);
-            font-size: 42px;
-            line-height: 1;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-        }
-        .stat-value.green {
-            color: var(--accent-green);
-        }
-        .stat-value.yellow {
-            color: var(--accent-yellow);
-        }
-        .stat-sub {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
+        .submit-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+        @media (max-width: 599px) { .submit-row .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; } }
 
-        /* ─── CARDS & FORMS ─────────────────── */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            transition: all var(--transition);
-        }
-        .card-header {
-            font-family: var(--font-display);
-            font-size: 24px;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-primary);
-        }
-        .card-header .icon {
-            font-size: 28px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 10px;
-            align-items: end;
-            flex-wrap: wrap;
-        }
-        @media (max-width: 600px) {
-            .form-row {
-                grid-template-columns: 1fr 1fr;
-            }
-            .form-row .full-width-mobile {
-                grid-column: 1 / -1;
-            }
-            .nav-tabs {
-                gap: 1px;
-                padding: 3px;
-            }
-            .nav-tab {
-                padding: 7px 10px;
-                font-size: 11px;
-            }
-            .header {
-                padding: 0 10px;
-                height: 50px;
-            }
-            .logo {
-                font-size: 24px;
-            }
-            .stat-value {
-                font-size: 30px;
-            }
-            .btn {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .form-group label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-        }
-        .form-group input,
-        .form-group select {
-            font-family: var(--font-body);
-            font-size: 15px;
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            transition: all var(--transition);
-            font-weight: 500;
-            width: 100%;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-            box-shadow: var(--green-glow);
-        }
-        .form-group input::placeholder {
-            color: var(--text-muted);
-        }
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 400px; }
+        th { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); text-align: left; padding: 8px; border-bottom: 2px solid var(--border); }
+        td { padding: 8px; border-bottom: 1px solid var(--border); font-weight: 500; }
+        .num-cell { font-family: var(--font-display); font-size: 16px; }
+        .highlight-pr { color: var(--accent-green); font-weight: 700; }
+        .badge { display: inline-block; padding: 2px 6px; border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .badge-green { background: rgba(74,222,128,0.15); color: var(--accent-green); }
+        .badge-new { background: rgba(74,222,128,0.2); color: var(--accent-green); animation: pulse-badge 1.5s infinite; }
+        @keyframes pulse-badge { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
-        /* ─── TABLE ─────────────────────────── */
-        .table-wrapper {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        th {
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            text-align: left;
-            padding: 10px 12px;
-            border-bottom: 2px solid var(--border);
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--border);
-            font-weight: 500;
-        }
-        .num-cell {
-            font-family: var(--font-display);
-            font-size: 20px;
-            letter-spacing: 0.5px;
-        }
-        .highlight-pr {
-            color: var(--accent-green);
-            font-weight: 700;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .badge-green {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--accent-green);
-        }
-        .badge-yellow {
-            background: rgba(251, 191, 36, 0.15);
-            color: var(--accent-yellow);
-        }
-        .badge-new {
-            background: rgba(74, 222, 128, 0.2);
-            color: var(--accent-green);
-            animation: pulse-badge 1.5s ease-in-out infinite;
-        }
-        @keyframes pulse-badge {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
+        .leaderboard-rank { font-family: var(--font-display); font-size: 22px; text-align: center; min-width: 40px; }
+        .leaderboard-rank.gold { color: #f5c518; } .leaderboard-rank.silver { color: #c0c0c0; } .leaderboard-rank.bronze { color: #cd7f32; }
+        .avatar-circle { width: 30px; height: 30px; border-radius: 50%; background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid var(--border); }
 
-        /* ─── LEADERBOARD ──────────────────── */
-        .leaderboard-rank {
-            font-family: var(--font-display);
-            font-size: 28px;
-            text-align: center;
-            width: 50px;
-        }
-        .leaderboard-rank.gold {
-            color: #f5c518;
-        }
-        .leaderboard-rank.silver {
-            color: #c0c0c0;
-        }
-        .leaderboard-rank.bronze {
-            color: #cd7f32;
-        }
-        .avatar-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--bg-input);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-            border: 2px solid var(--border);
-        }
+        .modal-overlay { position: fixed; inset: 0; background: var(--overlay); z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+        @media (min-width: 600px) { .modal-overlay { align-items: center; } }
+        .modal { background: var(--bg-modal); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px 16px 28px; width: 100%; max-width: 440px; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+        @media (min-width: 600px) { .modal { border-radius: var(--radius-lg); padding: 28px; } }
+        .modal h2 { font-family: var(--font-display); font-size: 22px; margin-bottom: 16px; }
+        .modal-buttons { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; flex-wrap: wrap; }
 
-        /* ─── MODAL ─────────────────────────── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--overlay);
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        .modal {
-            background: var(--bg-modal);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            width: 90%;
-            max-width: 440px;
-            box-shadow: var(--shadow-lg);
-            animation: scaleIn 0.25s ease;
-        }
-        @keyframes scaleIn {
-            from {
-                transform: scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        .modal h2 {
-            font-family: var(--font-display);
-            font-size: 26px;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-        .modal .form-group {
-            margin-bottom: 12px;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
+        .toast-container { position: fixed; top: 12px; left: 12px; right: 12px; z-index: 300; display: flex; flex-direction: column; gap: 6px; }
+        @media (min-width: 600px) { .toast-container { left: auto; right: 20px; top: 20px; width: auto; } }
+        .toast { background: var(--bg-card); border: 1px solid var(--accent-green); border-radius: var(--radius-sm); padding: 10px 14px; font-weight: 600; font-size: 13px; color: var(--text-primary); box-shadow: var(--shadow-lg); text-align: center; animation: slideIn 0.3s ease, fadeOut 0.3s 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
 
-        /* ─── TOAST ─────────────────────────── */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--accent-green);
-            border-radius: var(--radius-sm);
-            padding: 12px 18px;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-lg);
-            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            max-width: 350px;
-        }
-        @keyframes slideInRight {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-        }
-
-        /* ─── EMPTY STATE ──────────────────── */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state .emoji {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 12px;
-        }
-
-        /* ─── FILTER BAR ───────────────────── */
-        .filter-bar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-            align-items: center;
-        }
-        .filter-bar select {
-            font-family: var(--font-body);
-            font-size: 13px;
-            padding: 7px 12px;
-            border-radius: var(--radius-sm);
-            border: 2px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .filter-bar select:focus {
-            outline: none;
-            border-color: var(--accent-green);
-        }
-
-        /* ─── MISC ──────────────────────────── */
-        .text-muted {
-            color: var(--text-muted);
-            font-size: 12px;
-        }
-        .text-green {
-            color: var(--accent-green);
-        }
-        .text-yellow {
-            color: var(--accent-yellow);
-        }
-        .mt-2 {
-            margin-top: 8px;
-        }
-        .mt-4 {
-            margin-top: 16px;
-        }
-        .mb-4 {
-            margin-bottom: 16px;
-        }
-        .gap-2 {
-            gap: 8px;
-        }
-        .flex-wrap {
-            flex-wrap: wrap;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .user-indicator {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--accent-green);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .empty-state { text-align: center; padding: 32px 16px; color: var(--text-muted); }
+        .empty-state .emoji { font-size: 40px; display: block; margin-bottom: 10px; }
+        .hidden { display: none !important; }
+        .mt-2 { margin-top: 8px; }
+        .text-muted { color: var(--text-muted); font-size: 11px; }
     </style>
 </head>
 <body>
 
-    <!-- ═══════════ HEADER ═══════════════════ -->
-    <header class="header">
-        <div class="logo" onclick="navigateTo('log')" title="TOPSET — Home">
-            <span class="top">TOP</span><span class="set">SET</span>
-            <span class="logo-dot"></span>
+<header class="header">
+    <div class="logo" onclick="navigateTo('log')"><span class="top">TOP</span><span class="set">SET</span><span class="logo-dot"></span></div>
+    <div class="header-actions">
+        <span class="user-indicator hidden" id="userIndicator"></span>
+        <nav class="desktop-nav" id="desktopNav">
+            <button class="nav-tab-desktop active" data-page="log">📝 Log</button>
+            <button class="nav-tab-desktop" data-page="history">📋 History</button>
+            <button class="nav-tab-desktop" data-page="prs">🏆 PRs</button>
+            <button class="nav-tab-desktop hidden" data-page="leaderboard" id="desktopNavLeaderboard">📊 Board</button>
+        </nav>
+        <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeToggleBtn"><span id="themeIcon">🌙</span></button>
+        <button class="btn btn-outline btn-sm" onclick="openSettings()">⚙️</button>
+    </div>
+</header>
+
+<nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-page="log"><span class="nav-icon">📝</span> Log</button>
+    <button class="bottom-nav-item" data-page="history"><span class="nav-icon">📋</span> History</button>
+    <button class="bottom-nav-item" data-page="prs"><span class="nav-icon">🏆</span> PRs</button>
+    <button class="bottom-nav-item hidden" data-page="leaderboard" id="bottomNavLeaderboard"><span class="nav-icon">📊</span> Board</button>
+</nav>
+
+<div class="main-container">
+
+    <!-- LOG PAGE -->
+    <div class="page active" id="page-log">
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value green" id="statStreak">0</div><div class="stat-sub">days</div></div>
+            <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value" id="statTotalEntries">0</div><div class="stat-sub">sessions</div></div>
+            <div class="stat-card"><div class="stat-label">Tests Tracked</div><div class="stat-value green" id="statUniqueTests">0</div><div class="stat-sub">unique tests</div></div>
+            <div class="stat-card"><div class="stat-label">PRs Achieved</div><div class="stat-value yellow" id="statPRCount">0</div><div class="stat-sub">personal bests</div></div>
         </div>
-        <div class="header-right">
-            <span class="user-indicator" id="userIndicator" style="display:none;"></span>
-            <nav class="nav-tabs" id="navTabs">
-                <button class="nav-tab active" data-page="log">📝 Log</button>
-                <button class="nav-tab" data-page="history">📋 History</button>
-                <button class="nav-tab" data-page="prs">🏆 PRs</button>
-                <button class="nav-tab hidden" data-page="leaderboard" id="navLeaderboard">📊 Board</button>
-            </nav>
-            <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light mode" aria-label="Toggle theme">
-                <span id="themeIcon">🌙</span>
-            </button>
-            <button class="btn btn-outline btn-sm" onclick="openSettings()" title="Settings">⚙️</button>
-        </div>
-    </header>
 
-    <!-- ═══════════ MAIN CONTENT ═════════════ -->
-    <div class="main-container">
-
-        <!-- ─── LOG PAGE ──────────────────────── -->
-        <div class="page active" id="page-log">
-            <div class="stats-row" id="statsRow">
-                <div class="stat-card">
-                    <div class="stat-label">Current Streak</div>
-                    <div class="stat-value green" id="statStreak">0</div>
-                    <div class="stat-sub">days</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Workouts</div>
-                    <div class="stat-value" id="statTotalWorkouts">0</div>
-                    <div class="stat-sub">sessions</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Volume</div>
-                    <div class="stat-value yellow" id="statTotalVolume">0</div>
-                    <div class="stat-sub">lbs total</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Exercises Tracked</div>
-                    <div class="stat-value green" id="statUniqueExercises">0</div>
-                    <div class="stat-sub">unique lifts</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header"><span class="icon">💪</span> Log a Set</div>
-                <form id="logForm" onsubmit="handleLogSubmit(event)">
-                    <div class="form-row">
-                        <div class="form-group full-width-mobile">
-                            <label>Exercise Name</label>
-                            <input type="text" id="logExercise" placeholder="e.g. Bench Press" required list="exerciseSuggestions" autocomplete="off">
-                            <datalist id="exerciseSuggestions"></datalist>
-                        </div>
-                        <div class="form-group">
-                            <label>Weight (lbs)</label>
-                            <input type="number" id="logWeight" placeholder="225" required min="0" step="0.5">
-                        </div>
-                        <div class="form-group">
-                            <label>Sets</label>
-                            <input type="number" id="logSets" placeholder="3" required min="1" value="3">
-                        </div>
-                        <div class="form-group">
-                            <label>Reps</label>
-                            <input type="number" id="logReps" placeholder="5" required min="1" value="5">
-                        </div>
+        <div class="card">
+            <div class="card-header"><span>💪</span> Log Test Result</div>
+            <form id="logForm" onsubmit="handleLogSubmit(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Test</label>
+                        <select id="logTest" required onchange="updateResultField()">
+                            <option value="">-- Select --</option>
+                            <option value="Broad Jump">Broad Jump (m)</option>
+                            <option value="3km Run">3km Run</option>
+                            <option value="2:00 Push-ups">2:00 Push-ups</option>
+                            <option value="2:00 Sit-ups">2:00 Sit-ups</option>
+                            <option value="Sit and Reach">Sit and Reach (cm)</option>
+                            <option value="Bodyweight">Bodyweight (kg)</option>
+                        </select>
                     </div>
-                    <div class="form-row mt-2" style="grid-template-columns: 1fr auto;">
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" id="logDate" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="align-self: flex-end; height: 42px; padding: 0 24px;">
-                            ✅ Log Set
-                        </button>
+                    <div class="form-group" id="resultGroup">
+                        <label id="resultLabel">Result</label>
+                        <input type="text" id="logResult" placeholder="Select test" required autocomplete="off">
                     </div>
-                </form>
+                </div>
+                <div class="form-row" style="margin-top:8px;">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="logDate" required>
+                    </div>
+                </div>
+                <div class="submit-row">
+                    <button type="submit" class="btn btn-primary">✅ Log Result</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page" id="page-history">
+        <div class="card">
+            <div class="card-header"><span>📋</span> Workout History</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Date</th><th>Test</th><th>Result</th><th>Notes</th></tr></thead>
+                    <tbody id="historyTableBody"></tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        <!-- ─── HISTORY PAGE ──────────────────── -->
-        <div class="page" id="page-history">
-            <div class="card">
-                <div class="card-header"><span class="icon">📋</span> Workout History</div>
-                <div class="filter-bar">
-                    <label style="font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Filter:</label>
-                    <select id="historyFilter" onchange="renderHistory()">
-                        <option value="all">All Exercises</option>
-                    </select>
-                </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Exercise</th>
-                                <th>Weight</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Volume</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No workouts logged yet.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- PRs PAGE -->
+    <div class="page" id="page-prs">
+        <div class="card">
+            <div class="card-header"><span>🏆</span> Personal Records</div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Test</th><th>Best Result</th><th>Date</th><th>Status</th></tr></thead>
+                    <tbody id="prTableBody"></tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        <!-- ─── PRs PAGE ──────────────────────── -->
-        <div class="page" id="page-prs">
-            <div class="card">
-                <div class="card-header"><span class="icon">🏆</span> Personal Records</div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>PR Weight</th>
-                                <th>Date Set</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="prTableBody">
-                            <tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- ─── LEADERBOARD PAGE ──────────────── -->
-        <div class="page" id="page-leaderboard">
-            <div class="card">
-                <div class="card-header">
-                    <span class="icon">📊</span> Leaderboard
-                    <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">
-                        Spotlight Lift:
-                    </span>
-                    <select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:6px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;cursor:pointer;">
+    <!-- LEADERBOARD PAGE -->
+    <div class="page" id="page-leaderboard">
+        <div class="card">
+            <div class="card-header"><span>📊</span> Leaderboard</div>
+            <div class="form-row" style="margin-bottom:12px;">
+                <div class="form-group">
+                    <label>Spotlight Test</label>
+                    <select id="spotlightLiftSelect" onchange="renderLeaderboard()">
                         <option value="">-- Select --</option>
                     </select>
                 </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>User</th>
-                                <th>Lift</th>
-                                <th>PR Weight</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardTableBody">
-                            <tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead><tr><th>Rank</th><th>User</th><th>Test</th><th>Best</th><th>Date</th></tr></thead>
+                    <tbody id="leaderboardTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- ═══════════ SETTINGS MODAL ════════════ -->
-    <div class="modal-overlay hidden" id="settingsModal">
-        <div class="modal">
-            <h2>⚙️ Settings</h2>
-            <div class="form-group">
-                <label>App Mode</label>
-                <select id="appModeSelect" onchange="handleModeChange()">
-                    <option value="single">Single User (Default)</option>
-                    <option value="multi">Multi-User / Leaderboard Mode</option>
-                </select>
-                <span class="text-muted mt-2">Multi-user mode enables profiles & leaderboard.</span>
-            </div>
-            <div id="multiUserSettings" class="hidden mt-4">
-                <p style="font-weight:600;color:var(--accent-yellow);">⚠️ Switching to multi-user mode requires creating a profile.</p>
-            </div>
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay hidden" id="settingsModal">
+    <div class="modal">
+        <h2>⚙️ Settings</h2>
+        <div class="form-group">
+            <label>App Mode</label>
+            <select id="appModeSelect" onchange="handleModeChange()">
+                <option value="single">Single User</option>
+                <option value="multi">Multi-User / Leaderboard</option>
+            </select>
+            <span class="text-muted mt-2">Multi-user mode enables profiles & leaderboard.</span>
+        </div>
+        <div id="multiUserSettings" class="hidden mt-2"><p style="font-weight:600;color:var(--accent-yellow);">⚠️ Switching requires creating a profile.</p></div>
+        <div class="modal-buttons">
+            <button class="btn btn-outline" onclick="closeSettings()">Close</button>
+            <button class="btn btn-primary" onclick="applySettings()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay hidden" id="authModal">
+    <div class="modal">
+        <h2 id="authModalTitle">🔐 Sign In</h2>
+        <form id="authForm" onsubmit="handleAuthSubmit(event)">
+            <div class="form-group"><label>Email</label><input type="email" id="authEmail" placeholder="you@example.com" required></div>
+            <div class="form-group"><label>Password</label><input type="password" id="authPassword" placeholder="••••••••" required minlength="4"></div>
+            <div class="form-group hidden" id="authNameGroup"><label>Display Name</label><input type="text" id="authName" placeholder="Your name" maxlength="30"></div>
+            <div class="form-group hidden" id="authAvatarGroup"><label>Avatar (emoji)</label><input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️"></div>
             <div class="modal-buttons">
-                <button class="btn btn-outline" onclick="closeSettings()">Close</button>
-                <button class="btn btn-primary" onclick="applySettings()">Save</button>
+                <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button>
+                <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
             </div>
-        </div>
+        </form>
+        <button class="btn btn-outline btn-sm mt-2 btn-block" onclick="closeAuthModal()">Cancel</button>
     </div>
+</div>
 
-    <!-- ═══════════ AUTH MODAL ════════════════ -->
-    <div class="modal-overlay hidden" id="authModal">
-        <div class="modal">
-            <h2 id="authModalTitle">🔐 Sign In</h2>
-            <form id="authForm" onsubmit="handleAuthSubmit(event)">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="authEmail" placeholder="you@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="authPassword" placeholder="••••••••" required minlength="4">
-                </div>
-                <div class="form-group hidden" id="authNameGroup">
-                    <label>Display Name</label>
-                    <input type="text" id="authName" placeholder="Your name" maxlength="30">
-                </div>
-                <div class="form-group hidden" id="authAvatarGroup">
-                    <label>Avatar (emoji)</label>
-                    <input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️">
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button>
-                    <button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button>
-                </div>
-            </form>
-            <button class="btn btn-outline btn-sm mt-2" onclick="closeAuthModal()" style="width:100%;">Cancel</button>
-        </div>
-    </div>
+<div class="toast-container" id="toastContainer"></div>
 
-    <!-- ═══════════ TOAST CONTAINER ═══════════ -->
-    <div class="toast-container" id="toastContainer"></div>
+<script>
+    (function() {
+        // ─── CONFIG: tests and their properties ─────
+        const TESTS = [
+            { id: 'broad_jump', name: 'Broad Jump', unit: 'm', higherIsBetter: true, inputType: 'number', step: '0.01', placeholder: '2.50' },
+            { id: '3km_run', name: '3km Run', unit: 'time', higherIsBetter: false, inputType: 'text', placeholder: '12:30' },
+            { id: 'pushups', name: '2:00 Push-ups', unit: 'reps', higherIsBetter: true, inputType: 'number', placeholder: '50' },
+            { id: 'situps', name: '2:00 Sit-ups', unit: 'reps', higherIsBetter: true, inputType: 'number', placeholder: '45' },
+            { id: 'sit_reach', name: 'Sit and Reach', unit: 'cm', higherIsBetter: true, inputType: 'number', step: '0.1', placeholder: '30' },
+            { id: 'bodyweight', name: 'Bodyweight', unit: 'kg', higherIsBetter: true, inputType: 'number', step: '0.1', placeholder: '80' }
+        ];
 
-    <!-- ═══════════ SCRIPTS ═══════════════════ -->
-    <script>
-        (function() {
-            // ─── CONSTANTS ──────────────────────────
-            const STORAGE_PREFIX = 'topset_';
-            const KEYS = {
-                theme: STORAGE_PREFIX + 'theme',
-                appMode: STORAGE_PREFIX + 'mode',
-                entriesSingle: STORAGE_PREFIX + 'entries_single',
-                users: STORAGE_PREFIX + 'users',
-                currentUserId: STORAGE_PREFIX + 'current_user_id',
-                spotlightLift: STORAGE_PREFIX + 'spotlight_lift',
+        function getTestConfig(testName) {
+            return TESTS.find(t => t.name === testName) || null;
+        }
+
+        // ─── STORAGE KEYS ──────────────────────
+        const STORAGE_PREFIX = 'topset_';
+        const KEYS = {
+            theme: STORAGE_PREFIX + 'theme',
+            appMode: STORAGE_PREFIX + 'mode',
+            entriesSingle: STORAGE_PREFIX + 'entries_single',
+            users: STORAGE_PREFIX + 'users',
+            currentUserId: STORAGE_PREFIX + 'current_user_id',
+            spotlightLift: STORAGE_PREFIX + 'spotlight_lift',
+        };
+
+        let appState = {
+            mode: 'single',
+            currentUserId: null,
+            theme: 'dark',
+            entries: [],
+            allUsers: [],
+            spotlightLift: ''
+        };
+
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,6); }
+        function todayStr() { return new Date().toISOString().split('T')[0]; }
+        function formatDate(d) { return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }
+        function daysAgo(d) { return Math.floor((new Date()-new Date(d+'T00:00:00'))/(1000*60*60*24)); }
+
+        function showToast(msg) {
+            const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+            $('#toastContainer').appendChild(t); setTimeout(()=>t.remove(),3000);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            appState.theme = theme;
+            localStorage.setItem(KEYS.theme, theme);
+            $('#themeIcon').textContent = theme==='dark'?'☀️':'🌙';
+        }
+        window.toggleTheme = function() { applyTheme(appState.theme==='dark'?'light':'dark'); };
+
+        // ─── DATA ─────────────────────────────
+        function getEntriesKey() {
+            return appState.mode==='multi' && appState.currentUserId ? STORAGE_PREFIX+'entries_'+appState.currentUserId : KEYS.entriesSingle;
+        }
+        function loadEntries() {
+            const raw = localStorage.getItem(getEntriesKey());
+            try { appState.entries = raw ? JSON.parse(raw) : []; } catch(e) { appState.entries = []; }
+            appState.entries = appState.entries.map(e => ({...e, id:e.id||uid(), date:e.date||todayStr(), test:e.test||'Unknown', value:parseFloat(e.value)||0 }));
+        }
+        function saveEntries() { localStorage.setItem(getEntriesKey(), JSON.stringify(appState.entries)); }
+
+        function addEntry(entryData) {
+            const entry = {
+                id: uid(),
+                test: entryData.test,
+                value: entryData.value,
+                date: entryData.date || todayStr(),
+                timestamp: Date.now()
             };
+            appState.entries.unshift(entry);
+            saveEntries();
+            return entry;
+        }
 
-            // ─── STATE ─────────────────────────────
-            let appState = {
-                mode: 'single', // 'single' | 'multi'
-                currentUserId: null, // set in multi mode
-                theme: 'dark',
-                entries: [], // loaded entries for current context
-                allUsers: [], // multi-mode user list
-                spotlightLift: '',
-            };
+        function loadUsers() { try { appState.allUsers = JSON.parse(localStorage.getItem(KEYS.users)||'[]'); } catch(e) { appState.allUsers = []; } }
+        function saveUsers() { localStorage.setItem(KEYS.users, JSON.stringify(appState.allUsers)); }
+        function getCurrentUser() { return appState.mode==='multi'&&appState.currentUserId ? appState.allUsers.find(u=>u.id===appState.currentUserId) : null; }
 
-            // ─── DOM REFS ──────────────────────────
-            const $ = (sel) => document.querySelector(sel);
-            const $$ = (sel) => document.querySelectorAll(sel);
-
-            // ─── UTILS ─────────────────────────────
-            function uid() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+        // ─── STREAK ───────────────────────────
+        function calculateStreak(entries) {
+            if(!entries.length) return 0;
+            const dates = [...new Set(entries.map(e=>e.date))].sort().reverse();
+            if(dates[0]!==todayStr() && daysAgo(dates[0])>1) return 0;
+            let streak=0; const today=new Date(); today.setHours(0,0,0,0);
+            for(let i=0;i<dates.length;i++) {
+                const d = new Date(dates[i]+'T00:00:00');
+                const expected = new Date(today); expected.setDate(expected.getDate()-i);
+                if(d.getTime()===expected.getTime()) streak++;
+                else if(i===0 && daysAgo(dates[i])===1) {
+                    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+                    if(d.getTime()===yesterday.getTime()) { streak=1; continue; }
+                    else break;
+                } else break;
             }
+            return streak;
+        }
 
-            function todayStr() {
-                return new Date().toISOString().split('T')[0];
-            }
-
-            function formatDate(dateStr) {
-                const d = new Date(dateStr + 'T00:00:00');
-                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            }
-
-            function daysAgo(dateStr) {
-                const d = new Date(dateStr + 'T00:00:00');
-                const now = new Date();
-                now.setHours(0, 0, 0, 0);
-                return Math.floor((now - d) / (1000 * 60 * 60 * 24));
-            }
-
-            function showToast(msg) {
-                const container = $('#toastContainer');
-                const toast = document.createElement('div');
-                toast.className = 'toast';
-                toast.textContent = msg;
-                container.appendChild(toast);
-                setTimeout(() => toast.remove(), 3000);
-            }
-
-            // ─── THEME ──────────────────────────────
-            function applyTheme(theme) {
-                document.documentElement.setAttribute('data-theme', theme);
-                appState.theme = theme;
-                localStorage.setItem(KEYS.theme, theme);
-                $('#themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
-            }
-
-            function toggleTheme() {
-                const next = appState.theme === 'dark' ? 'light' : 'dark';
-                applyTheme(next);
-            }
-
-            // ─── DATA PERSISTENCE ──────────────────
-            function getEntriesKey() {
-                if (appState.mode === 'multi' && appState.currentUserId) {
-                    return STORAGE_PREFIX + 'entries_' + appState.currentUserId;
+        // ─── PRS ──────────────────────────────
+        function getPersonalBests(entries) {
+            const bestMap = {};
+            entries.forEach(e => {
+                const testName = e.test;
+                const config = getTestConfig(testName);
+                if(!config) return;
+                const key = testName;
+                if(!bestMap[key]) bestMap[key] = e;
+                else {
+                    if(config.higherIsBetter ? e.value > bestMap[key].value : e.value < bestMap[key].value) {
+                        bestMap[key] = e;
+                    } else if(e.value === bestMap[key].value && e.date > bestMap[key].date) {
+                        bestMap[key] = e;
+                    }
                 }
-                return KEYS.entriesSingle;
-            }
+            });
+            return Object.values(bestMap);
+        }
 
-            function loadEntries() {
-                const key = getEntriesKey();
+        // ─── RENDER ───────────────────────────
+        function updateStatsRow() {
+            loadEntries();
+            $('#statStreak').textContent = calculateStreak(appState.entries);
+            $('#statTotalEntries').textContent = appState.entries.length;
+            $('#statUniqueTests').textContent = [...new Set(appState.entries.map(e=>e.test))].length;
+            $('#statPRCount').textContent = getPersonalBests(appState.entries).length;
+        }
+
+        function updateResultField() {
+            const test = $('#logTest').value;
+            const config = getTestConfig(test);
+            const group = $('#resultGroup');
+            const label = $('#resultLabel');
+            const input = $('#logResult');
+            if(!config) {
+                label.textContent = 'Result';
+                input.placeholder = 'Select test';
+                input.type = 'text';
+                return;
+            }
+            label.textContent = config.unit==='time' ? 'Time (mm:ss)' : `Result (${config.unit})`;
+            input.type = config.inputType;
+            input.step = config.step || '1';
+            input.placeholder = config.placeholder;
+            input.value = '';
+        }
+
+        function parseResult(testName, raw) {
+            const config = getTestConfig(testName);
+            if(!config) return NaN;
+            if(config.unit === 'time') {
+                const parts = raw.split(':');
+                if(parts.length === 2) {
+                    const min = parseInt(parts[0],10);
+                    const sec = parseInt(parts[1],10);
+                    if(!isNaN(min) && !isNaN(sec)) return min*60 + sec;
+                }
+                return NaN;
+            }
+            return parseFloat(raw);
+        }
+
+        window.handleLogSubmit = function(e) {
+            e.preventDefault();
+            const test = $('#logTest').value;
+            const raw = $('#logResult').value.trim();
+            const date = $('#logDate').value || todayStr();
+            if(!test) return showToast('Please select a test.');
+            const value = parseResult(test, raw);
+            if(isNaN(value)) return showToast('Invalid result format.');
+            const entry = addEntry({ test, value, date });
+            const config = getTestConfig(test);
+            const display = config && config.unit==='time' ? raw : `${value} ${config?.unit||''}`;
+            showToast(`✅ ${test}: ${display} logged!`);
+            $('#logTest').value = ''; $('#logResult').value = ''; $('#logDate').value = todayStr();
+            updateResultField();
+            updateStatsRow();
+        };
+
+        function renderHistory() {
+            loadEntries();
+            const tbody = $('#historyTableBody');
+            if(!appState.entries.length) return tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><span class="emoji">📭</span>No entries yet.</td></tr>';
+            tbody.innerHTML = appState.entries.map(e => {
+                const config = getTestConfig(e.test);
+                const display = config && config.unit==='time' ? formatTime(e.value) : `${e.value} ${config?.unit||''}`;
+                return `<tr><td>${formatDate(e.date)}</td><td><strong>${escapeHTML(e.test)}</strong></td><td class="num-cell">${display}</td><td class="text-muted">-</td></tr>`;
+            }).join('');
+        }
+
+        function renderPRs() {
+            loadEntries();
+            const prs = getPersonalBests(appState.entries);
+            const tbody = $('#prTableBody');
+            if(!prs.length) return tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet.</td></tr>';
+            tbody.innerHTML = prs.map(pr => {
+                const config = getTestConfig(pr.test);
+                const display = config && config.unit==='time' ? formatTime(pr.value) : `${pr.value} ${config?.unit||''}`;
+                const isRecent = daysAgo(pr.date) <= 7;
+                return `<tr><td><strong>${escapeHTML(pr.test)}</strong></td><td class="num-cell highlight-pr">${display}</td><td>${formatDate(pr.date)}</td><td><span class="badge ${isRecent?'badge-new':'badge-green'}">${isRecent?'🔥 RECENT':'PR'}</span></td></tr>`;
+            }).join('');
+        }
+
+        function renderLeaderboard() {
+            if(appState.mode !== 'multi') {
+                $('#leaderboardTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><span class="emoji">🔒</span>Enable multi-user mode in Settings.</td></tr>';
+                updateSpotlightSelect();
+                return;
+            }
+            loadUsers();
+            const spotlight = $('#spotlightLiftSelect').value || appState.spotlightLift;
+            if(!spotlight) {
+                $('#leaderboardTableBody').innerHTML = '<tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight test.</td></tr>';
+                updateSpotlightSelect();
+                return;
+            }
+            appState.spotlightLift = spotlight;
+            localStorage.setItem(KEYS.spotlightLift, spotlight);
+            updateSpotlightSelect();
+
+            const config = getTestConfig(spotlight);
+            const rankings = [];
+            appState.allUsers.forEach(user => {
+                const key = STORAGE_PREFIX+'entries_'+user.id;
                 const raw = localStorage.getItem(key);
-                try {
-                    appState.entries = raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    appState.entries = [];
+                let userEntries = [];
+                try { userEntries = raw ? JSON.parse(raw) : []; } catch(e) {}
+                const matching = userEntries.filter(e => e.test === spotlight);
+                if(matching.length) {
+                    const best = matching.reduce((best, e) => {
+                        if(!config) return e;
+                        if(config.higherIsBetter ? e.value > best.value : e.value < best.value) return e;
+                        if(e.value === best.value && e.date > best.date) return e;
+                        return best;
+                    }, matching[0]);
+                    rankings.push({ user, ...best });
                 }
-                // Ensure all entries have ids
-                appState.entries = appState.entries.map(e => ({
-                    ...e,
-                    id: e.id || uid(),
-                    date: e.date || todayStr(),
-                    exercise: e.exercise || 'Unknown',
-                    weight: parseFloat(e.weight) || 0,
-                    sets: parseInt(e.sets) || 1,
-                    reps: parseInt(e.reps) || 1,
-                }));
-            }
+            });
+            if(config) rankings.sort((a,b) => config.higherIsBetter ? b.value - a.value : a.value - b.value);
 
-            function saveEntries() {
-                const key = getEntriesKey();
-                localStorage.setItem(key, JSON.stringify(appState.entries));
-            }
-
-            function addEntry(entryData) {
-                const entry = {
-                    id: uid(),
-                    exercise: entryData.exercise.trim(),
-                    weight: parseFloat(entryData.weight),
-                    sets: parseInt(entryData.sets),
-                    reps: parseInt(entryData.reps),
-                    date: entryData.date || todayStr(),
-                    timestamp: Date.now(),
-                };
-                appState.entries.unshift(entry);
-                saveEntries();
-                return entry;
-            }
-
-            function deleteEntry(entryId) {
-                appState.entries = appState.entries.filter(e => e.id !== entryId);
-                saveEntries();
-            }
-
-            function loadUsers() {
-                const raw = localStorage.getItem(KEYS.users);
-                try {
-                    appState.allUsers = raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    appState.allUsers = [];
-                }
-            }
-
-            function saveUsers() {
-                localStorage.setItem(KEYS.users, JSON.stringify(appState.allUsers));
-            }
-
-            function getCurrentUser() {
-                if (appState.mode !== 'multi' || !appState.currentUserId) return null;
-                return appState.allUsers.find(u => u.id === appState.currentUserId) || null;
-            }
-
-            // ─── STREAK CALCULATION ────────────────
-            function calculateStreak(entries) {
-                if (!entries.length) return 0;
-                const dates = [...new Set(entries.map(e => e.date))].sort().reverse();
-                if (dates[0] !== todayStr() && daysAgo(dates[0]) > 1) return 0;
-                let streak = 0;
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                for (let i = 0; i < dates.length; i++) {
-                    const d = new Date(dates[i] + 'T00:00:00');
-                    const expected = new Date(today);
-                    expected.setDate(expected.getDate() - i);
-                    if (d.getTime() === expected.getTime()) {
-                        streak++;
-                    } else if (i === 0 && daysAgo(dates[i]) === 1) {
-                        // Started yesterday
-                        const yesterday = new Date(today);
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        if (d.getTime() === yesterday.getTime()) {
-                            streak = 1;
-                            const checkToday = new Date(today);
-                            for (let j = 1; j < dates.length; j++) {
-                                const dd = new Date(dates[j] + 'T00:00:00');
-                                const exp = new Date(yesterday);
-                                exp.setDate(exp.getDate() - j);
-                                if (dd.getTime() === exp.getTime()) streak++;
-                                else break;
-                            }
-                            return streak;
-                        }
-                        break;
-                    } else {
-                        break;
-                    }
-                }
-                return streak;
-            }
-
-            // ─── PR CALCULATION ────────────────────
-            function getPersonalBests(entries) {
-                const bestMap = {};
-                entries.forEach(e => {
-                    const key = e.exercise.toLowerCase().trim();
-                    if (!bestMap[key] || e.weight > bestMap[key].weight) {
-                        bestMap[key] = {
-                            exercise: e.exercise.trim(),
-                            weight: e.weight,
-                            date: e.date,
-                            id: e.id,
-                        };
-                    } else if (bestMap[key] && e.weight === bestMap[key].weight && e.date > bestMap[key].date) {
-                        bestMap[key].date = e.date;
-                        bestMap[key].id = e.id;
-                    }
-                });
-                return Object.values(bestMap).sort((a, b) => b.weight - a.weight);
-            }
-
-            function getTotalVolume(entries) {
-                return entries.reduce((sum, e) => sum + (e.weight * e.sets * e.reps), 0);
-            }
-
-            function getUniqueExercises(entries) {
-                return [...new Set(entries.map(e => e.exercise.toLowerCase().trim()))].length;
-            }
-
-            function getTotalWorkoutDays(entries) {
-                return [...new Set(entries.map(e => e.date))].length;
-            }
-
-            // ─── NAVIGATION ────────────────────────
-            function navigateTo(pageName) {
-                $$('.page').forEach(p => p.classList.remove('active'));
-                $$('.nav-tab').forEach(t => t.classList.remove('active'));
-                const page = $('#page-' + pageName);
-                if (page) page.classList.add('active');
-                const tab = document.querySelector(`.nav-tab[data-page="${pageName}"]`);
-                if (tab) tab.classList.add('active');
-                if (pageName === 'history') renderHistory();
-                if (pageName === 'prs') renderPRs();
-                if (pageName === 'leaderboard') renderLeaderboard();
-                if (pageName === 'log') updateStatsRow();
-            }
-
-            // ─── RENDER FUNCTIONS ──────────────────
-            function updateStatsRow() {
-                loadEntries();
-                const streak = calculateStreak(appState.entries);
-                const totalWorkouts = getTotalWorkoutDays(appState.entries);
-                const totalVolume = getTotalVolume(appState.entries);
-                const uniqueEx = getUniqueExercises(appState.entries);
-                $('#statStreak').textContent = streak;
-                $('#statTotalWorkouts').textContent = totalWorkouts;
-                $('#statTotalVolume').textContent = totalVolume.toLocaleString();
-                $('#statUniqueExercises').textContent = uniqueEx;
-                updateExerciseSuggestions();
-            }
-
-            function updateExerciseSuggestions() {
-                const datalist = $('#exerciseSuggestions');
-                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
-                datalist.innerHTML = exercises.map(ex => `<option value="${ex}">`).join('');
-            }
-
-            function renderHistory() {
-                loadEntries();
-                const filterVal = $('#historyFilter').value;
-                updateHistoryFilterOptions();
-                let filtered = appState.entries;
-                if (filterVal && filterVal !== 'all') {
-                    filtered = filtered.filter(e => e.exercise.toLowerCase().trim() === filterVal.toLowerCase().trim());
-                }
-                const tbody = $('#historyTableBody');
-                if (!filtered.length) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="6" class="empty-state"><span class="emoji">📭</span>No entries found.</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = filtered.map((e, i) => `
-                <tr>
-                  <td>${formatDate(e.date)}</td>
-                  <td><strong>${escapeHTML(e.exercise)}</strong></td>
-                  <td class="num-cell">${e.weight} <span class="text-muted">lbs</span></td>
-                  <td>${e.sets}</td>
-                  <td>${e.reps}</td>
-                  <td class="num-cell" style="font-size:16px;">${(e.weight * e.sets * e.reps).toLocaleString()}</td>
-                </tr>
-              `).join('');
-            }
-
-            function updateHistoryFilterOptions() {
-                const select = $('#historyFilter');
-                const currentVal = select.value;
-                const exercises = [...new Set(appState.entries.map(e => e.exercise.trim()))].sort();
-                select.innerHTML = '<option value="all">All Exercises</option>' +
-                    exercises.map(ex => `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`)
-                    .join('');
-            }
-
-            function renderPRs() {
-                loadEntries();
-                const prs = getPersonalBests(appState.entries);
-                const tbody = $('#prTableBody');
-                if (!prs.length) {
-                    tbody.innerHTML =
-                        '<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet. Start logging!</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = prs.map(pr => {
-                    const isRecent = daysAgo(pr.date) <= 7;
-                    const badgeClass = isRecent ? 'badge badge-new' : 'badge badge-green';
-                    const badgeText = isRecent ? '🔥 RECENT' : 'PR';
-                    return `
-                  <tr>
-                    <td><strong>${escapeHTML(pr.exercise)}</strong></td>
-                    <td class="num-cell highlight-pr">${pr.weight} <span class="text-muted">lbs</span></td>
-                    <td>${formatDate(pr.date)}</td>
-                    <td><span class="${badgeClass}">${badgeText}</span></td>
-                  </tr>
-                `;
-                }).join('');
-            }
-
-            function renderLeaderboard() {
-                if (appState.mode !== 'multi') {
-                    $('#leaderboardTableBody').innerHTML =
-                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🔒</span>Enable multi-user mode in Settings to use the leaderboard.</td></tr>';
-                    updateSpotlightSelect();
-                    return;
-                }
-                loadUsers();
-                const spotlight = $('#spotlightLiftSelect').value || appState.spotlightLift;
-                if (!spotlight) {
-                    $('#leaderboardTableBody').innerHTML =
-                        '<tr><td colspan="5" class="empty-state"><span class="emoji">🏅</span>Select a spotlight lift to see rankings.</td></tr>';
-                    updateSpotlightSelect();
-                    return;
-                }
-                appState.spotlightLift = spotlight;
-                localStorage.setItem(KEYS.spotlightLift, spotlight);
-                updateSpotlightSelect();
-
-                // Gather all users' PBs for the spotlight lift
-                const rankings = [];
-                appState.allUsers.forEach(user => {
-                    const key = STORAGE_PREFIX + 'entries_' + user.id;
-                    const raw = localStorage.getItem(key);
-                    let userEntries = [];
-                    try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
-                    const matching = userEntries.filter(e =>
-                        e.exercise.toLowerCase().trim() === spotlight.toLowerCase().trim()
-                    );
-                    if (matching.length > 0) {
-                        const best = matching.reduce((max, e) => e.weight > max.weight ? e : max,
-                        matching[0]);
-                        rankings.push({
-                            userId: user.id,
-                            name: user.name,
-                            avatar: user.avatar || '🏋️',
-                            exercise: best.exercise.trim(),
-                            weight: best.weight,
-                            date: best.date,
-                        });
-                    }
-                });
-                rankings.sort((a, b) => b.weight - a.weight);
-                const tbody = $('#leaderboardTableBody');
-                if (!rankings.length) {
-                    tbody.innerHTML =
-                        `<tr><td colspan="5" class="empty-state"><span class="emoji">📭</span>No entries for "${escapeHTML(spotlight)}" yet.</td></tr>`;
-                    return;
-                }
-                tbody.innerHTML = rankings.map((r, i) => {
-                    let rankClass = '';
-                    if (i === 0) rankClass = 'gold';
-                    else if (i === 1) rankClass = 'silver';
-                    else if (i === 2) rankClass = 'bronze';
-                    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
-                    return `
-                  <tr>
-                    <td class="leaderboard-rank ${rankClass}">${medal} ${i + 1}</td>
-                    <td>
-                      <div style="display:flex;align-items:center;gap:8px;">
-                        <span class="avatar-circle">${r.avatar}</span>
-                        <strong>${escapeHTML(r.name)}</strong>
-                      </div>
-                    </td>
-                    <td>${escapeHTML(r.exercise)}</td>
-                    <td class="num-cell highlight-pr">${r.weight} <span class="text-muted">lbs</span></td>
+            const tbody = $('#leaderboardTableBody');
+            if(!rankings.length) return tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><span class="emoji">📭</span>No entries for "${escapeHTML(spotlight)}".</td></tr>`;
+            tbody.innerHTML = rankings.map((r,i) => {
+                const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+                const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+                const display = config && config.unit==='time' ? formatTime(r.value) : `${r.value} ${config?.unit||''}`;
+                return `<tr>
+                    <td class="leaderboard-rank ${rankClass}">${medal} ${i+1}</td>
+                    <td><div style="display:flex;align-items:center;gap:6px;"><span class="avatar-circle">${r.user.avatar||'🏋️'}</span><strong>${escapeHTML(r.user.name)}</strong></div></td>
+                    <td>${escapeHTML(r.test)}</td>
+                    <td class="num-cell highlight-pr">${display}</td>
                     <td>${formatDate(r.date)}</td>
-                  </tr>
-                `;
-                }).join('');
+                </tr>`;
+            }).join('');
+        }
+
+        function updateSpotlightSelect() {
+            const select = $('#spotlightLiftSelect');
+            const current = select.value || appState.spotlightLift;
+            select.innerHTML = '<option value="">-- Select --</option>' +
+                TESTS.map(t => `<option value="${t.name}" ${t.name===current?'selected':''}>${t.name}</option>`).join('');
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds/60);
+            const s = Math.floor(seconds%60);
+            return `${m}:${s.toString().padStart(2,'0')}`;
+        }
+        function escapeHTML(str) { const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+
+        // ─── NAVIGATION ────────────────────────
+        window.navigateTo = function(page) {
+            $$('.page').forEach(p=>p.classList.remove('active'));
+            $$('.nav-tab-desktop').forEach(t=>t.classList.remove('active'));
+            $$('.bottom-nav-item').forEach(t=>t.classList.remove('active'));
+            $('#page-'+page).classList.add('active');
+            document.querySelector(`.nav-tab-desktop[data-page="${page}"]`)?.classList.add('active');
+            document.querySelector(`.bottom-nav-item[data-page="${page}"]`)?.classList.add('active');
+            if(page==='history') renderHistory();
+            if(page==='prs') renderPRs();
+            if(page==='leaderboard') renderLeaderboard();
+            if(page==='log') updateStatsRow();
+        };
+
+        // ─── SETTINGS & AUTH ──────────────────
+        function handleModeChange() { $('#multiUserSettings').classList.toggle('hidden', $('#appModeSelect').value!=='multi'); }
+        window.openSettings = function() { $('#appModeSelect').value=appState.mode; handleModeChange(); $('#settingsModal').classList.remove('hidden'); };
+        window.closeSettings = function() { $('#settingsModal').classList.add('hidden'); };
+        window.applySettings = function() {
+            const newMode = $('#appModeSelect').value;
+            if(newMode===appState.mode) return closeSettings();
+            if(newMode==='multi') {
+                appState.mode='multi'; localStorage.setItem(KEYS.appMode,'multi');
+                closeSettings(); openAuthModal('signup');
+            } else {
+                appState.mode='single'; appState.currentUserId=null;
+                localStorage.setItem(KEYS.appMode,'single'); localStorage.removeItem(KEYS.currentUserId);
+                updateUIForMode(); closeSettings(); showToast('Switched to single-user mode.');
             }
+            window.navigateTo('log'); updateStatsRow();
+        };
 
-            function updateSpotlightSelect() {
-                const select = $('#spotlightLiftSelect');
-                const currentVal = select.value || appState.spotlightLift;
-                // Collect all exercises from all users
-                const allExercises = new Set();
-                if (appState.mode === 'multi') {
-                    appState.allUsers.forEach(user => {
-                        const key = STORAGE_PREFIX + 'entries_' + user.id;
-                        const raw = localStorage.getItem(key);
-                        let userEntries = [];
-                        try { userEntries = raw ? JSON.parse(raw) : []; } catch (e) { userEntries = []; }
-                        userEntries.forEach(e => allExercises.add(e.exercise.trim()));
-                    });
-                } else {
-                    loadEntries();
-                    appState.entries.forEach(e => allExercises.add(e.exercise.trim()));
-                }
-                const sorted = [...allExercises].sort();
-                select.innerHTML = '<option value="">-- Select --</option>' +
-                    sorted.map(ex =>
-                        `<option value="${ex}" ${ex === currentVal ? 'selected' : ''}>${ex}</option>`
-                    ).join('');
+        let authMode = 'signin';
+        window.openAuthModal = function(mode='signin') { authMode=mode; $('#authModal').classList.remove('hidden'); updateAuthModalUI(); };
+        window.closeAuthModal = function() { $('#authModal').classList.add('hidden'); if(appState.mode==='multi'&&!appState.currentUserId) { appState.mode='single'; localStorage.setItem(KEYS.appMode,'single'); updateUIForMode(); } };
+        window.toggleAuthMode = function() { authMode = authMode==='signin'?'signup':'signin'; updateAuthModalUI(); };
+
+        function updateAuthModalUI() {
+            if(authMode==='signin') {
+                $('#authModalTitle').textContent='🔐 Sign In'; $('#authSubmitBtn').textContent='Sign In';
+                $('#authToggleBtn').textContent='Need an account? Sign Up';
+                $('#authNameGroup').classList.add('hidden'); $('#authAvatarGroup').classList.add('hidden');
+            } else {
+                $('#authModalTitle').textContent='🆕 Create Profile'; $('#authSubmitBtn').textContent='Sign Up';
+                $('#authToggleBtn').textContent='Already have an account? Sign In';
+                $('#authNameGroup').classList.remove('hidden'); $('#authAvatarGroup').classList.remove('hidden');
             }
+        }
 
-            function escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
+        window.handleAuthSubmit = function(e) {
+            e.preventDefault();
+            const email = $('#authEmail').value.trim().toLowerCase();
+            const password = $('#authPassword').value;
+            loadUsers();
+            if(authMode==='signup') {
+                const name = $('#authName').value.trim() || email.split('@')[0];
+                const avatar = $('#authAvatar').value.trim() || '🏋️';
+                if(appState.allUsers.find(u=>u.email===email)) return showToast('❌ Email already exists.');
+                const newUser = { id:uid(), name, email, password:btoa(password), avatar, createdAt:new Date().toISOString() };
+                appState.allUsers.push(newUser); saveUsers();
+                appState.currentUserId = newUser.id; localStorage.setItem(KEYS.currentUserId, newUser.id);
+                appState.mode='multi'; localStorage.setItem(KEYS.appMode,'multi');
+                closeAuthModal(); updateUIForMode(); showToast(`✅ Welcome, ${name}!`);
+            } else {
+                const user = appState.allUsers.find(u=>u.email===email && u.password===btoa(password));
+                if(!user) return showToast('❌ Invalid email or password.');
+                appState.currentUserId = user.id; localStorage.setItem(KEYS.currentUserId, user.id);
+                appState.mode='multi'; localStorage.setItem(KEYS.appMode,'multi');
+                closeAuthModal(); updateUIForMode(); showToast(`👋 Welcome back, ${user.name}!`);
             }
+            window.navigateTo('log'); updateStatsRow();
+        };
 
-            // ─── EVENT HANDLERS ────────────────────
-            function handleLogSubmit(event) {
-                event.preventDefault();
-                const entryData = {
-                    exercise: $('#logExercise').value,
-                    weight: $('#logWeight').value,
-                    sets: $('#logSets').value,
-                    reps: $('#logReps').value,
-                    date: $('#logDate').value || todayStr(),
-                };
-                const entry = addEntry(entryData);
-                showToast(`✅ ${entry.exercise}: ${entry.weight}lbs × ${entry.sets}×${entry.reps} logged!`);
-                $('#logExercise').value = '';
-                $('#logWeight').value = '';
-                $('#logSets').value = '3';
-                $('#logReps').value = '5';
-                $('#logDate').value = todayStr();
-                updateStatsRow();
-                updateExerciseSuggestions();
-                $('#logExercise').focus();
+        function handleLogout() {
+            appState.currentUserId=null; localStorage.removeItem(KEYS.currentUserId);
+            appState.mode='single'; localStorage.setItem(KEYS.appMode,'single');
+            updateUIForMode(); showToast('👋 Signed out.'); window.navigateTo('log'); updateStatsRow();
+        }
+        window.handleLogout = handleLogout;
+
+        function updateUIForMode() {
+            const isMulti = appState.mode==='multi' && appState.currentUserId;
+            $('#desktopNavLeaderboard').classList.toggle('hidden',!isMulti);
+            $('#bottomNavLeaderboard').classList.toggle('hidden',!isMulti);
+            $('#userIndicator').classList.toggle('hidden',!isMulti);
+            if(isMulti) {
+                const user = getCurrentUser();
+                if(user) $('#userIndicator').innerHTML = `${user.avatar||'🏋️'} ${escapeHTML(user.name)} <button class="btn btn-ghost btn-sm" onclick="window.handleLogout()" style="margin-left:4px;font-size:10px;">✕</button>`;
             }
+            loadEntries(); updateStatsRow(); updateSpotlightSelect();
+            if($('#page-leaderboard').classList.contains('active') && !isMulti) window.navigateTo('log');
+        }
 
-            function handleModeChange() {
-                const newMode = $('#appModeSelect').value;
-                if (newMode === 'multi') {
-                    $('#multiUserSettings').classList.remove('hidden');
-                } else {
-                    $('#multiUserSettings').classList.add('hidden');
-                }
-            }
-
-            function applySettings() {
-                const newMode = $('#appModeSelect').value;
-                if (newMode === appState.mode) {
-                    closeSettings();
-                    return;
-                }
-                if (newMode === 'multi') {
-                    // Switching to multi-user mode
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeSettings();
-                    openAuthModal('signup');
-                } else {
-                    // Switching to single-user mode
-                    appState.mode = 'single';
-                    appState.currentUserId = null;
-                    localStorage.setItem(KEYS.appMode, 'single');
-                    localStorage.removeItem(KEYS.currentUserId);
-                    updateUIForMode();
-                    closeSettings();
-                    showToast('Switched to single-user mode.');
-                }
-                navigateTo('log');
-                updateStatsRow();
-            }
-
-            function openSettings() {
-                $('#appModeSelect').value = appState.mode;
-                $('#multiUserSettings').classList.toggle('hidden', appState.mode !== 'multi');
-                $('#settingsModal').classList.remove('hidden');
-            }
-
-            function closeSettings() {
-                $('#settingsModal').classList.add('hidden');
-            }
-
-            // ─── AUTH ──────────────────────────────
-            let authMode = 'signin'; // 'signin' | 'signup'
-
-            function openAuthModal(mode = 'signin') {
-                authMode = mode;
-                $('#authModal').classList.remove('hidden');
-                updateAuthModalUI();
-            }
-
-            function closeAuthModal() {
-                $('#authModal').classList.add('hidden');
-                // If in multi mode but not logged in, revert to single
-                if (appState.mode === 'multi' && !appState.currentUserId) {
-                    appState.mode = 'single';
-                    localStorage.setItem(KEYS.appMode, 'single');
-                    updateUIForMode();
-                }
-            }
-
-            function toggleAuthMode() {
-                authMode = authMode === 'signin' ? 'signup' : 'signin';
-                updateAuthModalUI();
-            }
-
-            function updateAuthModalUI() {
-                if (authMode === 'signin') {
-                    $('#authModalTitle').textContent = '🔐 Sign In';
-                    $('#authSubmitBtn').textContent = 'Sign In';
-                    $('#authToggleBtn').textContent = 'Need an account? Sign Up';
-                    $('#authNameGroup').classList.add('hidden');
-                    $('#authAvatarGroup').classList.add('hidden');
-                } else {
-                    $('#authModalTitle').textContent = '🆕 Create Profile';
-                    $('#authSubmitBtn').textContent = 'Sign Up';
-                    $('#authToggleBtn').textContent = 'Already have an account? Sign In';
-                    $('#authNameGroup').classList.remove('hidden');
-                    $('#authAvatarGroup').classList.remove('hidden');
-                }
-                $('#authEmail').value = '';
-                $('#authPassword').value = '';
-                $('#authName').value = '';
-                $('#authAvatar').value = '🏋️';
-            }
-
-            function handleAuthSubmit(event) {
-                event.preventDefault();
-                const email = $('#authEmail').value.trim().toLowerCase();
-                const password = $('#authPassword').value;
+        // ─── INIT ──────────────────────────────
+        function init() {
+            applyTheme(localStorage.getItem(KEYS.theme)||'dark');
+            appState.mode = localStorage.getItem(KEYS.appMode)||'single';
+            appState.spotlightLift = localStorage.getItem(KEYS.spotlightLift)||'';
+            if(appState.mode==='multi') {
+                const savedUserId = localStorage.getItem(KEYS.currentUserId);
                 loadUsers();
-
-                if (authMode === 'signup') {
-                    const name = $('#authName').value.trim() || email.split('@')[0];
-                    const avatar = $('#authAvatar').value.trim() || '🏋️';
-                    // Check if email exists
-                    if (appState.allUsers.find(u => u.email === email)) {
-                        showToast('❌ An account with this email already exists.');
-                        return;
-                    }
-                    const newUser = {
-                        id: uid(),
-                        name,
-                        email,
-                        password: btoa(password), // Simple encoding (NOT secure — use backend for production)
-                        avatar,
-                        createdAt: new Date().toISOString(),
-                    };
-                    appState.allUsers.push(newUser);
-                    saveUsers();
-                    appState.currentUserId = newUser.id;
-                    localStorage.setItem(KEYS.currentUserId, newUser.id);
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeAuthModal();
-                    updateUIForMode();
-                    showToast(`✅ Welcome, ${name}! Multi-user mode active.`);
-                    navigateTo('log');
-                    updateStatsRow();
-                } else {
-                    // Sign in
-                    const user = appState.allUsers.find(u => u.email === email && u.password === btoa(password));
-                    if (!user) {
-                        showToast('❌ Invalid email or password.');
-                        return;
-                    }
-                    appState.currentUserId = user.id;
-                    localStorage.setItem(KEYS.currentUserId, user.id);
-                    appState.mode = 'multi';
-                    localStorage.setItem(KEYS.appMode, 'multi');
-                    closeAuthModal();
-                    updateUIForMode();
-                    showToast(`👋 Welcome back, ${user.name}!`);
-                    navigateTo('log');
-                    updateStatsRow();
-                }
+                if(savedUserId && appState.allUsers.find(u=>u.id===savedUserId)) appState.currentUserId = savedUserId;
+                else { appState.mode='single'; localStorage.setItem(KEYS.appMode,'single'); }
             }
-
-            function handleLogout() {
-                appState.currentUserId = null;
-                localStorage.removeItem(KEYS.currentUserId);
-                appState.mode = 'single';
-                localStorage.setItem(KEYS.appMode, 'single');
-                updateUIForMode();
-                showToast('👋 Signed out. Switched to single-user mode.');
-                navigateTo('log');
-                updateStatsRow();
-            }
-
-            // ─── UI STATE MANAGEMENT ──────────────
-            function updateUIForMode() {
-                const isMulti = appState.mode === 'multi' && appState.currentUserId;
-                $('#navLeaderboard').classList.toggle('hidden', !isMulti);
-                $('#userIndicator').style.display = isMulti ? 'flex' : 'none';
-                if (isMulti) {
-                    const user = getCurrentUser();
-                    if (user) {
-                        $('#userIndicator').innerHTML =
-                            `${user.avatar || '🏋️'} ${escapeHTML(user.name)} <button class="btn btn-ghost btn-sm" onclick="handleLogout()" style="margin-left:4px;font-size:10px;">✕</button>`;
-                    }
-                } else {
-                    $('#userIndicator').innerHTML = '';
-                }
-                // If on leaderboard page but mode is single, redirect
-                if (!isMulti && $('#page-leaderboard').classList.contains('active')) {
-                    navigateTo('log');
-                }
-                $('#appModeSelect').value = appState.mode;
-                loadEntries();
-                updateStatsRow();
-                updateSpotlightSelect();
-                if ($('#page-leaderboard').classList.contains('active')) renderLeaderboard();
-            }
-
-            // Expose logout to global scope for inline onclick
-            window.handleLogout = handleLogout;
-
-            // ─── INITIALIZATION ────────────────────
-            function init() {
-                // Load theme
-                const savedTheme = localStorage.getItem(KEYS.theme) || 'dark';
-                applyTheme(savedTheme);
-
-                // Load app mode
-                const savedMode = localStorage.getItem(KEYS.appMode) || 'single';
-                appState.mode = savedMode;
-
-                // Load spotlight lift
-                appState.spotlightLift = localStorage.getItem(KEYS.spotlightLift) || '';
-
-                if (appState.mode === 'multi') {
-                    const savedUserId = localStorage.getItem(KEYS.currentUserId);
-                    loadUsers();
-                    if (savedUserId && appState.allUsers.find(u => u.id === savedUserId)) {
-                        appState.currentUserId = savedUserId;
-                    } else {
-                        // Invalid session, revert to single
-                        appState.mode = 'single';
-                        localStorage.setItem(KEYS.appMode, 'single');
-                        localStorage.removeItem(KEYS.currentUserId);
-                        appState.currentUserId = null;
-                    }
-                }
-
-                updateUIForMode();
-                loadEntries();
-                updateStatsRow();
-                updateExerciseSuggestions();
-                $('#logDate').value = todayStr();
-                $('#spotlightLiftSelect').value = appState.spotlightLift;
-
-                // Set up nav tab clicks
-                $$('.nav-tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const page = tab.getAttribute('data-page');
-                        navigateTo(page);
-                    });
-                });
-
-                // Close modals on overlay click
-                $('#settingsModal').addEventListener('click', function(e) {
-                    if (e.target === this) closeSettings();
-                });
-                $('#authModal').addEventListener('click', function(e) {
-                    if (e.target === this) closeAuthModal();
-                });
-
-                // Keyboard shortcut: Escape to close modals
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        if (!$('#settingsModal').classList.contains('hidden')) closeSettings();
-                        if (!$('#authModal').classList.contains('hidden')) closeAuthModal();
-                    }
-                });
-
-                // Initial leaderboard render if needed
-                updateSpotlightSelect();
-
-                console.log('🏋️ TOPSET initialized — Mode:', appState.mode, '| Theme:', appState.theme);
-                console.log('💡 Tip: Toggle multi-user mode in Settings for leaderboard features.');
-            }
-
-            // ─── START APP ─────────────────────────
-            init();
-
-            // Expose functions needed by inline handlers
-            window.navigateTo = navigateTo;
-            window.toggleTheme = toggleTheme;
-            window.openSettings = openSettings;
-            window.closeSettings = closeSettings;
-            window.applySettings = applySettings;
-            window.handleModeChange = handleModeChange;
-            window.openAuthModal = openAuthModal;
-            window.closeAuthModal = closeAuthModal;
-            window.toggleAuthMode = toggleAuthMode;
-            window.handleAuthSubmit = handleAuthSubmit;
-            window.handleLogSubmit = handleLogSubmit;
-            window.renderHistory = renderHistory;
-            window.renderPRs = renderPRs;
-            window.renderLeaderboard = renderLeaderboard;
-            window.handleLogout = handleLogout;
-        })();
-    </script>
+            updateUIForMode();
+            $('#logDate').value = todayStr();
+            updateResultField();
+            $$('.nav-tab-desktop').forEach(tab => tab.addEventListener('click', ()=> window.navigateTo(tab.dataset.page)));
+            $$('.bottom-nav-item').forEach(item => item.addEventListener('click', ()=> window.navigateTo(item.dataset.page)));
+            $('#settingsModal').addEventListener('click', e=>{ if(e.target===$('#settingsModal')) closeSettings(); });
+            $('#authModal').addEventListener('click', e=>{ if(e.target===$('#authModal')) closeAuthModal(); });
+            document.addEventListener('keydown', e=>{ if(e.key==='Escape') { closeSettings(); closeAuthModal(); } });
+            updateSpotlightSelect();
+            console.log('🏋️ TOPSET ready — fitness tests mode');
+        }
+        init();
+    })();
+</script>
 </body>
-                                            </html>
+    </html>
