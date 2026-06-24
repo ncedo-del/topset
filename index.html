@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/open-props"/>
 
     <style>
         :root {
@@ -30,12 +31,18 @@
             --accent-gold: #f5c518;
             --danger: #ef4444;
             --danger-bg: rgba(239, 68, 68, 0.12);
-            --shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-            --shadow-lg: 0 20px 35px rgba(0, 0, 0, 0.5);
+            /* Upgraded via Open Props — layered, physically-calibrated shadows */
+            --shadow: var(--shadow-3);
+            --shadow-lg: var(--shadow-5);
             --radius: 14px;
             --radius-sm: 10px;
             --radius-lg: 20px;
-            --transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            /* Upgraded easings via Open Props */
+            --transition: 0.2s var(--ease-out-3);
+            --transition-spring: 0.35s var(--ease-spring-2);
+            /* Skeleton shimmer */
+            --skeleton-base: #1e1e1e;
+            --skeleton-shine: #2c2c2c;
             --font-display: 'Bebas Neue', 'Impact', sans-serif;
             --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --green-glow: 0 0 18px rgba(74, 222, 128, 0.2);
@@ -63,8 +70,10 @@
             --accent-yellow: #d97706;
             --accent-yellow-dark: #b45309;
             --accent-gold: #c88a04;
-            --shadow: 0 8px 20px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
-            --shadow-lg: 0 20px 35px rgba(0, 0, 0, 0.08);
+            --shadow: var(--shadow-3);
+            --shadow-lg: var(--shadow-5);
+            --skeleton-base: #eaeef3;
+            --skeleton-shine: #f5f7fa;
             --green-glow: 0 0 12px rgba(22, 163, 74, 0.15);
             --yellow-glow: 0 0 12px rgba(217, 119, 6, 0.12);
             --overlay: rgba(0, 0, 0, 0.5);
@@ -118,7 +127,7 @@
         }
         .btn-sm { padding: 6px 12px; font-size: 12px; min-height: 34px; }
         .btn-primary { background: var(--accent-green); color: #0b0b0b; border-color: var(--accent-green); font-weight: 700; }
-        .btn-primary:hover { background: var(--accent-green-dark); transform: translateY(-1px); }
+        .btn-primary:hover { background: var(--accent-green-dark); transform: translateY(-2px); transition: all var(--transition-spring); }
         .btn-outline { background: transparent; border-color: var(--border); color: var(--text-primary); }
         .btn-outline:hover { border-color: var(--accent-green); color: var(--accent-green); background: rgba(74, 222, 128, 0.05); }
         .btn-ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
@@ -159,7 +168,7 @@
         .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 28px; }
         @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); gap: 18px; } }
         .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 14px; transition: all 0.2s; box-shadow: var(--shadow); }
-        .stat-card:hover { border-color: var(--accent-green); transform: translateY(-2px); background: var(--bg-card-hover); }
+        .stat-card:hover { border-color: var(--accent-green); transform: translateY(-3px); background: var(--bg-card-hover); box-shadow: var(--shadow-4); transition: all var(--transition-spring); }
         .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 6px; }
         .stat-value { font-family: var(--font-display); font-size: 34px; line-height: 1; color: var(--text-primary); letter-spacing: 1px; font-weight: 600; }
         .stat-value.green { color: var(--accent-green); text-shadow: var(--green-glow); }
@@ -194,6 +203,7 @@
         .highlight-pr { color: var(--accent-green); font-weight: 800; }
         .badge { display: inline-block; padding: 4px 12px; border-radius: 40px; font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
         .badge-green { background: rgba(74, 222, 128, 0.18); color: var(--accent-green); }
+        .badge-new { background: rgba(251, 191, 36, 0.18); color: var(--accent-yellow); }
         .row-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
         .row-action-btn { background: transparent; border: 1px solid var(--border); border-radius: 30px; color: var(--text-secondary); cursor: pointer; font-size: 13px; padding: 7px 12px; transition: all var(--transition); font-weight: 600; }
         .row-action-btn:hover { border-color: var(--accent-green); color: var(--accent-green); background: var(--bg-card-hover); }
@@ -215,7 +225,55 @@
         .user-indicator { font-size: 13px; font-weight: 700; background: rgba(74, 222, 128, 0.12); padding: 5px 12px; border-radius: 40px; color: var(--accent-green); display: flex; align-items: center; gap: 8px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
         .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-input); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; border: 2px solid var(--border); }
         .leaderboard-rank { font-family: var(--font-display); font-size: 28px; text-align: center; width: 60px; }
+        .leaderboard-rank.gold { color: #f5c518; }
+        .leaderboard-rank.silver { color: #c0c0c0; }
+        .leaderboard-rank.bronze { color: #cd7f32; }
         .hidden { display: none !important; }
+
+        /* ============================================================
+           SKELETON LOADING SYSTEM (Open Props powered)
+           ============================================================ */
+        @keyframes skeleton-sweep {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+        .skeleton {
+            background: linear-gradient(
+                90deg,
+                var(--skeleton-base) 25%,
+                var(--skeleton-shine) 50%,
+                var(--skeleton-base) 75%
+            );
+            background-size: 200% 100%;
+            animation: skeleton-sweep 1.6s var(--ease-in-out-3) infinite;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Stat card skeleton */
+        .skeleton-stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 14px;
+            box-shadow: var(--shadow);
+        }
+        .skeleton-stat-label  { height: 10px; width: 62%; margin-bottom: 10px; }
+        .skeleton-stat-value  { height: 34px; width: 44%; margin-bottom: 8px; }
+        .skeleton-stat-sub    { height: 9px;  width: 34%; }
+
+        /* Table row skeletons */
+        .skeleton-row td { padding: 14px 12px; border-bottom: 1px solid var(--border); }
+        .skeleton-cell    { height: 14px; border-radius: 6px; }
+        .skeleton-cell-sm { width: 60px; }
+        .skeleton-cell-md { width: 110px; }
+        .skeleton-cell-lg { width: 170px; }
+
+        /* Stagger the shimmer sweep across rows */
+        .skeleton-row:nth-child(1) .skeleton { animation-delay: 0s; }
+        .skeleton-row:nth-child(2) .skeleton { animation-delay: 0.08s; }
+        .skeleton-row:nth-child(3) .skeleton { animation-delay: 0.16s; }
+        .skeleton-row:nth-child(4) .skeleton { animation-delay: 0.24s; }
+        .skeleton-row:nth-child(5) .skeleton { animation-delay: 0.32s; }
     </style>
 </head>
 <body>
@@ -245,10 +303,10 @@
 <div class="main-container">
     <div class="page active" id="page-log">
         <div class="stats-row" id="statsRow">
-            <div class="stat-card"><div class="stat-label">Current Streak</div><div class="stat-value green" id="statStreak">0</div><div class="stat-sub">days</div></div>
-            <div class="stat-card"><div class="stat-label">Total Entries</div><div class="stat-value" id="statTotalEntries">0</div><div class="stat-sub">tests logged</div></div>
-            <div class="stat-card"><div class="stat-label">Tests Tracked</div><div class="stat-value yellow" id="statUniqueTests">0</div><div class="stat-sub">unique tests</div></div>
-            <div class="stat-card"><div class="stat-label">PRs Achieved</div><div class="stat-value green" id="statPRCount">0</div><div class="stat-sub">personal bests</div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
         </div>
         <div class="card"><div class="card-header"><span class="icon">💪</span> Log Test Result</div>
             <form id="logForm" onsubmit="handleLogSubmit(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTest" required onchange="updateResultField()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroup"><label id="resultLabel">Result</label><input type="text" id="logResult" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDate" required></div><button type="submit" class="btn btn-primary">✅ Log Result</button></div></form>
@@ -530,19 +588,6 @@
         try { await db.collection('entries').doc(id).delete(); return true; }
         catch(err){ console.error('deleteEntry failed:', err); showToast('❌ Could not delete entry.'); return false; }
     }
-    async function getUserById(id){
-        if (!initFirebase()) return null;
-        try {
-            const snap = await db.collection('users').doc(id).get();
-            if (!snap.exists) return null;
-            return { id:snap.id, ...snap.data() };
-        } catch(err){ console.error('getUserById failed:', err); return null; }
-    }
-    async function updateUserProfile(id,updates){
-        if (!initFirebase()) return false;
-        try { await db.collection('users').doc(id).update(updates); return true; }
-        catch(err){ console.error('updateUserProfile failed:', err); showToast('❌ Could not update profile.'); return false; }
-    }
     // Synchronous because appState.currentUser is kept fresh on login, signup, and profile edits.
     function getCurrentUser(){ return appState.currentUser; }
     function calculateStreak(entries){ if(!entries.length) return 0; const dates=[...new Set(entries.map(e=>e.date))].sort().reverse(); if(dates[0]!==todayStr()&&daysAgo(dates[0])>1) return 0; let s=0; const today=new Date(); today.setHours(0,0,0,0); for(let i=0;i<dates.length;i++){ const d=new Date(dates[i]+'T00:00:00'); const exp=new Date(today); exp.setDate(exp.getDate()-i); if(d.getTime()===exp.getTime())s++; else if(i===0&&daysAgo(dates[0])===1){ const y=new Date(today); y.setDate(y.getDate()-1); if(d.getTime()===y.getTime()){s=1;continue;}else break;} else break; } return s; }
@@ -551,7 +596,27 @@
     function parseTime(raw){ const p=raw.split(':'); if(p.length===2){ const m=parseInt(p[0]), s=parseInt(p[1]); if(!isNaN(m)&&!isNaN(s)) return m*60+s; } return NaN; }
     function updateResultField(){ const t=$('#logTest').value, cfg=getTestConfig(t), inp=$('#logResult'), lbl=$('#resultLabel'); if(!cfg){ inp.type='text'; inp.step='1'; inp.placeholder='Select test first'; lbl.textContent='Result'; return; } inp.type=cfg.inputType; inp.step=cfg.step||'1'; inp.placeholder=cfg.placeholder; lbl.textContent=cfg.unit==='time'?'Time (mm:ss)':`Result (${cfg.unit})`; inp.value=''; }
     async function handleLogSubmit(e){ e.preventDefault(); const test=$('#logTest').value, raw=$('#logResult').value.trim(), date=$('#logDate').value||todayStr(); if(!test) return showToast('Please select a test.'); const cfg=getTestConfig(test); let value; if(cfg.unit==='time'){ value=parseTime(raw); if(isNaN(value)) return showToast('Invalid time format (mm:ss).'); } else { value=parseFloat(raw); if(isNaN(value)) return showToast('Invalid number.'); } const saved = await addEntry({test,value,date}); if(!saved) return; await pushBestToCloud(test); const disp=cfg.unit==='time'?raw:`${value} ${cfg.unit}`; showToast(`✅ ${test}: ${disp} logged!`); $('#logTest').value=''; $('#logResult').value=''; $('#logDate').value=todayStr(); updateResultField(); updateStatsRow(); }
-    function updateStatsRow(){ const prs=getPersonalBests(appState.entries); $('#statStreak').textContent=calculateStreak(appState.entries); $('#statTotalEntries').textContent=appState.entries.length; $('#statUniqueTests').textContent=[...new Set(appState.entries.map(e=>e.test))].length; $('#statPRCount').textContent=prs.length; }
+    function skeletonTableRows(cols, count=5){
+        const widths=['skeleton-cell-md','skeleton-cell-lg','skeleton-cell-sm','skeleton-cell-sm','skeleton-cell-md'];
+        return Array.from({length:count},(_,i)=>`<tr class="skeleton-row">${Array.from({length:cols},(_,c)=>`<td><div class="skeleton skeleton-cell ${widths[c]||'skeleton-cell-md'}"></div></td>`).join('')}</tr>`).join('');
+    }
+    function updateStatsRow(){
+        const prs=getPersonalBests(appState.entries);
+        // First call: swap skeleton cards for real stat cards
+        if (!$('#statStreak')) {
+            $('#statsRow').innerHTML = [
+                {label:'Current Streak', val:calculateStreak(appState.entries), cls:'green', sub:'days', id:'statStreak'},
+                {label:'Total Entries',  val:appState.entries.length,           cls:'',      sub:'tests logged', id:'statTotalEntries'},
+                {label:'Tests Tracked',  val:[...new Set(appState.entries.map(e=>e.test))].length, cls:'yellow', sub:'unique tests', id:'statUniqueTests'},
+                {label:'PRs Achieved',   val:prs.length,                        cls:'green', sub:'personal bests', id:'statPRCount'},
+            ].map(s=>`<div class="stat-card"><div class="stat-label">${s.label}</div><div class="stat-value ${s.cls}" id="${s.id}">${s.val}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+        } else {
+            $('#statStreak').textContent=calculateStreak(appState.entries);
+            $('#statTotalEntries').textContent=appState.entries.length;
+            $('#statUniqueTests').textContent=[...new Set(appState.entries.map(e=>e.test))].length;
+            $('#statPRCount').textContent=prs.length;
+        }
+    }
     function renderHistory(){ const tb=$('#historyTableBody'); if(!appState.entries.length) return tb.innerHTML='<tr><td colspan="4" class="empty-state"><span class="emoji">📭</span>No entries yet.</td></tr>'; tb.innerHTML=appState.entries.map(e=>{ const cfg=getTestConfig(e.test); const disp=cfg&&cfg.unit==='time'?formatTime(e.value):`${e.value} ${cfg?.unit||''}`; return `<tr><td>${formatDate(e.date)}</td><td><strong>${escapeHTML(e.test)}</strong></td><td class="num-cell">${disp}</td><td><div class="row-actions"><button class="row-action-btn" title="Edit" onclick="openEditEntryModal('${e.id}')">✏️</button><button class="row-action-btn danger" title="Delete" onclick="handleDeleteEntry('${e.id}')">🗑️</button></div></td></tr>`; }).join(''); }
     function renderPRs(){ const prs=getPersonalBests(appState.entries), tb=$('#prTableBody'); if(!prs.length) return tb.innerHTML='<tr><td colspan="4" class="empty-state"><span class="emoji">🏋️</span>No PRs yet.</td></tr>'; tb.innerHTML=prs.map(p=>{ const cfg=getTestConfig(p.test); const disp=cfg&&cfg.unit==='time'?formatTime(p.value):`${p.value} ${cfg?.unit||''}`; const recent=daysAgo(p.date)<=7; return `<tr><td><strong>${escapeHTML(p.test)}</strong></td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(p.date)}</td><td><span class="badge ${recent?'badge-new':'badge-green'}">${recent?'🔥 RECENT':'PR'}</span></td></tr>`; }).join(''); }
     function renderLeaderboard(){
@@ -563,7 +628,7 @@
         appState.spotlightLift=spotlight; localStorage.setItem(KEYS.spotlightLift,spotlight);
         if (!initFirebase()){ $('#leaderboardTableBody').innerHTML='<tr><td colspan="5" class="empty-state"><span class="emoji">⚠️</span>Cloud leaderboard isn\'t set up yet — add your Firebase config to enable it.</td></tr>'; return; }
         const cfg=getTestConfig(spotlight), tb=$('#leaderboardTableBody');
-        tb.innerHTML='<tr><td colspan="5" class="empty-state"><span class="emoji">⏳</span>Loading...</td></tr>';
+        tb.innerHTML=skeletonTableRows(5,5);
         leaderboardUnsub = db.collection('leaderboard').where('test','==',spotlight).onSnapshot(snapshot=>{
             const rankings=[];
             snapshot.forEach(doc=>rankings.push(doc.data()));
@@ -605,7 +670,7 @@
         const sent = await sendPasswordReset(email);
         if(sent) showToast('📧 Password reset email sent. Check your inbox.');
     };
-    function handleLogout(){ if(!auth) return; auth.signOut(); /* onAuthStateChanged handles the rest */ }
+    window.handleLogout = function(){ if(!auth) return; auth.signOut(); };
     // NEW: Profile editing
     window.openEditProfileModal = function(){ if(!appState.currentUserId){ showToast('Please sign in first.'); return; } const user=getCurrentUser(); if(user){ $('#profileName').value=user.name||''; $('#profileAvatar').value=user.avatar||'🏋️'; $('#profilePassword').value=''; $('#editProfileModal').classList.remove('hidden'); } };
     window.closeEditProfileModal = function(){ $('#editProfileModal').classList.add('hidden'); };
@@ -667,7 +732,12 @@
         });
     }
     init();
-    window.navigateTo=navigateTo; window.handleLogSubmit=handleLogSubmit; window.handleLogout=handleLogout; window.openEditProfileModal=openEditProfileModal; window.closeEditProfileModal=closeEditProfileModal; window.handleEditProfileSubmit=handleEditProfileSubmit;
+    // Expose plain `function` declarations called from inline HTML (onclick/onsubmit/onchange).
+    // Functions already declared as `window.X = ...` above don't need to be listed here.
+    window.navigateTo = navigateTo;
+    window.handleLogSubmit = handleLogSubmit;
+    window.updateResultField = updateResultField;
+    window.renderLeaderboard = renderLeaderboard;
 </script>
 </body>
 </html>
