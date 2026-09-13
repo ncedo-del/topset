@@ -44,7 +44,13 @@
         $('#streakModal').addEventListener('click',e=>{ if(e.target===$('#streakModal')) closeStreakModal(); });
         document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeAuthModal(); closeAboutModal(); closeInstallModal(); closeEditEntryModal(); closeEditProfileModal(); closeManageTests(); closeManageGyms(); closeMyGym(); closeManageClasses(); closeStatCard(); closeStreakModal(); closeManageEvent(); } });
 
-        if (!initFirebase()) return;
+        if (!initFirebase()){
+            // No Firebase on this deployment (e.g. pure GitHub Pages UI preview).
+            // Still resolve the stat-card skeletons so the Log page looks
+            // complete, rather than shimmering forever with no data behind it.
+            updateStatsRow();
+            return;
+        }
 
         // The event board is public — no sign-in required to view it — so this
         // runs unconditionally here, not inside the auth branch below.
@@ -130,6 +136,6 @@
     // never competes with the initial render for network/CPU resources.
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(err => console.error('Service worker registration failed:', err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.error('Service worker registration failed:', err));
         });
     }

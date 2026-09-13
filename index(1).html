@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>TOPSET — Fitness Log with Profile</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/open-props"/>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-left">
+        <div class="logo" onclick="navigateTo('log')"><img src="" alt="TOPSET" class="logo-img" id="logoImg" /><span class="logo-dot"></span></div>
+        <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeToggleBtn"><span id="themeIcon" style="display:flex;"></span></button>
+        <button class="btn btn-ghost btn-sm" onclick="window.openAboutModal()" id="aboutBtn" title="About TOPSET">About</button>
+    </div>
+    <div class="header-right">
+        <nav class="desktop-nav" id="desktopNav">
+            <button class="nav-tab active" data-page="log"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Log</button>
+            <button class="nav-tab" data-page="history"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
+            <button class="nav-tab" data-page="prs"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
+            <button class="nav-tab" data-page="leaderboard" id="desktopNavLeaderboard"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+            <button class="nav-tab hidden" data-page="event" id="desktopNavEvent"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
+        </nav>
+        <button class="streak-count-badge hidden" id="streakBadgeBtn" onclick="window.openStreakModal()" title="Streak & Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span>Streak: <strong id="streakBadgeCount">0</strong></span></button>
+        <span class="user-indicator" id="userIndicator" style="display:none;"></span>
+    </div>
+</header>
+
+<div class="email-verify-banner hidden" id="emailVerifyBanner">
+    <span>Please verify your email — check your inbox for a link from TOPSET.</span>
+    <button type="button" onclick="window.handleResendVerification()">Resend email</button>
+    <button type="button" onclick="window.handleRefreshVerification()">I've verified</button>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-page="log"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Log</button>
+    <button class="bottom-nav-item" data-page="history"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
+    <button class="bottom-nav-item" data-page="prs"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
+    <button class="bottom-nav-item" data-page="leaderboard" id="bottomNavLeaderboard"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+    <button class="bottom-nav-item hidden" data-page="event" id="bottomNavEvent"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
+    <button class="bottom-nav-item hidden" id="bottomNavManageTestsBtn" onclick="window.openManageTests()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Tests</button>
+    <button class="bottom-nav-item hidden" id="bottomNavMyGymBtn" onclick="window.openMyGym()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> My Gym</button>
+</nav>
+
+<div class="main-container">
+    <div class="page active" id="page-log">
+        <div class="stats-row" id="statsRow">
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+        </div>
+        <div class="card"><div class="card-header">Log Test Result</div>
+            <form id="logForm" onsubmit="handleLogSubmit(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTest" required onchange="updateResultField()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroup"><label id="resultLabel">Result</label><input type="text" id="logResult" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDate" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div></form>
+        </div>
+        <!-- One Log form now for everyone, club member or not — personal test-logging
+             was never club-scoped. There used to be a second "public pool" form here
+             plus an Official Results checkbox; both are gone (see results-ui.js /
+             entries-journal.js, Training Club rebuild). Club activity (classes,
+             check-ins, weekly journal) lives in the Streak & Journal modal's Club tab. -->
+    </div>
+    <div class="page" id="page-history"><div class="card"><div class="card-header">Test History</div><div class="table-wrapper"><table><thead><tr><th>Date</th><th>Test</th><th>Result</th><th></th></tr></thead><tbody id="historyTableBody"><tr><td colspan="4" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg></span>No tests logged yet.</td></tr></tbody></table></div></div></div>
+    <div class="page" id="page-prs"><div class="card"><div class="card-header">Personal Records</div><div class="table-wrapper"><table><thead><tr><th>Test</th><th>Best Result</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody id="prTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg></span>No PRs yet. Start logging!</td></tr></tbody></table></div></div></div>
+    <!-- One public leaderboard now — no more My Gym/Public toggle, no more
+         Regular/Official scope filter. Every result feeds this single board. -->
+    <div class="page" id="page-leaderboard"><div class="card"><div class="card-header">Leaderboard <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">Spotlight:</span><select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">-- Select Test --</option></select><select id="filterAgeGroup" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Ages</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select><select id="filterGender" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Genders</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div id="myRankBar"></div><div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Test</th><th>Best</th><th>Date</th></tr></thead><tbody id="leaderboardTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg></span>Select a spotlight test to see rankings.</td></tr></tbody></table></div></div></div>
+    <div class="page" id="page-event">
+        <div class="card">
+            <div class="card-header" id="eventTitle">Event</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin:-8px 0 14px;" id="eventDescription"></div>
+            <div id="eventPageContent"></div>
+        </div>
+        <div class="card hidden" id="eventLogCard">
+            <div class="card-header">Log Event Result</div>
+            <form id="eventLogForm" onsubmit="handleEventLogSubmit(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Test</label><select id="eventLogTest" required onchange="updateEventResultField()"><option value="">-- Select Test --</option></select></div>
+                    <div class="form-group"><label id="eventResultLabel">Result</label><input type="text" id="eventLogResult" placeholder="Select test first" required autocomplete="off"></div>
+                </div>
+                <div class="modal-buttons" style="margin-top:12px;"><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header">Event Leaderboard <select id="eventSpotlightSelect" onchange="renderEventLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">-- Select Test --</option></select></div>
+            <div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Best</th><th>Updated</th></tr></thead><tbody id="eventLeaderboardBody"><tr><td colspan="4" class="empty-state">Select a test to see rankings.</td></tr></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals: Auth, Edit Profile, Edit Entry -->
+
+<div class="modal-overlay hidden" id="authModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeAuthModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2 id="authModalTitle"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Sign In</h2><form id="authForm" onsubmit="handleAuthSubmit(event)"><div class="form-group"><label>Email</label><input type="email" id="authEmail" placeholder="you@example.com" required></div><div class="form-group"><label>Password</label><input type="password" id="authPassword" placeholder="••••••••" required minlength="6"></div><div class="form-group hidden" id="authNameGroup"><label>Display Name</label><input type="text" id="authName" placeholder="Your name" maxlength="30"></div><div class="form-group hidden" id="authAvatarGroup"><label>Avatar (emoji)</label><input type="text" id="authAvatar" placeholder="🦍" maxlength="4" value="🏋️"></div><div class="form-group hidden" id="authAgeGroupGroup"><label>Age Group (optional)</label><select id="authAgeGroup"><option value="">Prefer not to say</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select></div><div class="form-group hidden" id="authGenderGroup"><label>Gender (optional)</label><select id="authGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div class="form-group hidden" id="authSportGroup"><label>Sport (optional)</label><input type="text" id="authSport" placeholder="e.g. Kickboxing, Powerlifting" maxlength="30"></div><div class="form-group hidden" id="authGymCodeGroup"><label>Club Invite Code</label><input type="text" id="authGymCode" placeholder="e.g. TOPSET-ABC123" maxlength="20" autocapitalize="characters"><span style="font-size:11px;color:var(--text-muted);margin-top:4px;">Ask your club for their invite code. Leave blank to join without a club for now — you can add one later in Edit Profile.</span></div><p class="hidden" id="authCookieNotice" style="font-size:11px;color:var(--text-muted);margin:-4px 0 4px;">By signing up, you agree to TOPSET's use of cookies and local storage to keep you signed in and remember your preferences.</p><div class="modal-buttons"><button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button><button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button></div></form><button type="button" class="btn btn-ghost btn-sm" id="forgotPasswordBtn" onclick="handleForgotPassword()" style="width:100%;margin-top:8px;font-size:12px;opacity:0.7;">Forgot password?</button><div class="auth-divider">or</div><button type="button" class="btn-google" id="googleAuthBtn" onclick="window.handleGoogleAuth()"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.5 18.9 12 24 12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.6 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36 26.9 37 24 37c-5.3 0-9.7-3.1-11.3-7.9l-6.6 5.1C9.5 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.6 5.6C39.6 37.5 43 31.5 43 24c0-1.2-.1-2.4-.4-3.5z"/></svg> Continue with Google</button></div></div>
+
+<div class="modal-overlay hidden" id="aboutModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeAboutModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <div class="about-eyebrow">Performance as a lifestyle</div>
+    <h2 class="about-title">What is TOPSET?</h2>
+    <div class="about-body">
+        <p>TOPSET is a performance and athletic club platform turning your workout data into a clear, traceable baseline — helping athletes and everyday enthusiasts build consistency, track progress, and compete on a single platform.</p>
+        <p>Through live scoreboards and traceable metrics, we take the guesswork out of training and turn individual effort into a shared community standard. Whether you're chasing your first major personal record or pushing to top a leaderboard, we give your hard work <strong>the proof it deserves</strong>.</p>
+        <p style="font-size:13px;font-style:italic;color:var(--text-muted);">Traditional, pure, and hybrid sports all considered.</p>
+    </div>
+    <hr class="about-divider">
+    <div class="about-cta-row">
+        <button type="button" class="btn btn-primary" onclick="window.openAuthModal('signup')">Create Your Profile →</button>
+        <button type="button" class="about-link" onclick="window.openAuthModal('signin')">Already have an account? Sign in</button>
+        <button type="button" class="about-link" onclick="window.openInstallModal()" style="margin-top:6px;">How do I install this as an app?</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:14px;opacity:0.6;">Build <span id="aboutBuildStamp"></span></div>
+</div></div>
+
+<div class="modal-overlay hidden" id="installModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeInstallModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg> Add TOPSET to Your Home Screen</h2>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">This app can be saved among your apps — no App Store needed. Opens full-screen, loads faster, and keeps your streak one tap away.</p>
+    <div class="install-columns">
+        <div class="install-col">
+            <h3>Android — Chrome</h3>
+            <ol>
+                <li>Tap the <strong>⋮</strong> menu in the top-right corner</li>
+                <li>Tap <strong>Add to Home screen</strong></li>
+                <li>Tap <strong>Add</strong> to confirm</li>
+            </ol>
+        </div>
+        <div class="install-col">
+            <h3>iPhone — Safari</h3>
+            <ol>
+                <li>Tap the <strong>Share</strong> icon (square with an arrow) in the bottom bar</li>
+                <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
+                <li>Tap <strong>Add</strong> in the top-right corner</li>
+            </ol>
+        </div>
+    </div>
+    <div class="modal-buttons" style="justify-content:center;">
+        <button type="button" class="btn btn-outline" onclick="window.closeInstallModal()">Got it</button>
+    </div>
+</div></div>
+
+<!-- Streak / Journal Modal — a daily journal for how a session felt (or that it was a
+     rest day), independent of the Log form. One entry per day, rated Rest/Light/
+     Moderate/Hard, shown as a GitHub-contribution-style calendar. -->
+<div class="modal-overlay hidden" id="streakModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeStreakModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Streak &amp; Journal</h2>
+    <span class="streak-count-badge" id="streakModalCountBadge" style="margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span><strong id="streakModalCount">0</strong>-day streak</span></span>
+
+    <div class="streak-week-strip" id="streakWeekStrip"></div>
+
+    <div class="streak-tabs">
+        <button type="button" class="streak-tab-btn active" id="streakTabBtnCalendar" onclick="window.switchStreakTab('calendar')">Calendar</button>
+        <button type="button" class="streak-tab-btn" id="streakTabBtnJournal" onclick="window.switchStreakTab('journal')">Journal</button>
+        <button type="button" class="streak-tab-btn" id="streakTabBtnClub" onclick="window.switchStreakTab('club')">Club</button>
+    </div>
+
+    <div class="streak-tab-pane active" id="streakPaneCalendar">
+        <div class="streak-cal-nav">
+            <button type="button" class="streak-cal-nav-btn" onclick="window.streakCalPrevMonth()" title="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="streak-cal-month-label" id="streakCalMonthLabel"></span>
+            <button type="button" class="streak-cal-nav-btn" onclick="window.streakCalNextMonth()" title="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="streak-cal-grid" id="streakCalGrid"></div>
+        <div class="streak-cal-legend">
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-none);"></span>None</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-rest);"></span>Rest</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-light);"></span>Light</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-moderate);"></span>Moderate</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-hard);"></span>Hard</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-class);"></span>Class check-in</div>
+        </div>
+    </div>
+
+    <div class="streak-tab-pane" id="streakPaneJournal">
+        <div class="streak-journal-date" id="streakJournalDateLabel">Today</div>
+        <div class="streak-intensity-row" id="streakIntensityRow">
+            <button type="button" class="streak-intensity-btn" data-intensity="rest" onclick="window.selectIntensity('rest')"><span class="streak-intensity-swatch" style="background:var(--streak-rest);"></span>Rest</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="light" onclick="window.selectIntensity('light')"><span class="streak-intensity-swatch" style="background:var(--streak-light);"></span>Light</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="moderate" onclick="window.selectIntensity('moderate')"><span class="streak-intensity-swatch" style="background:var(--streak-moderate);"></span>Moderate</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="hard" onclick="window.selectIntensity('hard')"><span class="streak-intensity-swatch" style="background:var(--streak-hard);"></span>Hard</button>
+        </div>
+        <textarea class="streak-journal-textarea" id="streakJournalTextarea" placeholder="How did today's session feel? Notes, soreness, mood — whatever's worth remembering." maxlength="500"></textarea>
+        <div class="modal-buttons" style="margin-top:14px;">
+            <button type="button" class="btn btn-primary" onclick="window.saveJournalEntry()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Save Entry</button>
+        </div>
+    </div>
+
+    <!-- Rendered by classes-member-ui.js's window.renderMemberClubTab() — see
+         entries-journal.js's switchStreakTab(), which calls it whenever this
+         pane becomes active. Empty on first paint; filled in immediately. -->
+    <div class="streak-tab-pane" id="streakPaneClub"></div>
+</div></div>
+
+<!-- NEW: Edit Profile Modal -->
+<div class="modal-overlay hidden" id="editProfileModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeEditProfileModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit Profile</h2><form id="editProfileForm" onsubmit="handleEditProfileSubmit(event)"><div class="form-group"><label>Display Name</label><input type="text" id="profileName" maxlength="30" required></div><div class="form-group"><label>Avatar Emoji</label><input type="text" id="profileAvatar" maxlength="4" placeholder="🏋️"></div><div class="form-group"><label>Age Group (optional)</label><select id="profileAgeGroup"><option value="">Prefer not to say</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select></div><div class="form-group"><label>Gender (optional)</label><select id="profileGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div class="form-group"><label>Sport (optional)</label><input type="text" id="profileSport" placeholder="e.g. Kickboxing, Powerlifting" maxlength="30"></div><div class="form-group"><label>Club <span id="profileGymStatus" style="text-transform:none;font-weight:500;color:var(--text-muted);"></span></label><input type="text" id="profileGymCode" placeholder="Enter invite code to join a club" maxlength="20" autocapitalize="characters"><button type="button" class="row-action-btn danger hidden" id="leaveGymBtn" onclick="window.handleLeaveClub()" style="margin-top:8px;width:fit-content;">Leave Club</button></div><div class="form-group"><label>New Password (optional)</label><input type="password" id="profilePassword" placeholder="Leave blank to keep current"></div><div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeEditProfileModal()">Cancel</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Changes</button></div></form><div class="danger-zone"><div class="danger-zone-label">Danger Zone</div><button type="button" class="btn-danger-outline" id="deleteAccountBtn" onclick="window.handleDeleteAccount()">Delete Account</button><div class="danger-zone-hint">Permanently deletes your profile, journal, and leaderboard history, plus any non-official entries. Official results locked in by your gym stay on record. This cannot be undone.</div></div></div></div>
+
+<div class="modal-overlay hidden" id="manageTestsModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageTests()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Manage Tests</h2>
+    <!-- Single global catalog now — no per-club scope picker. -->
+    <div id="manageTestsList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;"></div>
+    <form id="addTestForm" onsubmit="handleAddTestSubmit(event)">
+        <div class="form-group"><label>Test Name</label><input type="text" id="newTestName" maxlength="40" placeholder="e.g. Max Pull-ups" required></div>
+        <div class="form-group"><label><input type="checkbox" id="newTestIsTime" onchange="handleNewTestTimeToggle()"> This test is timed (mm:ss), like a run</label></div>
+        <div class="form-group" id="newTestUnitGroup"><label>Unit</label><input type="text" id="newTestUnit" maxlength="12" placeholder="e.g. reps, kg, cm"></div>
+        <div class="form-group"><label><input type="checkbox" id="newTestHigherBetter" checked> Higher result is better</label><span class="text-muted mt-2">Uncheck for things like race times, where lower is better.</span></div>
+        <div class="form-group"><label>Example placeholder (optional)</label><input type="text" id="newTestPlaceholder" maxlength="12" placeholder="e.g. 25"></div>
+        <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:-6px;">Decimals are always allowed when logging a result — no need to configure it per test.</span>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageTests()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Test</button></div>
+    </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageGymsModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageGyms()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> Manage Clubs</h2>
+    <div id="manageGymsList" style="max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+    <form id="addGymForm" onsubmit="handleAddGymSubmit(event)">
+        <div class="form-group"><label>Club Name</label><input type="text" id="newGymName" maxlength="60" placeholder="e.g. Iron Works Club" required></div>
+        <div class="form-group"><label>Tier</label><select id="newGymTier"><option value="small">Small — 50 members</option><option value="medium">Medium — 126 members</option><option value="large">Large — 250 members</option><option value="xlarge">Extra Large — 520 members</option></select></div>
+        <span style="font-size:11px;color:var(--text-muted);">An invite code is generated automatically — you'll get it right after creating the club, ready to copy and hand to the club owner.</span>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageGyms()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Club</button></div>
+    </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageEventModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageEvent()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Manage Event</h2>
+    <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:-14px;margin-bottom:14px;">Public — no invite code needed to join. Only one event can be visible at a time; making one visible hides any other.</span>
+
+    <div id="manageEventListView">
+        <div id="manageEventsList" style="max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+        <form id="addEventForm" onsubmit="handleAddEventSubmit(event)">
+            <div class="form-group"><label>Event Name</label><input type="text" id="newEventName" maxlength="60" placeholder="e.g. TOPSET Kasi Games 2026" required></div>
+            <div class="form-group"><label>Description (optional)</label><input type="text" id="newEventDescription" maxlength="140" placeholder="One line shown above the board"></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageEvent()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Event</button></div>
+        </form>
+    </div>
+
+    <div class="hidden" id="manageEventTestsView">
+        <div id="manageEventTestsScope" style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:14px;font-weight:600;"></div>
+        <div id="manageEventTestsList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;"></div>
+        <form id="addEventTestForm" onsubmit="handleAddEventTestSubmit(event)">
+            <div class="form-group"><label>Test Name</label><input type="text" id="newEventTestName" maxlength="40" placeholder="e.g. Sandbag Carry" required></div>
+            <div class="form-group"><label><input type="checkbox" id="newEventTestIsTime" onchange="handleNewEventTestTimeToggle()"> This test is timed (mm:ss)</label></div>
+            <div class="form-group" id="newEventTestUnitGroup"><label>Unit</label><input type="text" id="newEventTestUnit" maxlength="12" placeholder="e.g. reps, kg, cm"></div>
+            <div class="form-group"><label><input type="checkbox" id="newEventTestHigherBetter" checked> Higher result is better</label></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="backToManageEventList()">Back</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Test</button></div>
+        </form>
+    </div>
+</div></div>
+
+<div class="modal-overlay hidden" id="myGymModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeMyGym()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> My Club</h2>
+    <div class="form-group"><label>Club Name</label><input type="text" id="myGymName" maxlength="60"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;" id="myGymTierInfo"></div>
+    <div class="form-group"><label>Invite Code</label><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><code id="myGymInviteCode" style="font-size:14px;background:var(--bg-input);padding:6px 12px;border-radius:6px;letter-spacing:0.5px;"></code><button type="button" class="row-action-btn" onclick="window.handleCopyMyInviteCode()">Copy</button></div><span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">Share this with people you want to join your club. Subscription tier and status are set by TOPSET support — reach out if you need to change your member limit.</span></div>
+    <div class="modal-buttons" style="margin-top:0;margin-bottom:18px;"><button type="button" class="btn btn-primary" onclick="window.handleSaveMyGymName()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Name</button></div>
+    <!-- Official Results Day is gone — there's no official-result concept
+         anymore. Classes/schedules/roster-attendance/weekly-journal-review
+         all live in the Manage Classes panel now, not here. -->
+    <div class="form-group"><label>Classes</label><button type="button" class="btn btn-outline btn-sm" onclick="closeMyGym(); window.openManageClasses();"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Manage Classes</button><span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">Create classes, set schedules, and review member roster, attendance, and weekly journals.</span></div>
+    <div class="form-group"><label>Members</label></div>
+    <div id="myGymRosterList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--bg-input);margin-bottom:18px;"></div>
+    <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeMyGym()">Close</button></div>
+</div></div>
+
+<!-- Manage Classes modal — club manager panel wired in classes-ui.js. Four
+     views in one modal: class list (default) → Exercises & Schedule /
+     Roster & Attendance / Weekly Journal Review, all reachable from the list
+     and all backing out to it via window.backToClassList(). -->
+<div class="modal-overlay hidden" id="manageClassesModal"><div class="modal"><button type="button" class="modal-close-x" onclick="window.closeManageClasses()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Manage Classes</h2>
+
+    <div id="manageClassesListView">
+        <div id="manageClassesList" style="max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+        <form id="addClassForm" onsubmit="window.handleAddClassSubmit(event)">
+            <div class="form-group"><label>Class Name</label><input type="text" id="newClassName" maxlength="60" placeholder="e.g. Tuesday Strength" required></div>
+            <div class="form-group"><label>Description (optional)</label><input type="text" id="newClassDescription" maxlength="200" placeholder="One line describing this class"></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.openClubJournalReview()">Review Weekly Journals</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Class</button></div>
+        </form>
+    </div>
+
+    <div class="hidden" id="classDetailView">
+        <div id="classDetailScopeName" style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:14px;font-weight:600;"></div>
+        <div class="form-group"><label>Exercises</label></div>
+        <div id="classDetailExercisesList" style="margin-bottom:14px;"></div>
+        <form id="addClassExerciseForm" onsubmit="window.handleAddClassExerciseSubmit(event)" style="margin-bottom:20px;">
+            <div class="form-group"><label>Exercise Name</label><input type="text" id="newClassExerciseName" maxlength="60" placeholder="e.g. Back Squat" required></div>
+            <div class="modal-buttons" style="margin-top:8px;"><button type="submit" class="btn btn-outline btn-sm"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Exercise</button></div>
+        </form>
+        <div class="form-group"><label>Schedule</label></div>
+        <div id="classDetailSchedulesList" style="margin-bottom:14px;"></div>
+        <form id="addClassScheduleForm" onsubmit="window.handleAddClassScheduleSubmit(event)">
+            <div class="form-group" id="newScheduleDays"><label>Days</label><div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:none;letter-spacing:normal;"><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="MO">Mon</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="TU">Tue</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="WE">Wed</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="TH">Thu</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="FR">Fri</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="SA">Sat</label><label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" value="SU">Sun</label></div></div>
+            <div class="form-group"><label>Time (optional)</label><input type="text" id="newScheduleTime" maxlength="10" placeholder="e.g. 18:00"></div>
+            <span style="font-size:11px;color:var(--text-muted);">Display only — doesn't restrict when members can check in.</span>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.backToClassList()">Back</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Schedule</button></div>
+        </form>
+    </div>
+
+    <div class="hidden" id="classRosterView">
+        <div id="classRosterScopeName" style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:14px;font-weight:600;"></div>
+        <div class="form-group"><label>Enrolled</label></div>
+        <div id="classRosterEnrolledList" style="max-height:180px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--bg-input);margin-bottom:16px;"></div>
+        <div class="form-group"><label>Recent Check-ins</label></div>
+        <div id="classRosterAttendanceList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--bg-input);margin-bottom:16px;"></div>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.backToClassList()">Back</button></div>
+    </div>
+
+    <div class="hidden" id="classJournalReviewView">
+        <div class="streak-cal-nav" style="margin-top:-6px;">
+            <button type="button" class="streak-cal-nav-btn" onclick="window.journalReviewPrevWeek()" title="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="streak-cal-month-label" id="classJournalReviewWeekLabel"></span>
+            <button type="button" class="streak-cal-nav-btn" onclick="window.journalReviewNextWeek()" title="Next week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div id="classJournalReviewList" style="max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:16px 0;"></div>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.backToClassList()">Back</button></div>
+    </div>
+</div></div>
+
+<div class="modal-overlay hidden" id="editEntryModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeEditEntryModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit Entry</h2><form id="editEntryForm" onsubmit="handleEditEntrySubmit(event)"><div class="form-group"><label>Test</label><input type="text" id="editEntryTest" disabled style="opacity:0.6;"></div><div class="form-group"><label id="editEntryResultLabel">Result</label><input type="text" id="editEntryResult" required></div><div class="form-group"><label>Date</label><input type="date" id="editEntryDate" required></div><div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeEditEntryModal()">Cancel</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Changes</button></div></form></div></div>
+
+<div class="modal-overlay hidden" id="statCardModal"><div class="modal" style="max-width:760px;"><button type="button" class="modal-close-x" onclick="closeStatCard()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 20 8.5 17 20 7 20 4 8.5"/><path d="M12 2v12M4 8.5l8 5.5M20 8.5l-8 5.5M7 20l5-6M17 20l-5-6"/></svg> Stat Card</h2><div id="statCardContent" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;"></div></div></div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Firebase: powers ALL app data — profiles, entries, history, PRs, streaks, leaderboard, and auth. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="js/core.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/clubs.js"></script>
+<script src="js/classes.js"></script>
+<script src="js/classes-ui.js"></script>
+<script src="js/entries-journal.js"></script>
+<script src="js/classes-member-ui.js"></script>
+<script src="js/results-ui.js"></script>
+<script src="js/leaderboard-ui.js"></script>
+<script src="js/admin-ui.js"></script>
+<script src="js/events-ui.js"></script>
+<script src="js/app-init.js"></script>
+</body>
+</html>
