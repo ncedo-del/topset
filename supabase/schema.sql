@@ -128,3 +128,20 @@ CREATE TABLE IF NOT EXISTS public.opportunity_applications (
 );
 
 CREATE INDEX IF NOT EXISTS idx_applications_athlete ON public.opportunity_applications(athlete_firebase_uid);
+
+-- 7. Row Level Security (RLS) & Anon Access Policies
+ALTER TABLE public.test_catalog ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.athlete_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.test_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.opportunities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.opportunity_applications ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to active test catalog & active opportunities
+CREATE POLICY "Public read test catalog" ON public.test_catalog FOR SELECT USING (true);
+CREATE POLICY "Public read active opportunities" ON public.opportunities FOR SELECT USING (is_active = true);
+
+-- Allow public read for opted-in public athlete profiles (for Scout discovery)
+CREATE POLICY "Public read public athlete profiles" ON public.athlete_profiles FOR SELECT USING (is_public = true);
+
+-- Allow read for test entries
+CREATE POLICY "Public read test entries" ON public.test_entries FOR SELECT USING (true);
