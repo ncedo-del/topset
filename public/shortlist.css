@@ -1,0 +1,162 @@
+/* shortlist.css — drop into your existing stylesheet or link separately.
+   Uses plain colors, not app CSS variables, since I don't have your
+   theme tokens — swap the hex values for your existing --vars. */
+
+.shortlist-bookmark-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.shortlist-bookmark-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+.shortlist-bookmark-btn.is-active {
+  color: #111827;
+}
+
+.shortlist-count-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.shortlist-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+.shortlist-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.shortlist-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(360px, 100%);
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.shortlist-overlay.is-open .shortlist-panel {
+  transform: translateX(0);
+}
+
+.shortlist-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.shortlist-panel-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.shortlist-close-btn {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.shortlist-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.shortlist-empty {
+  padding: 24px 16px;
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+}
+
+.shortlist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 8px;
+  border-radius: 6px;
+}
+.shortlist-row:hover {
+  background: #f9fafb;
+}
+.shortlist-row-info {
+  font-size: 14px;
+  color: #111827;
+}
+.shortlist-row-info.is-clickable {
+  cursor: pointer;
+}
+.shortlist-row-info.is-clickable:hover {
+  text-decoration: underline;
+}
+.shortlist-row-remove {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+}
+.shortlist-row-remove:hover {
+  color: #ef4444;
+}
+
+[data-theme="dark"] .shortlist-panel {
+  background: var(--bg-modal, #181818);
+  color: var(--text-primary, #f5f5f5);
+  border-left: 1px solid var(--border, #2c2c2c);
+}
+[data-theme="dark"] .shortlist-panel-header {
+  border-bottom: 1px solid var(--border, #2c2c2c);
+}
+[data-theme="dark"] .shortlist-panel-header h2 {
+  color: var(--text-primary, #f5f5f5);
+}
+[data-theme="dark"] .shortlist-bookmark-btn {
+  color: var(--text-muted, #6e6e6e);
+}
+[data-theme="dark"] .shortlist-bookmark-btn.is-active {
+  color: var(--accent-green, #4ade80);
+}
+[data-theme="dark"] .shortlist-row:hover {
+  background: var(--bg-card-hover, #202020);
+}
+[data-theme="dark"] .shortlist-row-info {
+  color: var(--text-primary, #f5f5f5);
+}
+[data-theme="dark"] .shortlist-count-badge {
+  background: var(--accent-green, #4ade80);
+  color: #0b0b0b;
+}

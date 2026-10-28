@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0b0b" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f5f5" media="(prefers-color-scheme: light)">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <title>TOPSET — Fitness Log with Profile</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/open-props"/>
+
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/home.css">
+</head>
+<body>
+
+<header class="header">
+    <div class="header-left">
+        <div class="logo" onclick="navigateTo('home')"><img src="" alt="TOPSET" class="logo-img" id="logoImg" /><span class="logo-dot"></span></div>
+        <div class="interface-toggle" id="headerInterfaceToggle" style="display:inline-flex;align-items:center;background:var(--bg-input);border:1.5px solid var(--border);border-radius:40px;padding:2px;gap:2px;margin-left:6px;">
+            <button type="button" class="btn-mode active" id="btnModeAthlete" onclick="window.switchToAthleteMode()" title="Athlete Interface" style="font-family:var(--font-body);font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:40px;border:none;background:var(--accent-green);color:#0b0b0b;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s ease;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg>
+                Athlete
+            </button>
+            <button type="button" class="btn-mode" id="btnModeScout" onclick="window.switchToScoutMode()" title="Scout &amp; Talent Discovery" style="font-family:var(--font-body);font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:40px;border:none;background:transparent;color:var(--text-secondary);cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all 0.15s ease;">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Scout
+            </button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="window.openAboutModal()" id="aboutBtn" title="About TOPSET">About</button>
+    </div>
+    <div class="header-right">
+        <nav class="desktop-nav" id="desktopNav">
+            <button class="nav-tab active" data-page="home"><svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5Z"/></svg> Home</button>
+            <button class="nav-tab" data-page="log"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Log</button>
+            <button class="nav-tab" data-page="history"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
+            <button class="nav-tab" data-page="prs"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
+            <button class="nav-tab" data-page="leaderboard" id="desktopNavLeaderboard"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+            <button class="nav-tab" id="desktopNavOpportunities" onclick="window.openOpportunitiesModal()"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Opps</button>
+            <button class="nav-tab hidden" data-page="event" id="desktopNavEvent"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
+        </nav>
+        <button class="streak-count-badge hidden" id="streakBadgeBtn" onclick="window.openStreakModal()" title="Streak & Journal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span>Streak: <strong id="streakBadgeCount">0</strong></span></button>
+        <button type="button" class="icon-btn hidden" id="notifBtn" onclick="window.openNotifModal()" title="Notifications" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="notif-badge hidden" id="notifBadge">0</span></button>
+        <button type="button" class="icon-btn" id="profileHubBtn" onclick="window.openProfileHub()" title="Profile &amp; settings" aria-label="Profile and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+</header>
+
+<div class="email-verify-banner hidden" id="emailVerifyBanner">
+    <span>Please verify your email — check your inbox for a link from TOPSET.</span>
+    <button type="button" onclick="window.handleResendVerification()">Resend email</button>
+    <button type="button" onclick="window.handleRefreshVerification()">I've verified</button>
+</div>
+
+<nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-page="home"><svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5Z"/></svg> Home</button>
+    <button class="bottom-nav-item" data-page="log"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Log</button>
+    <button class="bottom-nav-item" data-page="history"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
+    <button class="bottom-nav-item" data-page="prs"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
+    <button class="bottom-nav-item" data-page="leaderboard" id="bottomNavLeaderboard"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+    <button class="bottom-nav-item" id="bottomNavOpportunities" onclick="window.openOpportunitiesModal()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Opps</button>
+    <button class="bottom-nav-item hidden" data-page="event" id="bottomNavEvent"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
+    <button class="bottom-nav-item hidden" id="bottomNavManageTestsBtn" onclick="window.openManageTests()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Tests</button>
+    <button class="bottom-nav-item hidden" id="bottomNavMyGymBtn" onclick="window.openMyGym()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> My Gym</button>
+</nav>
+
+<div class="main-container">
+    <div class="page active" id="page-home">
+        <div class="home-wrap">
+            <!-- 1. Hero Section -->
+            <section class="home-hero">
+                <div class="home-eyebrow">TOPSET · Athlete Performance Hub</div>
+                <h1 class="home-title">Your performance.<br>Your next opportunity.</h1>
+                <p class="home-sub" id="homeHeroSub">Track progress, prove your ability and connect with opportunities.</p>
+                <div class="home-hero-meta hidden" id="homeHeroMeta">
+                    <span class="home-meta-badge hidden" id="homeHeroSportBadge"></span>
+                    <span class="home-meta-badge hidden" id="homeHeroGymBadge"></span>
+                    <span class="home-meta-badge is-verified hidden" id="homeHeroVerifiedBadge">✓ Official Athlete</span>
+                </div>
+            </section>
+
+            <!-- 2. "Your Next Move" action card -->
+            <section class="home-next-move" id="homeNextMoveSection">
+                <div class="home-next-move-card">
+                    <div class="home-next-move-header">
+                        <span class="home-next-move-tag">
+                            <span class="next-move-pulse"></span>
+                            <span id="homeNextMoveTagText">YOUR NEXT MOVE</span>
+                        </span>
+                        <span class="home-next-move-step" id="homeNextMoveStep">Objective</span>
+                    </div>
+                    <div class="home-next-move-body">
+                        <h3 class="home-next-move-title" id="homeNextMoveTitle">Record your baseline result</h3>
+                        <p class="home-next-move-desc" id="homeNextMoveDesc">Log your first performance benchmark to establish your verified baseline and join the leaderboard.</p>
+                    </div>
+                    <div class="home-next-move-actions">
+                        <button type="button" class="btn btn-primary" id="homeNextMoveBtn" data-home-action="log">
+                            <span id="homeNextMoveBtnText">Log a Result</span>
+                            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Primary Quick Actions -->
+            <div class="home-actions">
+                <button type="button" class="home-action" data-home-go="log">
+                    <span class="home-action-icon is-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+                    <span class="home-action-text"><strong>Log a result</strong><span>Record performance benchmark</span></span>
+                    <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+                <button type="button" class="home-action" data-home-go="prs">
+                    <span class="home-action-icon is-secondary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg></span>
+                    <span class="home-action-text"><strong>View progress</strong><span>Personal bests &amp; progression</span></span>
+                    <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+                <button type="button" class="home-action" data-home-go="opps">
+                    <span class="home-action-icon is-tertiary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
+                    <span class="home-action-text"><strong>Opportunities</strong><span>Trials, sponsorships &amp; grants</span></span>
+                    <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+                </button>
+            </div>
+
+            <!-- 4. Performance Summary (3 cards) -->
+            <div class="home-section-head">
+                <h2 class="home-h2">Your performance</h2>
+                <button type="button" class="home-head-link" data-home-go="history">Test History →</button>
+            </div>
+            <div class="home-stats-grid">
+                <!-- Latest Result Card -->
+                <button type="button" class="home-stat-card is-interactive" data-home-go="history" id="homeLatestCard">
+                    <div class="home-stat-head">
+                        <span class="home-stat-icon-wrap is-latest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                        <span class="home-stat-title">Latest Result</span>
+                        <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+                    </div>
+                    <div class="home-latest-main">
+                        <div class="home-stat-num-sm" id="homeLatestValue">–</div>
+                        <div class="home-stat-sublabel" id="homeLatestTest">No results yet</div>
+                    </div>
+                    <div class="home-stat-foot" id="homeLatestFoot">
+                        <span id="homeLatestDate">Log a test to set your first</span>
+                        <span class="home-badge-pill hidden" id="homeLatestBadge">VERIFIED</span>
+                    </div>
+                </button>
+
+                <!-- Personal Records Card -->
+                <button type="button" class="home-stat-card is-interactive" data-home-go="prs" id="homePrCard">
+                    <div class="home-stat-head">
+                        <span class="home-stat-icon-wrap is-pr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg></span>
+                        <span class="home-stat-title">Personal Records</span>
+                        <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+                    </div>
+                    <div class="home-stat-num" id="homePrCount">–</div>
+                    <div class="home-stat-label">personal bests</div>
+                    <div class="home-stat-foot" id="homePrFoot">Log a result to set your first</div>
+                </button>
+
+                <!-- Consistency & Activity Card -->
+                <button type="button" class="home-stat-card is-interactive" data-home-go="streak" id="homeStreakCard">
+                    <div class="home-stat-head">
+                        <span class="home-stat-icon-wrap is-activity"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
+                        <span class="home-stat-title">Weekly Activity</span>
+                        <svg class="home-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+                    </div>
+                    <div class="home-stat-num" id="homeWeekCount">–</div>
+                    <div class="home-stat-label">tests logged this week</div>
+                    <div class="home-stat-foot" id="homeRecentFoot">No results logged yet</div>
+                </button>
+            </div>
+
+            <!-- 5. Compact Leaderboard Preview -->
+            <div class="home-section-head">
+                <h2 class="home-h2">Leaderboard standing</h2>
+                <button type="button" class="home-head-link" data-home-go="leaderboard">Full Leaderboard →</button>
+            </div>
+            <div class="home-leaderboard-card" id="homeLeaderboardCard">
+                <div class="home-lb-content" id="homeLbContent">
+                    <div class="home-lb-left">
+                        <span class="home-lb-scope" id="homeLbScope">TOPSET LEADERBOARD</span>
+                        <h4 class="home-lb-test" id="homeLbTest">Spotlight Benchmark</h4>
+                        <p class="home-lb-desc" id="homeLbDesc">See where your verified marks rank against teammates and the TOPSET network.</p>
+                    </div>
+                    <div class="home-lb-right">
+                        <div class="home-lb-rank-badge" id="homeLbRankBadge">–</div>
+                        <span class="home-lb-rank-label" id="homeLbRankLabel">Current Rank</span>
+                    </div>
+                </div>
+                <div class="home-lb-footer">
+                    <button type="button" class="btn btn-outline btn-sm" data-home-go="leaderboard">Open Leaderboard</button>
+                    <span class="home-lb-subtext" id="homeLbSubtext">Rankings update in real-time</span>
+                </div>
+            </div>
+
+            <!-- 6. Featured Opportunities Preview -->
+            <div class="home-section-head">
+                <h2 class="home-h2">Featured opportunities</h2>
+                <button type="button" class="home-head-link" data-home-go="opps">View All →</button>
+            </div>
+            <div class="home-opps-preview" id="homeOppsPreview">
+                <div class="empty-state" style="padding:16px;">Loading opportunities...</div>
+            </div>
+        </div>
+    </div>
+    <div class="page" id="page-log">
+        <div class="stats-row" id="statsRow">
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+            <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
+        </div>
+        <div class="card"><div class="card-header">Log Test Result<span id="logGymBadge" class="hidden" style="font-size:11px;font-weight:600;color:var(--accent-green);margin-left:8px;padding:4px 10px;background:var(--accent-tint-bg);border-radius:40px;"></span></div>
+            <form id="logForm" onsubmit="handleLogSubmit(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTest" required onchange="updateResultField()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroup"><label id="resultLabel">Result</label><input type="text" id="logResult" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDate" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div><div class="form-group hidden" id="officialCheckboxWrap" style="margin-top:12px;"><label style="display:flex;align-items:center;gap:12px;cursor:pointer;text-transform:none;font-weight:600;color:var(--text-primary);font-size:13px;padding:10px 8px;margin:-10px -8px;border-radius:8px;-webkit-user-select:none;user-select:none;"><input type="checkbox" id="logIsOfficial" style="width:22px;height:22px;min-width:22px;flex-shrink:0;accent-color:var(--accent-green);">Mark as Official Result</label><span id="officialHint" style="font-size:11px;color:var(--text-muted);margin-top:3px;display:block;"></span></div></form>
+        </div>
+        <!-- Second Log form, ONLY shown to signed-in members who belong to a gym (toggled in
+             updateLogFormVisibility). Lets a gym member ALSO log a result into the public,
+             TOPSET-wide pool — separate from their gym's leaderboard — so they can compete
+             against everyone on TOPSET, not just their own gym. Always uses the pure global
+             test catalog (appState.globalTests), never the gym's own custom tests, and never
+             carries the "Official" flag — official results are a gym-scoped concept tied to a
+             gym's officialTestDate, which doesn't apply to the public pool. -->
+        <div class="card hidden" id="publicLogCard"><div class="card-header">Log to TOPSET Public<span style="font-size:11px;font-weight:500;color:var(--text-muted);margin-left:8px;text-transform:none;">Compete gym-wide, not just at your gym</span></div>
+            <form id="logFormPublic" onsubmit="handleLogSubmitPublic(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTestPublic" required onchange="updateResultFieldPublic()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroupPublic"><label id="resultLabelPublic">Result</label><input type="text" id="logResultPublic" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDatePublic" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Public Result</button></div></form>
+        </div>
+    </div>
+    <div class="page" id="page-history">
+        <div class="history-wrap">
+            <!-- 1. Progress Header & Summary Stats -->
+            <div class="card history-hero">
+                <div class="history-hero-top">
+                    <div>
+                        <div class="history-eyebrow">ATHLETE PERFORMANCE TIMELINE</div>
+                        <h2 class="history-title">Progress &amp; Test History</h2>
+                        <p class="history-sub">Chronological benchmark history, delta comparisons, and performance trend visualizations.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="navigateTo('log')">
+                        <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        Log Result
+                    </button>
+                </div>
+                
+                <!-- Quick Summary Stats Strip -->
+                <div class="history-stats-strip" id="historyStatsStrip">
+                    <div class="history-stat-box">
+                        <span class="history-stat-label">Total Logged</span>
+                        <strong class="history-stat-val" id="histTotalCount">0</strong>
+                    </div>
+                    <div class="history-stat-box">
+                        <span class="history-stat-label">Personal Bests</span>
+                        <strong class="history-stat-val is-gold" id="histPrCount">0</strong>
+                    </div>
+                    <div class="history-stat-box">
+                        <span class="history-stat-label">Tests Tracked</span>
+                        <strong class="history-stat-val is-green" id="histUniqueCount">0</strong>
+                    </div>
+                    <div class="history-stat-box">
+                        <span class="history-stat-label">Verified Results</span>
+                        <strong class="history-stat-val" id="histVerifiedCount">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Progression Trend Chart -->
+            <div class="card history-chart-card" id="historyChartCard">
+                <div class="history-chart-header">
+                    <div>
+                        <div class="history-chart-eyebrow">PROGRESSION TREND</div>
+                        <h3 class="history-chart-test" id="histChartTestName">Benchmark</h3>
+                    </div>
+                    <div class="history-chart-meta" id="histChartMeta">
+                        <span class="badge badge-green" id="histChartPbBadge">PB: –</span>
+                        <span class="history-chart-delta" id="histChartDelta">Baseline</span>
+                    </div>
+                </div>
+                <div class="history-chart-body" id="histChartBody">
+                    <!-- Responsive SVG Chart injected here -->
+                </div>
+            </div>
+
+            <!-- 3. Filters Bar -->
+            <div class="card history-filter-card" id="historyFilterCard">
+                <div class="history-filter-bar">
+                    <div class="history-filter-group">
+                        <label for="historyTestFilter">Benchmark Test</label>
+                        <select id="historyTestFilter" onchange="renderHistory()">
+                            <option value="">All Tests</option>
+                        </select>
+                    </div>
+                    <div class="history-filter-group">
+                        <label for="historyTimeFilter">Time Period</label>
+                        <select id="historyTimeFilter" onchange="renderHistory()">
+                            <option value="all">All Time</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="365">Past Year</option>
+                        </select>
+                    </div>
+                    <div class="history-filter-group">
+                        <label for="historyStatusFilter">Verification</label>
+                        <select id="historyStatusFilter" onchange="renderHistory()">
+                            <option value="all">All Results</option>
+                            <option value="verified">Verified Official Only</option>
+                            <option value="self">Self-Reported Only</option>
+                        </select>
+                    </div>
+                    <div class="history-filter-reset">
+                        <button type="button" class="btn btn-ghost btn-sm" id="historyResetFiltersBtn" onclick="window.resetHistoryFilters()">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Chronological Results Timeline -->
+            <div class="card">
+                <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span>Chronological Results Timeline</span>
+                    <span class="history-count-badge" id="historyFilteredCountBadge" style="font-size:12px;color:var(--text-muted);font-weight:600;">0 entries</span>
+                </div>
+                <div class="table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Benchmark Test</th>
+                                <th>Result</th>
+                                <th>Progression / Delta</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr><td colspan="6" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg></span>No tests logged yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="history-footnote">
+                    <p style="margin:0;font-size:12px;color:var(--text-muted);line-height:1.4;"><strong>Note:</strong> Performance comparisons are calculated chronologically against the immediately preceding attempt of the same benchmark test according to its official scoring direction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page" id="page-prs"><div class="card"><div class="card-header">Personal Records</div><div class="table-wrapper"><table><thead><tr><th>Test</th><th>Best Result</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody id="prTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg></span>No PRs yet. Start logging!</td></tr></tbody></table></div></div></div>
+    <div class="page" id="page-leaderboard"><div class="card"><div class="card-header">Leaderboard <span id="leaderboardGymLabel" style="font-size:13px;font-weight:600;color:var(--accent-green);margin-left:8px;padding:4px 10px;background:var(--accent-tint-bg);border-radius:40px;"></span> <select id="filterBoardScope" class="hidden" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="gym">My Gym</option><option value="public">Public · TopSet-Wide</option></select> <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">Spotlight:</span><select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">-- Select Test --</option></select><select id="filterResultScope" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="regular">Regular</option><option value="official">Official</option></select><select id="filterAgeGroup" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Ages</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select><select id="filterGender" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Genders</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div id="myRankBar"></div><div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Test</th><th>Best</th><th>Date</th></tr></thead><tbody id="leaderboardTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg></span>Select a spotlight test to see rankings.</td></tr></tbody></table></div></div></div>
+    <div class="page" id="page-event">
+        <div class="card">
+            <div class="card-header" id="eventTitle">Event</div>
+            <div style="font-size:13px;color:var(--text-secondary);margin:-8px 0 14px;" id="eventDescription"></div>
+            <div id="eventPageContent"></div>
+        </div>
+        <div class="card hidden" id="eventLogCard">
+            <div class="card-header">Log Event Result</div>
+            <form id="eventLogForm" onsubmit="handleEventLogSubmit(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>Test</label><select id="eventLogTest" required onchange="updateEventResultField()"><option value="">-- Select Test --</option></select></div>
+                    <div class="form-group"><label id="eventResultLabel">Result</label><input type="text" id="eventLogResult" placeholder="Select test first" required autocomplete="off"></div>
+                </div>
+                <div class="modal-buttons" style="margin-top:12px;"><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header">Event Leaderboard <select id="eventSpotlightSelect" onchange="renderEventLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">-- Select Test --</option></select></div>
+            <div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Best</th><th>Updated</th></tr></thead><tbody id="eventLeaderboardBody"><tr><td colspan="4" class="empty-state">Select a test to see rankings.</td></tr></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<!-- Public, signed-out-readable athlete profile page — rendered by
+     renderPublicAthletePage() in athlete-profile-ui.js when the URL matches
+     /athlete/{uid}. Kept outside .main-container and hidden by default so
+     it never shows during normal signed-in app use. -->
+<div class="public-athlete-page hidden" id="page-public-athlete"></div>
+
+<!-- Modals: Auth, Edit Profile, Edit Entry -->
+
+<div class="modal-overlay hidden" id="authModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeAuthModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2 id="authModalTitle"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Sign In</h2><form id="authForm" onsubmit="handleAuthSubmit(event)"><div class="form-group"><label>Email</label><input type="email" id="authEmail" placeholder="you@example.com" required></div><div class="form-group"><label>Password</label><input type="password" id="authPassword" placeholder="••••••••" required minlength="6"></div><div class="form-group hidden" id="authNameGroup"><label>Display Name</label><input type="text" id="authName" placeholder="Your name" maxlength="30"></div><div class="form-group hidden" id="authAvatarGroup"><label>Avatar</label><div class="avatar-picker" id="authAvatarPicker"></div><input type="hidden" id="authAvatar" value="gym"></div><div class="form-group hidden" id="authAgeGroupGroup"><label>Age Group (optional)</label><select id="authAgeGroup"><option value="">Prefer not to say</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select></div><div class="form-group hidden" id="authGenderGroup"><label>Gender (optional)</label><select id="authGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div class="form-group hidden" id="authSportGroup"><label>Sport (optional)</label><select id="authSport"><option value="">Select sport (optional)</option></select></div><div class="form-group hidden" id="authGymCodeGroup"><label>Gym Invite Code</label><input type="text" id="authGymCode" placeholder="e.g. TOPSET-ABC123" maxlength="20" autocapitalize="characters"><span style="font-size:11px;color:var(--text-muted);margin-top:4px;">Ask your gym for their invite code. Leave blank to join without a gym for now — you can add one later in Edit Profile.</span></div><p class="hidden" id="authCookieNotice" style="font-size:11px;color:var(--text-muted);margin:-4px 0 4px;">By signing up, you agree to TOPSET's use of cookies and local storage to keep you signed in and remember your preferences.</p><div class="modal-buttons"><button type="button" class="btn btn-ghost" id="authToggleBtn" onclick="toggleAuthMode()">Need an account? Sign Up</button><button type="submit" class="btn btn-primary" id="authSubmitBtn">Sign In</button></div></form><button type="button" class="btn btn-ghost btn-sm" id="forgotPasswordBtn" onclick="handleForgotPassword()" style="width:100%;margin-top:8px;font-size:12px;opacity:0.7;">Forgot password?</button><div class="auth-divider">or</div><button type="button" class="btn-google" id="googleAuthBtn" onclick="window.handleGoogleAuth()"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.6 15.5 18.9 12 24 12c3.1 0 5.8 1.1 8 3l6-6C34.6 5.1 29.6 3 24 3 16.3 3 9.6 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.5 0 10.4-1.9 14.3-5.1l-6.6-5.6C29.6 36 26.9 37 24 37c-5.3 0-9.7-3.1-11.3-7.9l-6.6 5.1C9.5 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.6 5.6C39.6 37.5 43 31.5 43 24c0-1.2-.1-2.4-.4-3.5z"/></svg> Continue with Google</button></div></div>
+
+<div class="modal-overlay hidden" id="aboutModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeAboutModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <div class="about-eyebrow">Performance as a lifestyle</div>
+    <h2 class="about-title">What is TOPSET?</h2>
+    <div class="about-body">
+        <p>TOPSET is a performance and athletic club platform turning your workout data into a clear, traceable baseline — helping athletes and everyday enthusiasts build consistency, track progress, and compete on a single platform.</p>
+        <p>Through live scoreboards and traceable metrics, we take the guesswork out of training and turn individual effort into a shared community standard. Whether you're chasing your first major personal record or pushing to top a leaderboard, we give your hard work <strong>the proof it deserves</strong>.</p>
+        <p style="font-size:13px;font-style:italic;color:var(--text-muted);">Traditional, pure, and hybrid sports all considered.</p>
+    </div>
+    <hr class="about-divider">
+    <div class="about-cta-row">
+        <button type="button" class="btn btn-primary" onclick="window.openAuthModal('signup')">Create Your Profile →</button>
+        <button type="button" class="about-link" onclick="window.openAuthModal('signin')">Already have an account? Sign in</button>
+        <button type="button" class="about-link" onclick="window.openInstallModal()" style="margin-top:6px;">How do I install this as an app?</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:14px;opacity:0.6;">Build <span id="aboutBuildStamp"></span></div>
+</div></div>
+
+<div class="modal-overlay hidden" id="installModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeInstallModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg> Add TOPSET to Your Home Screen</h2>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">This app can be saved among your apps — no App Store needed. Opens full-screen, loads faster, and keeps your streak one tap away.</p>
+    <div class="install-columns">
+        <div class="install-col">
+            <h3>Android — Chrome</h3>
+            <ol>
+                <li>Tap the <strong>⋮</strong> menu in the top-right corner</li>
+                <li>Tap <strong>Add to Home screen</strong></li>
+                <li>Tap <strong>Add</strong> to confirm</li>
+            </ol>
+        </div>
+        <div class="install-col">
+            <h3>iPhone — Safari</h3>
+            <ol>
+                <li>Tap the <strong>Share</strong> icon (square with an arrow) in the bottom bar</li>
+                <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
+                <li>Tap <strong>Add</strong> in the top-right corner</li>
+            </ol>
+        </div>
+    </div>
+    <div class="modal-buttons" style="justify-content:center;">
+        <button type="button" class="btn btn-outline" onclick="window.closeInstallModal()">Got it</button>
+    </div>
+</div></div>
+
+<!-- Streak / Journal Modal — a daily journal for how a session felt (or that it was a
+     rest day), independent of the Log form. One entry per day, rated Rest/Light/
+     Moderate/Hard, shown as a GitHub-contribution-style calendar. -->
+<div class="modal-overlay hidden" id="streakModal"><div class="modal modal-wide">
+    <button type="button" class="modal-close-x" onclick="window.closeStreakModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Streak &amp; Journal</h2>
+    <span class="streak-count-badge" id="streakModalCountBadge" style="margin-bottom:16px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span><strong id="streakModalCount">0</strong>-day streak</span></span>
+
+    <div class="streak-week-strip" id="streakWeekStrip"></div>
+
+    <div class="streak-tabs">
+        <button type="button" class="streak-tab-btn active" id="streakTabBtnCalendar" onclick="window.switchStreakTab('calendar')">Calendar</button>
+        <button type="button" class="streak-tab-btn" id="streakTabBtnJournal" onclick="window.switchStreakTab('journal')">Journal</button>
+    </div>
+
+    <div class="streak-tab-pane active" id="streakPaneCalendar">
+        <div class="streak-cal-nav">
+            <button type="button" class="streak-cal-nav-btn" onclick="window.streakCalPrevMonth()" title="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="streak-cal-month-label" id="streakCalMonthLabel"></span>
+            <button type="button" class="streak-cal-nav-btn" onclick="window.streakCalNextMonth()" title="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="streak-cal-grid" id="streakCalGrid"></div>
+        <div class="streak-cal-legend">
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-none);"></span>None</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-rest);"></span>Rest</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-light);"></span>Light</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-moderate);"></span>Moderate</div>
+            <div class="streak-legend-item"><span class="streak-legend-swatch" style="background:var(--streak-hard);"></span>Hard</div>
+        </div>
+    </div>
+
+    <div class="streak-tab-pane" id="streakPaneJournal">
+        <div class="streak-journal-date" id="streakJournalDateLabel">Today</div>
+        <div class="streak-intensity-row" id="streakIntensityRow">
+            <button type="button" class="streak-intensity-btn" data-intensity="rest" onclick="window.selectIntensity('rest')"><span class="streak-intensity-swatch" style="background:var(--streak-rest);"></span>Rest</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="light" onclick="window.selectIntensity('light')"><span class="streak-intensity-swatch" style="background:var(--streak-light);"></span>Light</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="moderate" onclick="window.selectIntensity('moderate')"><span class="streak-intensity-swatch" style="background:var(--streak-moderate);"></span>Moderate</button>
+            <button type="button" class="streak-intensity-btn" data-intensity="hard" onclick="window.selectIntensity('hard')"><span class="streak-intensity-swatch" style="background:var(--streak-hard);"></span>Hard</button>
+        </div>
+        <textarea class="streak-journal-textarea" id="streakJournalTextarea" placeholder="How did today's session feel? Notes, soreness, mood — whatever's worth remembering." maxlength="500"></textarea>
+        <div class="modal-buttons" style="margin-top:14px;">
+            <button type="button" class="btn btn-primary" onclick="window.saveJournalEntry()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Save Entry</button>
+        </div>
+    </div>
+</div></div>
+
+<!-- NEW: Edit Profile Modal -->
+<div class="modal-overlay hidden" id="editProfileModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeEditProfileModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit Profile</h2><form id="editProfileForm" onsubmit="handleEditProfileSubmit(event)"><div class="form-group"><label>Display Name</label><input type="text" id="profileName" maxlength="30" required></div><div class="form-group"><label>Avatar</label><div class="avatar-picker" id="profileAvatarPicker"></div><input type="hidden" id="profileAvatar" value="gym"></div><div class="form-group"><label>Age Group (optional)</label><select id="profileAgeGroup"><option value="">Prefer not to say</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select></div><div class="form-group"><label>Gender (optional)</label><select id="profileGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div class="form-group"><label>Sport (optional)</label><select id="profileSport"><option value="">No sport selected</option></select></div><div class="form-group"><label>Gym <span id="profileGymStatus" style="text-transform:none;font-weight:500;color:var(--text-muted);"></span></label><input type="text" id="profileGymCode" placeholder="Enter invite code to join a gym" maxlength="20" autocapitalize="characters"><button type="button" class="row-action-btn danger hidden" id="leaveGymBtn" onclick="window.handleLeaveGym()" style="margin-top:8px;width:fit-content;">Leave Gym</button></div><div class="form-group"><label>New Password (optional)</label><input type="password" id="profilePassword" placeholder="Leave blank to keep current"></div><div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeEditProfileModal()">Cancel</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Changes</button></div></form><button type="button" class="btn btn-outline btn-sm" style="width:100%;margin-top:4px;" onclick="closeEditProfileModal(); window.openAthleteProfileModal();">Public Athlete Profile</button><div class="danger-zone"><div class="danger-zone-label">Danger Zone</div><button type="button" class="btn-danger-outline" id="deleteAccountBtn" onclick="window.handleDeleteAccount()">Delete Account</button><div class="danger-zone-hint">Permanently deletes your profile, journal, and leaderboard history, plus any non-official entries. Official results locked in by your gym stay on record. This cannot be undone.</div></div></div></div>
+
+<!-- Athlete Profile Modal — Phase 1 "Athlete Identity", opt-in public profile
+     editor. Fields wired in athlete-profile-ui.js. -->
+<div class="modal-overlay hidden" id="athleteProfileModal"><div class="modal">
+  <button type="button" class="modal-close-x" onclick="closeAthleteProfileModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  <h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a6 6 0 0 1 12 0v2"/></svg> Athlete Profile</h2>
+  <p style="font-size:12px;color:var(--text-muted);margin-top:-10px;margin-bottom:16px;">Opt in to a public profile page scouts, sponsors, and teammates can view — even signed out. Off by default; nothing here is visible to anyone until you turn it on.</p>
+  <form id="athleteProfileForm" onsubmit="window.handleSaveAthleteProfile(event)">
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;text-transform:none;font-weight:600;color:var(--text-primary);font-size:14px;">
+        <input type="checkbox" id="athleteProfilePublicToggle" onchange="window.handleAthleteProfileToggle()" style="width:22px;height:22px;min-width:22px;accent-color:var(--accent-green);">
+        Make my profile public
+      </label>
+    </div>
+    <div class="form-group hidden" id="athleteProfileLinkRow" style="background:var(--bg-input);border-radius:var(--radius-sm);padding:10px 12px;">
+      <label>Your public link</label>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <code id="athleteProfileLinkText" style="font-size:12px;word-break:break-all;flex:1;"></code>
+        <button type="button" class="row-action-btn" onclick="window.handleCopyAthleteProfileLink()">Copy</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Sport</label><select id="athleteProfileSport"><option value="">No sport selected</option></select></div>
+    <div class="form-group"><label>Location</label><input type="text" id="athleteProfileLocation" maxlength="60" placeholder="e.g. Soweto, Johannesburg"></div>
+    <div class="form-group"><label>Bio</label><textarea id="athleteProfileBio" maxlength="500" rows="4" style="font-family:var(--font-body);font-size:14px;padding:12px 14px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);resize:vertical;" placeholder="A few lines about you as an athlete."></textarea></div>
+    <div class="form-group">
+      <label>Availability</label>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:500;font-size:13px;margin-bottom:6px;"><input type="checkbox" id="athleteAvailSponsorship"> Open to sponsorship</label>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:500;font-size:13px;margin-bottom:6px;"><input type="checkbox" id="athleteAvailTrials"> Open to team trials</label>
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-weight:500;font-size:13px;"><input type="checkbox" id="athleteAvailOpportunities"> Open to opportunities generally</label>
+    </div>
+    <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeAthleteProfileModal()">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>
+  </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageTestsModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageTests()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Manage Tests</h2><div id="manageTestsModalScope" style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:14px;font-weight:600;"></div>
+    <div id="manageTestsList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;"></div>
+    <form id="addTestForm" onsubmit="handleAddTestSubmit(event)">
+        <div class="form-group"><label>Test Name</label><input type="text" id="newTestName" maxlength="40" placeholder="e.g. Max Pull-ups" required></div>
+        <div class="form-group"><label><input type="checkbox" id="newTestIsTime" onchange="handleNewTestTimeToggle()"> This test is timed (mm:ss), like a run</label></div>
+        <div class="form-group" id="newTestUnitGroup"><label>Unit</label><input type="text" id="newTestUnit" maxlength="12" placeholder="e.g. reps, kg, cm"></div>
+        <div class="form-group"><label><input type="checkbox" id="newTestHigherBetter" checked> Higher result is better</label><span class="text-muted mt-2">Uncheck for things like race times, where lower is better.</span></div>
+        <div class="form-group" id="newTestSportGroup"><label>Sport</label><select id="newTestSport"><option value="">General (visible to everyone)</option></select><span class="text-muted mt-2">Sport-tagged tests only show for athletes whose profile sport matches. General tests show for everyone.</span></div>
+        <div class="form-group"><label>Example placeholder (optional)</label><input type="text" id="newTestPlaceholder" maxlength="12" placeholder="e.g. 25"></div>
+        <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:-6px;">Decimals are always allowed when logging a result — no need to configure it per test.</span>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageTests()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Test</button></div>
+    </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageGymsModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageGyms()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> Manage Gyms</h2>
+    <div id="manageGymsList" style="max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+    <form id="addGymForm" onsubmit="handleAddGymSubmit(event)">
+        <div class="form-group"><label>Gym Name</label><input type="text" id="newGymName" maxlength="60" placeholder="e.g. Iron Works Gym" required></div>
+        <div class="form-group"><label>Tier</label><select id="newGymTier"><option value="small">Small — 50 members</option><option value="medium">Medium — 126 members</option><option value="large">Large — 250 members</option><option value="xlarge">Extra Large — 520 members</option></select></div>
+        <span style="font-size:11px;color:var(--text-muted);">An invite code is generated automatically — you'll get it right after creating the gym, ready to copy and hand to the gym owner.</span>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageGyms()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Gym</button></div>
+    </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageSportsModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageSports()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg> Manage Sports</h2>
+    <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:-10px;margin-bottom:14px;">The list athletes pick from at signup and in Edit Profile. Tag tests to a sport in Manage Tests.</span>
+    <div id="manageSportsList" style="max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;"></div>
+    <form id="addSportForm" onsubmit="handleAddSportSubmit(event)">
+        <div class="form-group"><label>Sport Name</label><input type="text" id="newSportName" maxlength="40" placeholder="e.g. Rugby" required></div>
+        <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageSports()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Sport</button></div>
+    </form>
+</div></div>
+
+<div class="modal-overlay hidden" id="manageEventModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeManageEvent()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Manage Event</h2>
+    <span style="font-size:11px;color:var(--text-muted);display:block;margin-top:-14px;margin-bottom:14px;">Public — no invite code needed to join. Only one event can be visible at a time; making one visible hides any other.</span>
+
+    <div id="manageEventListView">
+        <div id="manageEventsList" style="max-height:220px;overflow-y:auto;margin-bottom:16px;"></div>
+        <form id="addEventForm" onsubmit="handleAddEventSubmit(event)">
+            <div class="form-group"><label>Event Name</label><input type="text" id="newEventName" maxlength="60" placeholder="e.g. TOPSET Kasi Games 2026" required></div>
+            <div class="form-group"><label>Description (optional)</label><input type="text" id="newEventDescription" maxlength="140" placeholder="One line shown above the board"></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeManageEvent()">Close</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Create Event</button></div>
+        </form>
+    </div>
+
+    <div class="hidden" id="manageEventTestsView">
+        <div id="manageEventTestsScope" style="font-size:12px;color:var(--text-muted);margin-top:-14px;margin-bottom:14px;font-weight:600;"></div>
+        <div id="manageEventTestsList" style="max-height:200px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;"></div>
+        <form id="addEventTestForm" onsubmit="handleAddEventTestSubmit(event)">
+            <div class="form-group"><label>Test Name</label><input type="text" id="newEventTestName" maxlength="40" placeholder="e.g. Sandbag Carry" required></div>
+            <div class="form-group"><label><input type="checkbox" id="newEventTestIsTime" onchange="handleNewEventTestTimeToggle()"> This test is timed (mm:ss)</label></div>
+            <div class="form-group" id="newEventTestUnitGroup"><label>Unit</label><input type="text" id="newEventTestUnit" maxlength="12" placeholder="e.g. reps, kg, cm"></div>
+            <div class="form-group"><label><input type="checkbox" id="newEventTestHigherBetter" checked> Higher result is better</label></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="backToManageEventList()">Back</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Test</button></div>
+        </form>
+    </div>
+</div></div>
+
+<div class="modal-overlay hidden" id="myGymModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeMyGym()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 22v-4h4v4"/><path d="M2 22h20"/><path d="M10 6h4M10 10h4M10 14h4"/></svg> My Gym</h2>
+    <div class="form-group"><label>Gym Name</label><input type="text" id="myGymName" maxlength="60"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;" id="myGymTierInfo"></div>
+    <div class="form-group"><label>Invite Code</label><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><code id="myGymInviteCode" style="font-size:14px;background:var(--bg-input);padding:6px 12px;border-radius:6px;letter-spacing:0.5px;"></code><button type="button" class="row-action-btn" onclick="window.handleCopyMyInviteCode()">Copy</button></div><span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">Share this with people you want to join your gym. Subscription tier and status are set by TOPSET support — reach out if you need to change your member limit.</span></div>
+    <div class="modal-buttons" style="margin-top:0;margin-bottom:18px;"><button type="button" class="btn btn-primary" onclick="window.handleSaveMyGymName()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Name</button></div>
+    <div class="form-group"><label>Official Results Day</label><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><input type="date" id="myGymOfficialDate" style="flex:1;min-width:140px;"><button type="button" class="btn btn-outline btn-sm" onclick="window.handleSaveOfficialDate()">Set</button></div><span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">On this date, members logging a result dated the same day can tick "Mark as Official". Clear the date to close the window. Once official, only you can edit or delete it.</span></div>
+    <div class="form-group"><label>Test Catalog</label><button type="button" class="btn btn-outline btn-sm" onclick="window.openMyGymTests()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Manage My Gym's Tests</button><span style="font-size:11px;color:var(--text-muted);display:block;margin-top:4px;">Customize which tests your members can log and see on your gym's leaderboard. Requires an active subscription.</span></div>
+    <div class="form-group"><label>Members</label></div>
+    <div id="myGymRosterList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--bg-input);margin-bottom:18px;"></div>
+    <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;"><label style="margin-bottom:0;">Official Results</label><button type="button" class="row-action-btn" onclick="window.refreshOfficialResults()">Refresh</button></div>
+    <div id="myGymOfficialResultsList" style="max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;background:var(--bg-input);"></div>
+    <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeMyGym()">Close</button></div>
+</div></div>
+
+<div class="modal-overlay hidden" id="editEntryModal"><div class="modal"><button type="button" class="modal-close-x" onclick="closeEditEntryModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> Edit Entry</h2><form id="editEntryForm" onsubmit="handleEditEntrySubmit(event)"><div class="form-group"><label>Test</label><input type="text" id="editEntryTest" disabled style="opacity:0.6;"></div><div class="form-group"><label id="editEntryResultLabel">Result</label><input type="text" id="editEntryResult" required></div><div class="form-group"><label>Date</label><input type="date" id="editEntryDate" required></div><div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeEditEntryModal()">Cancel</button><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Save Changes</button></div></form></div></div>
+
+<div class="modal-overlay hidden" id="statCardModal"><div class="modal" style="max-width:760px;"><button type="button" class="modal-close-x" onclick="closeStatCard()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 20 8.5 17 20 7 20 4 8.5"/><path d="M12 2v12M4 8.5l8 5.5M20 8.5l-8 5.5M7 20l5-6M17 20l-5-6"/></svg> Stat Card</h2><div id="statCardContent" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;"></div></div></div>
+
+<div class="modal-overlay hidden" id="profileHubModal"><div class="modal hub-modal"><button type="button" class="modal-close-x" onclick="window.closeProfileHub()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><div id="profileHubBody"></div></div></div>
+
+<div class="modal-overlay hidden" id="notifModal"><div class="modal"><button type="button" class="modal-close-x" onclick="window.closeNotifModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button><h2>Notifications</h2><div id="notifList"></div></div></div>
+
+<div class="modal-overlay hidden" id="opportunitiesModal">
+  <div class="modal modal-wide" style="max-width:860px;">
+    <button type="button" class="modal-close-x" onclick="window.closeOpportunitiesModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+      <h2 style="margin:0;"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Opportunities</h2>
+      <button type="button" class="btn btn-primary btn-sm" id="createOpportunityBtn" style="display:none;" onclick="window.openCreateOpportunityModal()"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Post Opportunity</button>
+    </div>
+    <div class="filter-bar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+      <input type="text" id="oppSearch" placeholder="Search opportunities..." oninput="window.applyOpportunityFilters()" style="flex:1;min-width:180px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:13px;">
+      <select id="oppSportFilter" onchange="window.applyOpportunityFilters()" style="padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:13px;font-weight:600;"><option value="">All sports</option></select>
+      <select id="oppTypeFilter" onchange="window.applyOpportunityFilters()" style="padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:13px;font-weight:600;"><option value="">All types</option><option value="Team Trial">Team Trial</option><option value="Sponsorship">Sponsorship</option><option value="Development Grant">Development Grant</option><option value="Academy Contract">Academy Contract</option><option value="Ambassador">Ambassador</option><option value="Other">Other</option></select>
+    </div>
+    <div id="opportunitiesGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:14px;max-height:60vh;overflow-y:auto;padding-right:4px;"></div>
+    <div class="modal-buttons" style="margin-top:16px;"><button type="button" class="btn btn-outline" onclick="window.closeOpportunitiesModal()">Close</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="createOpportunityModal">
+  <div class="modal" style="max-width:540px;">
+    <button type="button" class="modal-close-x" onclick="window.closeCreateOpportunityModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2>Post Opportunity</h2>
+    <form id="createOpportunityForm" onsubmit="window.handleCreateOpportunitySubmit(event)">
+      <div class="form-group"><label>Opportunity Title</label><input type="text" id="newOppTitle" required maxlength="80" placeholder="e.g. U23 Provincial Rugby Trial"></div>
+      <div class="form-group"><label>Organization / Team Name</label><input type="text" id="newOppOrgName" required maxlength="60" placeholder="e.g. Western Province Rugby Academy"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Sport</label><select id="newOppSport"><option value="General">General</option></select></div>
+        <div class="form-group"><label>Type</label><select id="newOppType"><option value="Team Trial">Team Trial</option><option value="Sponsorship">Sponsorship</option><option value="Development Grant">Development Grant</option><option value="Academy Contract">Academy Contract</option><option value="Ambassador">Ambassador</option><option value="Other">Other</option></select></div>
+      </div>
+      <div class="form-group"><label>Location</label><input type="text" id="newOppLocation" maxlength="60" placeholder="e.g. Johannesburg, ZA or Remote"></div>
+      <div class="form-group"><label>Requirements</label><input type="text" id="newOppReqs" maxlength="160" placeholder="e.g. Verified 40m Sprint under 5.1s"></div>
+      <div class="form-group"><label>Description</label><textarea id="newOppDesc" rows="3" maxlength="300" style="font-family:var(--font-body);font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);resize:vertical;" placeholder="Details about this opportunity and next steps."></textarea></div>
+      <div class="form-group"><label>Deadline (optional)</label><input type="date" id="newOppDeadline"></div>
+      <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.closeCreateOpportunityModal()">Cancel</button><button type="submit" class="btn btn-primary">Publish Opportunity</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="opportunityApplicantsModal">
+  <div class="modal modal-wide" style="max-width:680px;">
+    <button type="button" class="modal-close-x" onclick="window.closeOpportunityApplicantsModal()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <h2 id="oppApplicantsTitle">Applicants</h2>
+    <div id="oppApplicantsList" style="max-height:60vh;overflow-y:auto;margin:16px 0;"></div>
+    <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="window.closeOpportunityApplicantsModal()">Close</button></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Firebase: powers ALL app data — profiles, entries, history, PRs, streaks, leaderboard, and auth. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="/js/core.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/gyms.js"></script>
+<script src="/js/athlete-profile.js"></script>
+<script src="/js/athlete-profile-ui.js"></script>
+<script src="/js/discover-ui.js"></script>
+<script src="/js/entries-journal.js"></script>
+<script src="/js/results-ui.js"></script>
+<script src="/js/leaderboard-ui.js"></script>
+<script src="/js/admin-ui.js"></script>
+<script src="/js/events-ui.js"></script>
+<script src="/js/notifications-ui.js"></script>
+<script src="/js/opportunities-ui.js"></script>
+<script src="/js/profile-hub.js"></script>
+<script src="/js/minors.js"></script>
+<script src="/js/app-init.js"></script>
+<script src="/js/scout.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,828 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users/{uid}
+    //   - name: string (<= 60 chars, required)
+    //   - email: string (<= 100 chars, required)
+    //   - avatar: string (<= 40 chars, optional)
+    //   - birthYear: int (1920..year - 14, immutable once set)
+    //   - ageGroup: string (<= 20 chars, optional)
+    //   - gender: string (<= 30 chars, optional)
+    //   - sport: string (<= 60 chars, optional)
+    //   - gymId: string or null (null on create, updated via invite code)
+    //   - claimedInviteCode: string (used when joining gym)
+    //   - lastWriteAt: number (timestamp cooldown for rate limiting)
+    //   - isAdmin: bool (admin only)
+    //   - managesGymId: string or null (admin only)
+    //   - guardianConsentAt: number or null (manager/admin only)
+    //   - guardianConsentBy: string or null (manager/admin only)
+    //   - accountType: 'scout' or absent (absent = athlete). Set ONCE on a fresh account
+    //                  (no gym, nothing logged yet); never editable afterwards except by admin.
+    //   - createdAt: string (immutable)
+    //
+    // Collection: entries/{entryId}
+    //   - userId: string (matches auth.uid, immutable)
+    //   - test: string (<= 60 chars)
+    //   - value: number (0..100000)
+    //   - date: string (YYYY-MM-DD)
+    //   - timestamp: number
+    //   - gymId: string or null
+    //   - isOfficial: bool (immutable on update)
+    //   - officialStatus: string ('pending', 'verified', 'rejected')
+    //   - verifiedBy: string (manager uid)
+    //   - verifiedByName: string (manager name, <= 60 chars)
+    //   - verifiedAt: number (timestamp)
+    //   - verifiedGymName: string (<= 80 chars)
+    //
+    // Collection: leaderboard/{docId}
+    //   - userId: string (matches auth.uid for regular; immutable on update)
+    //   - name: string (<= 60 chars)
+    //   - avatar: string (<= 40 chars)
+    //   - ageGroup: string
+    //   - gender: string or null
+    //   - gymId: string or null
+    //   - test: string (<= 60 chars, immutable on update)
+    //   - scope: string ('regular' or 'official', immutable on update)
+    //   - value: number (0..100000)
+    //   - date: string (YYYY-MM-DD)
+    //   - entryId: string (required for official scope)
+    //   - verifiedBy: string or null
+    //   - verifiedAt: number or null
+    //   - updatedAt: number
+    //
+    // Collection: tests/{testId}
+    //   - name: string (1..60 chars)
+    //   - unit: string (<= 30 chars)
+    //   - higherIsBetter: bool
+    //   - inputType: string ('number' or 'text')
+    //   - placeholder: string (<= 30 chars)
+    //   - order: number
+    //   - gymId: string or null
+    //   - sport: string or null (<= 60 chars)
+    //
+    // Collection: sports/{sportId}
+    //   - name: string (admin-managed)
+    //   - order: number
+    //
+    // Collection: gyms/{gymId}
+    //   - name: string (2..80 chars)
+    //   - inviteCode: string (immutable)
+    //   - officialTestDate: string (YYYY-MM-DD) or null
+    //   - subscriptionStatus: string ('active', etc.)
+    //   - ownerUserId: string or null
+    //   - ownerEmail: string or null
+    //
+    // Collection: journal/{docId} (${userId}_${date})
+    //   - userId: string (matches auth.uid, immutable)
+    //   - date: string (YYYY-MM-DD, immutable)
+    //   - intensity: string ('rest', 'light', 'moderate', 'hard')
+    //   - comment: string (<= 500 chars)
+    //   - updatedAt: number
+    //
+    // Collection: athleteProfiles/{uid}
+    //   - uid: string (matches path uid)
+    //   - name: string (<= 60 chars, matches user.name)
+    //   - avatar: string (<= 40 chars)
+    //   - ageGroup: string (matches expectedAgeGroup)
+    //   - gender: string or null (matches user.gender)
+    //   - sport: string (<= 60 chars)
+    //   - location: string (<= 60 chars)
+    //   - bio: string (<= 500 chars)
+    //   - availability: map with bool keys: openToSponsorship, openToTrials, openToOpportunities
+    //   - isPublic: bool (gated by adult/guardian consent)
+    //   - verifiedResults: map (manager/admin writable only)
+    //   - updatedAt: number
+    //
+    // Collection: opportunities/{oppId}
+    //   - title: string (1..80 chars)
+    //   - organizationName: string (1..60 chars)
+    //   - sport: string (<= 60 chars)
+    //   - opportunityType: string (<= 40 chars)
+    //   - location: string (<= 60 chars)
+    //   - requirements: string (<= 160 chars)
+    //   - description: string (<= 300 chars)
+    //   - deadline: string (<= 30 chars)
+    //   - createdBy: string (auth.uid, immutable)
+    //   - createdAt: number (immutable)
+    //
+    // Collection: applications/{appId} (${opportunityId}__${athleteId})
+    //   - opportunityId: string (<= 60 chars)
+    //   - athleteId: string (matches auth.uid)
+    //   - athleteName: string (<= 60 chars)
+    //   - athleteAvatar: string (<= 40 chars)
+    //   - athleteSport: string (<= 60 chars)
+    //   - athleteLocation: string (<= 60 chars)
+    //   - athleteProfileUrl: string
+    //   - organizationName: string (<= 60 chars)
+    //   - status: string ('submitted' -> 'withdrawn')
+    //   - submittedAt: number
+    //
+    // Collection: scoutAccounts/{uid}
+    //   - orgName: string (2..60 chars)
+    //   - orgType: string ('team', 'scout', 'sponsor', 'gym', 'other')
+    //   - orgVerified: bool (admin only)
+    //   - createdAt: number (immutable)
+    //
+    // Collection: scoutShortlists/{id} (${scoutId}__${athleteId})
+    //   - scoutId: string (matches auth.uid)
+    //   - athleteId: string (<= 60 chars)
+    //   - name: string (<= 60 chars)
+    //   - avatar: string (<= 40 chars)
+    //   - sport: string (<= 60 chars)
+    //   - location: string (<= 60 chars)
+    //   - note: string (<= 300 chars)
+    //   - addedAt: number
+    //
+    // Collection: introRequests/{id} (${scoutId}__${athleteId})
+    //   - scoutId: string (matches auth.uid)
+    //   - scoutName: string (<= 60 chars)
+    //   - scoutOrg: string
+    //   - scoutOrgType: string
+    //   - scoutOrgVerified: bool
+    //   - athleteId: string (<= 60 chars)
+    //   - athleteName: string (<= 60 chars)
+    //   - message: string (10..400 chars)
+    //   - status: string ('pending', 'declined', 'accepted', 'revoked')
+    //   - athleteContact: map ({ email, phone })
+    //   - createdAt: number
+    //   - respondedAt: number
+    //
+    // Collection: events/{eventId}
+    //   - name: string (admin managed)
+    //   - description: string
+    //   - isVisible: bool
+    //   - createdBy: string
+    //   - createdAt: number
+    //
+    // Collection: eventTests/{testId}
+    //   - eventId: string
+    //   - name: string (admin managed)
+    //   - unit: string
+    //   - inputType: string
+    //   - higherIsBetter: bool
+    //   - placeholder: string
+    //   - order: number
+    //
+    // Collection: eventLeaderboard/{docId} (${eventId}__${testId}__${userId})
+    //   - eventId: string (<= 60 chars, immutable)
+    //   - testId: string (<= 60 chars, immutable)
+    //   - userId: string (matches auth.uid, immutable)
+    //   - name: string (<= 60 chars)
+    //   - avatar: string (<= 40 chars)
+    //   - value: number (0..100000)
+    //   - updatedAt: number
+    //
+    // ===============================================================
+
+    // ── helpers ────────────────────────────────────────────────────────
+    function isSignedIn() { return request.auth != null; }
+    function isSelf(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function myProfile() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isAdmin() { return isSignedIn() && myProfile().get('isAdmin', false) == true; }
+
+    // Gym manager of exactly ONE gym. The gymId != null guard matters: a user whose
+    // managesGymId is null (never a manager, or demoted) must NOT match public rows
+    // that also carry gymId == null.
+    function managesGym(gymId) {
+      return isSignedIn() && gymId != null && myProfile().get('managesGymId', null) == gymId;
+    }
+    function managesAnyGym() { return isSignedIn() && myProfile().get('managesGymId', null) != null; }
+    function gymSubscriptionActive(gymId) {
+      return get(/databases/$(database)/documents/gyms/$(gymId)).data.get('subscriptionStatus', '') == 'active';
+    }
+    // The gym's officialTestDate is the ONLY thing that opens the "Mark as Official" window.
+    function officialAllowed(gymId, date) {
+      return gymId != null
+        && get(/databases/$(database)/documents/gyms/$(gymId)).data.get('officialTestDate', null) == date;
+    }
+    // Client batches every rate-limited write with a bump to users/{uid}.lastWriteAt.
+    function withinEntryRateLimit() {
+      return !('lastWriteAt' in myProfile())
+        || request.time.toMillis() - myProfile().lastWriteAt > 1000;
+    }
+
+    // ── age / guardian consent (POPIA) ─────────────────────────────────
+    // With only a birth YEAR we can't tell 17 from 18, so "adult" = 19+ by year arithmetic.
+    function validBirthYear(y) { return y is int && y >= 1920 && y <= request.time.year() - 14; }
+    function userIsAdult(u) { return u.get('birthYear', null) is int && request.time.year() - u.birthYear >= 19; }
+    function userHasConsent(u) { return u.get('guardianConsentAt', null) != null; }
+    // Legacy accounts with no birthYear are not treated as minors (they're asked to add one).
+    function userIsMinorNoConsent(u) {
+      return u.get('birthYear', null) is int && !userIsAdult(u) && !userHasConsent(u);
+    }
+    function profileMayBePublic(uid) {
+      let u = get(/databases/$(database)/documents/users/$(uid)).data;
+      return u.get('birthYear', null) is int && (userIsAdult(u) || userHasConsent(u));
+    }
+    function expectedAgeGroup(u) {
+      return u.get('birthYear', null) == null ? u.get('ageGroup', null) :
+        (request.time.year() - u.birthYear <= 17 ? '14-17' :
+         request.time.year() - u.birthYear <= 24 ? '18-24' :
+         request.time.year() - u.birthYear <= 34 ? '25-34' :
+         request.time.year() - u.birthYear <= 44 ? '35-44' :
+         request.time.year() - u.birthYear <= 54 ? '45-54' : '55+');
+    }
+    function memberGymId(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data.get('gymId', null);
+    }
+
+    // ── users/{uid} ────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin() || managesGym(resource.data.get('gymId', null));
+
+      // Always created gym-less (joining happens through the update path with an invite code),
+      // never as admin/manager, never with guardian consent, and with a valid year of birth (14+).
+      allow create: if isSelf(uid)
+        && request.resource.data.get('gymId', null) == null
+        && request.resource.data.get('isAdmin', null) == null
+        && request.resource.data.get('managesGymId', null) == null
+        && request.resource.data.get('guardianConsentAt', null) == null
+        && request.resource.data.get('guardianConsentBy', null) == null
+        && request.resource.data.get('accountType', null) in [null, 'scout']
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 100
+        && request.resource.data.createdAt is string
+        && validBirthYear(request.resource.data.get('birthYear', null));
+
+      allow update: if
+        // 1) the lastWriteAt bump batched with entry / journal writes
+        (isSelf(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastWriteAt']) && request.resource.data.lastWriteAt is number)
+        ||
+        // 2) normal self edit: never role or guardian fields; createdAt immutable; birthYear can be set ONCE
+        (
+          isSelf(uid)
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin','managesGymId','guardianConsentAt','guardianConsentBy','createdAt','accountType'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name']) || (request.resource.data.name is string && request.resource.data.name.size() <= 60))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['avatar']) || (request.resource.data.avatar is string && request.resource.data.avatar.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['gender']) || (request.resource.data.gender == null || (request.resource.data.gender is string && request.resource.data.gender.size() <= 30)))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['sport']) || (request.resource.data.sport == null || (request.resource.data.sport is string && request.resource.data.sport.size() <= 60)))
+          && (
+               !request.resource.data.diff(resource.data).affectedKeys().hasAny(['birthYear'])
+               || (!('birthYear' in resource.data) && validBirthYear(request.resource.data.birthYear))
+             )
+          && (
+               // leaving a gym, or no change to gymId — no proof needed
+               request.resource.data.get('gymId', null) == null
+               || request.resource.data.gymId == resource.data.get('gymId', null)
+               // joining / switching needs the target gym's REAL invite code
+               || (
+                    request.resource.data.get('claimedInviteCode', null) is string
+                    && get(/databases/$(database)/documents/gyms/$(request.resource.data.gymId)).data.inviteCode == request.resource.data.claimedInviteCode
+                  )
+             )
+        )
+        ||
+        // 2b) claim the scout account type ONCE, on a fresh account: no gym joined and nothing
+        //     ever logged (lastWriteAt is only written alongside entries / journal). After the
+        //     account has any athlete activity this path is closed for good.
+        (
+          isSelf(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['accountType'])
+          && request.resource.data.accountType == 'scout'
+          && !('accountType' in resource.data)
+          && resource.data.get('gymId', null) == null
+          && !('lastWriteAt' in resource.data)
+        )
+        ||
+        // 3) a gym manager, on a member of THEIR gym: remove from roster, or record/revoke guardian consent
+        (
+          managesGym(resource.data.get('gymId', null))
+          && (
+               (
+                 request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gymId'])
+                 && request.resource.data.gymId == null
+               )
+               ||
+               (
+                 request.resource.data.diff(resource.data).affectedKeys().hasOnly(['guardianConsentAt','guardianConsentBy'])
+                 && (
+                      (request.resource.data.guardianConsentAt is number && request.resource.data.guardianConsentBy == request.auth.uid)
+                      || (request.resource.data.guardianConsentAt == null && request.resource.data.guardianConsentBy == null)
+                    )
+               )
+             )
+        )
+        ||
+        // 4) admin: anything, including role fields and a corrected birthYear
+        isAdmin();
+
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    // ── entries/{entryId} ──────────────────────────────────────────────
+    // Official entries are created 'pending' by the athlete and only count once the gym's
+    // manager stamps them 'verified' (verifiedBy must be that manager's own uid).
+    match /entries/{entryId} {
+      allow read: if isSelf(resource.data.userId)
+        || isAdmin()
+        || (managesGym(resource.data.get('gymId', null)) && resource.data.isOfficial == true);
+
+      allow create: if isSelf(request.resource.data.userId)
+        && withinEntryRateLimit()
+        && request.resource.data.keys().hasOnly(['userId','test','value','date','timestamp','gymId','isOfficial','officialStatus'])
+        && request.resource.data.test is string
+        && request.resource.data.test.size() <= 60
+        && request.resource.data.value is number
+        && request.resource.data.value >= 0
+        && request.resource.data.value <= 100000
+        && request.resource.data.date is string
+        && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.timestamp is number
+        && request.resource.data.isOfficial is bool
+        // own gym's pool or the public pool (null) — never someone else's gym
+        && request.resource.data.gymId in [null, myProfile().get('gymId', null)]
+        && (
+             (request.resource.data.isOfficial == false && !('officialStatus' in request.resource.data))
+             || (
+                  request.resource.data.isOfficial == true
+                  && request.resource.data.officialStatus == 'pending'
+                  && officialAllowed(request.resource.data.gymId, request.resource.data.date)
+                )
+           );
+
+      allow update: if
+        // owner edits their own NON-official entry: value / date only
+        (
+          isSelf(resource.data.userId)
+          && resource.data.isOfficial != true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['value','date'])
+          && request.resource.data.value is number && request.resource.data.value >= 0 && request.resource.data.value <= 100000
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['date']) || (request.resource.data.date is string && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
+        )
+        ||
+        // gym manager on an OFFICIAL entry of their gym — never on their own result
+        (
+          managesGym(resource.data.get('gymId', null))
+          && resource.data.isOfficial == true
+          && resource.data.userId != request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['value','date','officialStatus','verifiedBy','verifiedByName','verifiedAt','verifiedGymName'])
+          && request.resource.data.value is number && request.resource.data.value >= 0 && request.resource.data.value <= 100000
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['date']) || (request.resource.data.date is string && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')))
+          && (
+               !request.resource.data.diff(resource.data).affectedKeys().hasAny(['officialStatus'])
+               || (
+                    request.resource.data.officialStatus in ['verified','rejected']
+                    && request.resource.data.verifiedBy == request.auth.uid
+                    && request.resource.data.verifiedByName is string
+                    && request.resource.data.verifiedByName.size() <= 60
+                    && request.resource.data.verifiedAt is number
+                    && (request.resource.data.get('verifiedGymName', null) == null || (request.resource.data.verifiedGymName is string && request.resource.data.verifiedGymName.size() <= 80))
+                  )
+             )
+        )
+        || isAdmin();
+
+      // Athletes may delete their own entries except VERIFIED official ones.
+      allow delete: if
+        (isSelf(resource.data.userId) && !(resource.data.isOfficial == true && resource.data.get('officialStatus', 'pending') == 'verified'))
+        || (managesGym(resource.data.get('gymId', null)) && resource.data.isOfficial == true && resource.data.userId != request.auth.uid)
+        || isAdmin();
+    }
+
+    // ── leaderboard/{docId} ────────────────────────────────────────────
+    // scope 'regular' = athlete-written personal bests. scope 'official' = MANAGER-written
+    // only, and each doc must point (entryId) at a real VERIFIED entry with the same value.
+    match /leaderboard/{docId} {
+      allow read: if isSignedIn();
+
+      function validSelfRow(d) {
+        return isSelf(d.userId)
+          && d.scope == 'regular'
+          && d.test is string && d.test.size() <= 60
+          && d.value is number && d.value >= 0 && d.value <= 100000
+          && d.gymId in [null, myProfile().get('gymId', null)]
+          && (d.get('name', '') is string && d.get('name', '').size() <= 60)
+          && (d.get('avatar', '') is string && d.get('avatar', '').size() <= 40)
+          && (d.get('date', '') is string && d.get('date', '').matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+          && d.get('updatedAt', 0) is number
+          // a minor without guardian consent stays off the PUBLIC board
+          && (d.gymId != null || !userIsMinorNoConsent(myProfile()));
+      }
+      function validOfficialRow(d) {
+        return d.scope == 'official'
+          && managesGym(d.gymId)
+          && d.userId != request.auth.uid
+          && d.entryId is string
+          && d.test is string && d.test.size() <= 60
+          && d.value is number && d.value >= 0 && d.value <= 100000
+          && (d.get('name', '') is string && d.get('name', '').size() <= 60)
+          && (d.get('avatar', '') is string && d.get('avatar', '').size() <= 40)
+          && (d.get('date', '') is string && d.get('date', '').matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+          && d.get('updatedAt', 0) is number
+          && get(/databases/$(database)/documents/entries/$(d.entryId)).data.officialStatus == 'verified'
+          && get(/databases/$(database)/documents/entries/$(d.entryId)).data.userId == d.userId
+          && get(/databases/$(database)/documents/entries/$(d.entryId)).data.gymId == d.gymId
+          && get(/databases/$(database)/documents/entries/$(d.entryId)).data.value == d.value;
+      }
+
+      allow create: if validSelfRow(request.resource.data) || validOfficialRow(request.resource.data) || isAdmin();
+
+      allow update: if
+        (
+          isSelf(resource.data.userId) && resource.data.scope == 'regular'
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.test == resource.data.test
+          && request.resource.data.scope == resource.data.scope
+          && validSelfRow(request.resource.data)
+        )
+        ||
+        (
+          resource.data.scope == 'official'
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.test == resource.data.test
+          && request.resource.data.scope == resource.data.scope
+          && validOfficialRow(request.resource.data)
+        )
+        || isAdmin();
+
+      allow delete: if
+        (isSelf(resource.data.userId) && resource.data.scope == 'regular')
+        || (resource.data.scope == 'official' && managesGym(resource.data.get('gymId', null)))
+        || isAdmin();
+    }
+
+    // ── tests/{testId} ─────────────────────────────────────────────────
+    match /tests/{testId} {
+      allow read: if isSignedIn();
+
+      function validTestDoc(d) {
+        return d.name is string && d.name.size() > 0 && d.name.size() <= 60
+          && d.unit is string && d.unit.size() <= 30
+          && d.higherIsBetter is bool
+          && d.inputType in ['number','text']
+          && (d.get('placeholder', '') is string && d.get('placeholder', '').size() <= 30)
+          && (d.get('sport', null) == null || (d.sport is string && d.sport.size() <= 60))
+          && (d.get('order', 0) is number);
+      }
+
+      allow create: if
+        (
+          // global catalog: admin, or the first signed-in user seeding the fixed default set
+          request.resource.data.get('gymId', null) == null
+          && (isAdmin() || testId in ['broad_jump','3km_run','pushups','situps','sit_reach','bodyweight'])
+          && validTestDoc(request.resource.data)
+        )
+        ||
+        (
+          // a gym manager's own catalog, gated on an active subscription
+          request.resource.data.get('gymId', null) != null
+          && managesGym(request.resource.data.gymId)
+          && gymSubscriptionActive(request.resource.data.gymId)
+          && validTestDoc(request.resource.data)
+        )
+        || isAdmin();
+
+      // admin only (sport tagging, edits). Managers create/delete, they don't edit in place.
+      allow update: if isAdmin();
+      allow delete: if isAdmin() || managesGym(resource.data.get('gymId', null));
+    }
+
+    // ── sports/{sportId} ───────────────────────────────────────────────
+    // Public read: signup needs the list before the user has an account.
+    match /sports/{sportId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ── gyms/{gymId} ───────────────────────────────────────────────────
+    match /gyms/{gymId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin();
+      allow update: if
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['inviteCode'])
+        && (
+             (
+               managesGym(gymId)
+               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','officialTestDate'])
+               && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
+               && (
+                    request.resource.data.get('officialTestDate', null) == null
+                    || (request.resource.data.officialTestDate is string && request.resource.data.officialTestDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+                  )
+             )
+             || isAdmin()
+           );
+      allow delete: if isAdmin();
+    }
+
+    // ── journal/{docId} ────────────────────────────────────────────────
+    match /journal/{docId} {
+      allow read: if isSelf(resource.data.userId) || isAdmin();
+
+      function validJournalDoc(d) {
+        return isSelf(d.userId)
+          && d.keys().hasOnly(['userId','date','intensity','comment','updatedAt'])
+          && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && d.intensity in ['rest','light','moderate','hard']
+          && d.comment is string && d.comment.size() <= 500
+          && d.updatedAt is number;
+      }
+
+      allow create: if withinEntryRateLimit()
+        && docId == request.auth.uid + '_' + request.resource.data.date
+        && validJournalDoc(request.resource.data);
+
+      allow update: if withinEntryRateLimit()
+        && isSelf(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.date == resource.data.date
+        && docId == request.auth.uid + '_' + request.resource.data.date
+        && validJournalDoc(request.resource.data);
+
+      allow delete: if isSelf(resource.data.userId) || isAdmin();
+    }
+
+    // ── athleteProfiles/{uid} ──────────────────────────────────────────
+    // Opt-in public profile. isPublic is the entire gate, and going public needs a birth year
+    // plus (if under 19) guardian consent. `verifiedResults` is writable ONLY by the athlete's
+    // gym manager (or admin) — an athlete can never forge it.
+    match /athleteProfiles/{uid} {
+      allow read: if isSelf(uid) || isAdmin() || resource.data.isPublic == true;
+
+      allow create: if
+        (
+          isSelf(uid)
+          && request.resource.data.uid == uid
+          && request.resource.data.isPublic is bool
+          && request.resource.data.updatedAt is number
+          && !('verifiedResults' in request.resource.data)
+          && request.resource.data.name == myProfile().name
+          && request.resource.data.name.size() <= 60
+          && (request.resource.data.get('avatar', '') is string && request.resource.data.get('avatar', '').size() <= 40)
+          && request.resource.data.get('gender', null) == myProfile().get('gender', null)
+          && request.resource.data.get('ageGroup', null) == expectedAgeGroup(myProfile())
+          && request.resource.data.get('bio', '') is string && request.resource.data.get('bio', '').size() <= 500
+          && request.resource.data.get('sport', '') is string && request.resource.data.get('sport', '').size() <= 60
+          && request.resource.data.get('location', '') is string && request.resource.data.get('location', '').size() <= 60
+          && (
+               !('availability' in request.resource.data)
+               || (
+                    request.resource.data.availability is map
+                    && request.resource.data.availability.keys().hasOnly(['openToSponsorship','openToTrials','openToOpportunities'])
+                  )
+             )
+          && (request.resource.data.isPublic == false || profileMayBePublic(uid))
+        )
+        ||
+        // private stub a manager creates to park a verified result before the athlete opts in
+        (
+          managesGym(memberGymId(uid))
+          && request.resource.data.uid == uid
+          && request.resource.data.isPublic == false
+          && request.resource.data.keys().hasOnly(['uid','isPublic','updatedAt','verifiedResults'])
+        )
+        || isAdmin();
+
+      allow update: if
+        (
+          isSelf(uid)
+          && request.resource.data.uid == uid
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedResults'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name']) || (request.resource.data.name == myProfile().name && request.resource.data.name.size() <= 60))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['avatar']) || (request.resource.data.avatar is string && request.resource.data.avatar.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['gender']) || request.resource.data.get('gender', null) == myProfile().get('gender', null))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ageGroup']) || request.resource.data.get('ageGroup', null) == expectedAgeGroup(myProfile()))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['bio']) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 500))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['sport']) || (request.resource.data.sport is string && request.resource.data.sport.size() <= 60))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['location']) || (request.resource.data.location is string && request.resource.data.location.size() <= 60))
+          && (
+               !request.resource.data.diff(resource.data).affectedKeys().hasAny(['availability'])
+               || (
+                    request.resource.data.availability is map
+                    && request.resource.data.availability.keys().hasOnly(['openToSponsorship','openToTrials','openToOpportunities'])
+                  )
+             )
+          && (request.resource.data.isPublic == false || profileMayBePublic(uid))
+        )
+        ||
+        // manager keeps the verified snapshot of THEIR gym's members current
+        (
+          managesGym(memberGymId(uid))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verifiedResults'])
+        )
+        ||
+        // manager revoking a minor's guardian consent switches the profile private
+        (
+          managesGym(memberGymId(uid))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isPublic'])
+          && request.resource.data.isPublic == false
+        )
+        || isAdmin();
+
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    // ── opportunities / applications ─────────────────────────────
+    match /opportunities/{oppId} {
+      allow read: if true;
+
+      function validOpportunity(d) {
+        return d.title is string
+          && d.title.size() > 0 && d.title.size() <= 80
+          && d.organizationName is string
+          && d.organizationName.size() > 0 && d.organizationName.size() <= 60
+          && (d.get('sport', '') is string && d.get('sport', '').size() <= 60)
+          && (d.get('opportunityType', '') is string && d.get('opportunityType', '').size() <= 40)
+          && (d.get('location', '') is string && d.get('location', '').size() <= 60)
+          && (d.get('requirements', '') is string && d.get('requirements', '').size() <= 160)
+          && (d.get('description', '') is string && d.get('description', '').size() <= 300)
+          && (d.get('deadline', '') is string && d.get('deadline', '').size() <= 30)
+          && d.createdAt is number;
+      }
+
+      allow create: if isSignedIn()
+        && (isAdmin() || managesAnyGym())
+        && request.resource.data.createdBy == request.auth.uid
+        && validOpportunity(request.resource.data);
+
+      allow update: if isSignedIn()
+        && (resource.data.createdBy == request.auth.uid || isAdmin())
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && validOpportunity(request.resource.data);
+
+      allow delete: if isSignedIn()
+        && (resource.data.createdBy == request.auth.uid || isAdmin());
+    }
+
+    match /applications/{appId} {
+      allow create: if isSelf(request.resource.data.athleteId)
+        && appId == request.resource.data.opportunityId + '__' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['opportunityId','athleteId','athleteName','athleteAvatar','athleteSport','athleteLocation','athleteProfileUrl','organizationName','status','submittedAt'])
+        && request.resource.data.opportunityId is string
+        && request.resource.data.opportunityId.size() <= 60
+        && request.resource.data.athleteName is string
+        && request.resource.data.athleteName.size() <= 60
+        && request.resource.data.athleteAvatar is string
+        && request.resource.data.athleteAvatar.size() <= 40
+        && request.resource.data.athleteSport is string
+        && request.resource.data.athleteSport.size() <= 60
+        && request.resource.data.athleteLocation is string
+        && request.resource.data.athleteLocation.size() <= 60
+        && request.resource.data.organizationName is string
+        && request.resource.data.organizationName.size() <= 60
+        && request.resource.data.athleteProfileUrl is string
+        && (request.resource.data.athleteProfileUrl == '' || request.resource.data.athleteProfileUrl.matches('.*/athlete/' + request.auth.uid + '$'))
+        && request.resource.data.status == 'submitted'
+        && request.resource.data.submittedAt is number;
+
+      allow read: if isSignedIn()
+        && (resource.data.athleteId == request.auth.uid
+            || isAdmin()
+            || get(/databases/$(database)/documents/opportunities/$(resource.data.opportunityId)).data.createdBy == request.auth.uid);
+
+      allow update: if isSelf(resource.data.athleteId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'withdrawn';
+
+      allow delete: if isSelf(resource.data.athleteId) || isAdmin();
+    }
+
+    // ── scout / sponsor interface ──────────────────────────────────────
+    // scoutAccounts/{uid}: who is a scout. Only a user whose users/{uid}.accountType is
+    // 'scout' can open one, so an athlete account can never enter the scout portal.
+    // orgVerified is ADMIN-set — a scout can never verify themselves.
+    match /scoutAccounts/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create: if isSelf(uid)
+        && myProfile().get('accountType', null) == 'scout'
+        && request.resource.data.keys().hasOnly(['orgName','orgType','orgVerified','createdAt'])
+        && request.resource.data.orgName is string
+        && request.resource.data.orgName.size() >= 2 && request.resource.data.orgName.size() <= 60
+        && request.resource.data.orgType in ['team','scout','sponsor','gym','other']
+        && request.resource.data.orgVerified == false
+        && request.resource.data.createdAt is number;
+
+      allow update: if (isSelf(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['orgName','orgType'])
+          && request.resource.data.orgName is string
+          && request.resource.data.orgName.size() >= 2 && request.resource.data.orgName.size() <= 60
+          && request.resource.data.orgType in ['team','scout','sponsor','gym','other'])
+        || isAdmin();
+
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    // scoutShortlists/{scoutId__athleteId}: private to the scout.
+    match /scoutShortlists/{id} {
+      allow read: if isSelf(resource.data.scoutId) || isAdmin();
+
+      function validShortlistDoc(d) {
+        return d.keys().hasOnly(['scoutId','athleteId','name','avatar','sport','location','note','addedAt'])
+          && d.athleteId is string && d.athleteId.size() <= 60
+          && d.name is string && d.name.size() <= 60
+          && (d.get('avatar', '') is string && d.get('avatar', '').size() <= 40)
+          && (d.get('sport', '') is string && d.get('sport', '').size() <= 60)
+          && (d.get('location', '') is string && d.get('location', '').size() <= 60)
+          && d.note is string && d.note.size() <= 300
+          && d.addedAt is number;
+      }
+
+      allow create: if isSelf(request.resource.data.scoutId)
+        && exists(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid))
+        && id == request.resource.data.scoutId + '__' + request.resource.data.athleteId
+        && validShortlistDoc(request.resource.data);
+
+      allow update: if isSelf(resource.data.scoutId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['note'])
+        && request.resource.data.note is string && request.resource.data.note.size() <= 300;
+
+      allow delete: if isSelf(resource.data.scoutId) || isAdmin();
+    }
+
+    // introRequests/{scoutId__athleteId}: scout asks -> athlete accepts and CHOOSES what contact
+    // to share, which lands on this doc. One doc per pair, so a declined/revoked athlete can't be
+    // re-asked (re-creating an existing id is an update, which the scout can't do).
+    match /introRequests/{id} {
+      allow read: if isSelf(resource.data.scoutId) || isSelf(resource.data.athleteId) || isAdmin();
+
+      allow create: if isSelf(request.resource.data.scoutId)
+        && id == request.resource.data.scoutId + '__' + request.resource.data.athleteId
+        && request.resource.data.keys().hasOnly(['scoutId','scoutName','scoutOrg','scoutOrgType','scoutOrgVerified','athleteId','athleteName','message','status','createdAt'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.scoutName is string && request.resource.data.scoutName.size() <= 60
+        && request.resource.data.athleteId is string && request.resource.data.athleteId.size() <= 60
+        && request.resource.data.athleteName is string && request.resource.data.athleteName.size() <= 60
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 10 && request.resource.data.message.size() <= 400
+        && request.resource.data.createdAt is number
+        // org details must match the scout's real account, incl. the admin-set verified flag
+        && request.resource.data.scoutOrg == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgName
+        && request.resource.data.scoutOrgType == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgType
+        && request.resource.data.scoutOrgVerified == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgVerified
+        // only to athletes who chose a public profile
+        && get(/databases/$(database)/documents/athleteProfiles/$(request.resource.data.athleteId)).data.isPublic == true;
+
+      // Only the athlete responds. Contact details exist only on an accepted request.
+      allow update: if isSelf(resource.data.athleteId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','respondedAt','athleteContact'])
+        && request.resource.data.respondedAt is number
+        && (
+             (resource.data.status == 'pending' && request.resource.data.status == 'declined' && !('athleteContact' in request.resource.data))
+             || (resource.data.status == 'pending' && request.resource.data.status == 'accepted'
+                 && request.resource.data.athleteContact is map
+                 && request.resource.data.athleteContact.keys().hasOnly(['email','phone'])
+                 && request.resource.data.athleteContact.size() >= 1
+                 && (!('email' in request.resource.data.athleteContact) || (request.resource.data.athleteContact.email is string && request.resource.data.athleteContact.email.size() <= 100))
+                 && (!('phone' in request.resource.data.athleteContact) || (request.resource.data.athleteContact.phone is string && request.resource.data.athleteContact.phone.size() <= 30)))
+             || (resource.data.status == 'accepted' && request.resource.data.status == 'revoked' && request.resource.data.get('athleteContact', null) == null)
+           )
+        || isAdmin();
+
+      // Scout may withdraw a pending request (or clear an accepted one); never a declined/revoked
+      // one, or they could delete it and ask again. Athlete may delete any (account deletion).
+      allow delete: if (isSelf(resource.data.scoutId) && resource.data.status in ['pending','accepted'])
+        || isSelf(resource.data.athleteId)
+        || isAdmin();
+    }
+
+    // ── events / eventTests / eventLeaderboard ─────────────────────────
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /eventTests/{testId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /eventLeaderboard/{docId} {
+      allow read: if true;
+
+      function validEventLeaderboardRow(d) {
+        return d.keys().hasOnly(['eventId','testId','userId','name','avatar','value','updatedAt'])
+          && d.eventId is string && d.eventId.size() <= 60
+          && d.testId is string && d.testId.size() <= 60
+          && isSelf(d.userId)
+          && d.name is string && d.name.size() <= 60
+          && (d.get('avatar', '') is string && d.get('avatar', '').size() <= 40)
+          && d.value is number && d.value >= 0 && d.value <= 100000
+          && d.updatedAt is number;
+      }
+
+      allow create: if isSelf(request.resource.data.userId)
+        && docId == request.resource.data.eventId + '__' + request.resource.data.testId + '__' + request.auth.uid
+        && validEventLeaderboardRow(request.resource.data);
+
+      allow update: if (
+          isSelf(resource.data.userId)
+          && isSelf(request.resource.data.userId)
+          && request.resource.data.eventId == resource.data.eventId
+          && request.resource.data.testId == resource.data.testId
+          && request.resource.data.userId == resource.data.userId
+          && validEventLeaderboardRow(request.resource.data)
+        )
+        || isAdmin();
+
+      allow delete: if isSelf(resource.data.userId) || isAdmin();
+    }
+  }
+}

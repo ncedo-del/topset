@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firebase-debug.*.log*
+
+# Firebase cache
+.firebase/
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
