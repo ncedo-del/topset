@@ -15,3 +15,12 @@ firebase-debug.*.log*
 Thumbs.db
 *.bak
 *.tmp
+
+node_modules/
+*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+# service-account keys must never be committed
+*-firebase-adminsdk-*.json
+serviceAccount*.json
