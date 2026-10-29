@@ -16,20 +16,45 @@
     // button with a Cloud Function doing the same write after a verified
     // webhook from the payment processor. Nothing in this file should be
     // trusted to grant paid access on its own.
+    // Invite codes live in inviteCodes/{CODE} -> { gymId } (get-only, never listable) so a
+    // signed-in user can resolve a code they were GIVEN but can't enumerate every gym's code.
+    // The returned object carries `inviteCode` so callers (joinGymByCode, profile edit) can
+    // pass it on as claimedInviteCode exactly as before.
     async function findGymByInviteCode(code){
         if (!initFirebase() || !code) return null;
+        const norm = String(code).trim().toUpperCase();
+        if (!/^[A-Z0-9-]{4,20}$/.test(norm)) return null;
         try {
-            const snap = await db.collection('gyms').where('inviteCode','==',code.trim().toUpperCase()).limit(1).get();
+            const idx = await db.collection('inviteCodes').doc(norm).get();
+            if (idx.exists){
+                const gym = await getGymById(idx.data().gymId);
+                return gym ? { ...gym, inviteCode: norm } : null;
+            }
+            // LEGACY fallback for gyms not yet migrated by scripts/migrate-invite-codes.js.
+            // Harmless once the inviteCode field has been stripped (the query just returns empty).
+            const snap = await db.collection('gyms').where('inviteCode','==',norm).limit(1).get();
             if (snap.empty) return null;
-            return { id: snap.docs[0].id, ...snap.docs[0].data() };
+            return { id: snap.docs[0].id, ...snap.docs[0].data(), inviteCode: norm };
         } catch(err){ console.error('findGymByInviteCode failed:', err); return null; }
+    }
+    // A gym's code is readable only by its manager and admins (gymSecrets/{gymId}). Everyone
+    // else gets the gym doc without it. Never throws: a permission error just means "not yours".
+    async function attachInviteCode(gym){
+        if (!gym) return gym;
+        const u = getCurrentUser();
+        if (!u || !(u.isAdmin === true || u.managesGymId === gym.id)) return gym;
+        try {
+            const sec = await db.collection('gymSecrets').doc(gym.id).get();
+            if (sec.exists) gym.inviteCode = sec.data().inviteCode;
+        } catch(e){ /* not a manager/admin of this gym — leave inviteCode unset */ }
+        return gym;
     }
     async function getGymById(id){
         if (!initFirebase() || !id) return null;
         try {
             const snap = await db.collection('gyms').doc(id).get();
             if (!snap.exists) return null;
-            return { id: snap.id, ...snap.data() };
+            return await attachInviteCode({ id: snap.id, ...snap.data() });
         } catch(err){ console.error('getGymById failed:', err); return null; }
     }
     // Caches the current member's own gym doc, purely so the Log Result form
@@ -71,7 +96,10 @@
     function generateInviteCode(){
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I — avoids ambiguity when read aloud or handwritten
         let code = 'TOPSET-';
-        for (let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
+        // crypto RNG, not Math.random(): codes gate gym membership. 256 % 32 === 0, so no modulo bias.
+        const bytes = new Uint8Array(6);
+        crypto.getRandomValues(bytes);
+        for (let i=0;i<6;i++) code += chars[bytes[i] % chars.length];
         return code;
     }
     async function createGym(name, tier){
@@ -85,15 +113,21 @@
             attempts++;
         } while (existing && attempts < 5);
         try {
-            const ref = await db.collection('gyms').add({
+            // One atomic batch: the public gym doc (NO inviteCode), the get-only lookup doc, and the
+            // manager/admin-only secret. Either all three exist or none do.
+            const ref = db.collection('gyms').doc();
+            const batch = db.batch();
+            batch.set(ref, {
                 name: name.trim(),
-                inviteCode: code,
                 subscriptionStatus: 'trial', // manual for now — see payment integration notes; nothing currently reads or enforces this field
                 tier: tier || 'small',
                 ownerUserId: null,
                 ownerEmail: null,
                 createdAt: new Date().toISOString()
             });
+            batch.set(db.collection('inviteCodes').doc(code), { gymId: ref.id });
+            batch.set(db.collection('gymSecrets').doc(ref.id), { inviteCode: code });
+            await batch.commit();
             return { id: ref.id, inviteCode: code, name: name.trim() };
         } catch(err){ console.error('createGym failed:', err); showToast('Could not create gym. Check your Firestore rules allow admin writes to the gyms collection.'); return null; }
     }
@@ -111,6 +145,12 @@
             const snap = await db.collection('gyms').get();
             const list = [];
             snap.forEach(doc=>list.push({ id:doc.id, ...doc.data() }));
+            // Admins may read every gymSecrets doc; fold the codes back in for the Manage Gyms list.
+            try {
+                const secrets = await db.collection('gymSecrets').get();
+                const byGym = {}; secrets.forEach(d=>{ byGym[d.id] = d.data().inviteCode; });
+                list.forEach(g=>{ if (byGym[g.id]) g.inviteCode = byGym[g.id]; });
+            } catch(e){ /* not an admin — gyms list unaffected */ }
             list.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
             return list;
         } catch(err){ console.error('fetchAllGyms failed:', err); showToast('Could not load gyms.'); return []; }

@@ -274,7 +274,17 @@ service cloud.firestore {
                // joining / switching needs the target gym's REAL invite code
                || (
                     request.resource.data.get('claimedInviteCode', null) is string
-                    && get(/databases/$(database)/documents/gyms/$(request.resource.data.gymId)).data.inviteCode == request.resource.data.claimedInviteCode
+                    && request.resource.data.claimedInviteCode.matches('^[A-Z0-9-]{4,20}$')
+                    && (
+                         // current: the code is the id of an inviteCodes/{code} doc pointing at the gym
+                         (
+                           exists(/databases/$(database)/documents/inviteCodes/$(request.resource.data.claimedInviteCode))
+                           && get(/databases/$(database)/documents/inviteCodes/$(request.resource.data.claimedInviteCode)).data.gymId == request.resource.data.gymId
+                         )
+                         // LEGACY — gyms not yet migrated still carry inviteCode on the gym doc.
+                         // Delete this branch once `scripts/migrate-invite-codes.js --strip` has run.
+                         || get(/databases/$(database)/documents/gyms/$(request.resource.data.gymId)).data.get('inviteCode', null) == request.resource.data.claimedInviteCode
+                       )
                   )
              )
         )
@@ -550,6 +560,30 @@ service cloud.firestore {
              )
              || isAdmin()
            );
+      allow delete: if isAdmin();
+    }
+
+    // ── inviteCodes/{code} ─────────────────────────────────────────────
+    // Lookup index: the invite code IS the document id, the body is { gymId }. A signed-in
+    // user can `get` a code they were handed, but can never `list` the collection — so
+    // codes can't be enumerated the way they could when they sat on world-readable gym docs.
+    match /inviteCodes/{code} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['gymId'])
+        && request.resource.data.gymId is string;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ── gymSecrets/{gymId} ─────────────────────────────────────────────
+    // Reverse lookup so a gym's manager (and admins) can SEE their own code: { inviteCode }.
+    match /gymSecrets/{gymId} {
+      allow read: if managesGym(gymId) || isAdmin();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['inviteCode'])
+        && request.resource.data.inviteCode is string;
       allow delete: if isAdmin();
     }
 
