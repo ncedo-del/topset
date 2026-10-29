@@ -392,9 +392,26 @@ service cloud.firestore {
     match /leaderboard/{docId} {
       allow read: if isSignedIn();
 
+      // Rows are self-reported ('regular') or manager-verified ('official'). Every row
+      // carries ONLY the fields the client actually writes: an unknown field (e.g. a
+      // forged verifiedBy on a regular row) is rejected instead of silently stored.
+      function selfRowShape(d) {
+        return d.keys().hasOnly(['userId','name','avatar','ageGroup','gender','gymId','test','scope','value','date','updatedAt']);
+      }
+      function officialRowShape(d) {
+        return d.keys().hasOnly(['userId','name','avatar','ageGroup','gender','gymId','test','scope','value','date','entryId','verifiedBy','verifiedAt','updatedAt']);
+      }
+      // The age band / gender shown on a board must be the athlete's own profile values,
+      // otherwise an adult can post into the 14-17 board or vice versa.
+      function ageGenderMatchesProfile(d) {
+        return d.get('ageGroup', null) == expectedAgeGroup(myProfile())
+          && d.get('gender', null) == myProfile().get('gender', null);
+      }
+
       function validSelfRow(d) {
         return isSelf(d.userId)
           && d.scope == 'regular'
+          && selfRowShape(d)
           && d.test is string && d.test.size() <= 60
           && d.value is number && d.value >= 0 && d.value <= 100000
           && d.gymId in [null, myProfile().get('gymId', null)]
@@ -405,8 +422,25 @@ service cloud.firestore {
           // a minor without guardian consent stays off the PUBLIC board
           && (d.gymId != null || !userIsMinorNoConsent(myProfile()));
       }
+
+      // Extra checks on CREATE only. The client names every self row
+      // `<uid>__<testDocId>__regular` (or `...__regular__public` for the TOPSET-wide pool of a
+      // gym member). Binding the id to a real test doc means one athlete can hold at most one
+      // row per test per pool, instead of flooding a board with unlimited rows. Done on create
+      // only so that deleting a test later can never make an old row un-updatable (which
+      // would fail the whole profile-sync batch).
+      function validNewSelfRow(d) {
+        return validSelfRow(d)
+          && ageGenderMatchesProfile(d)
+          && docId.matches('^' + request.auth.uid + '__[A-Za-z0-9]+(_[A-Za-z0-9]+)*__regular(__public)?$')
+          && (!docId.matches('.*__public$') || d.gymId == null)
+          && exists(/databases/$(database)/documents/tests/$(docId.split('__')[1]))
+          && get(/databases/$(database)/documents/tests/$(docId.split('__')[1])).data.get('name', null) == d.test;
+      }
+
       function validOfficialRow(d) {
         return d.scope == 'official'
+          && officialRowShape(d)
           && managesGym(d.gymId)
           && d.userId != request.auth.uid
           && d.entryId is string
@@ -422,7 +456,7 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/entries/$(d.entryId)).data.value == d.value;
       }
 
-      allow create: if validSelfRow(request.resource.data) || validOfficialRow(request.resource.data) || isAdmin();
+      allow create: if validNewSelfRow(request.resource.data) || validOfficialRow(request.resource.data) || isAdmin();
 
       allow update: if
         (
@@ -431,6 +465,11 @@ service cloud.firestore {
           && request.resource.data.test == resource.data.test
           && request.resource.data.scope == resource.data.scope
           && validSelfRow(request.resource.data)
+          // age band / gender may only change to the athlete's real profile values
+          && (
+               !request.resource.data.diff(resource.data).affectedKeys().hasAny(['ageGroup','gender'])
+               || ageGenderMatchesProfile(request.resource.data)
+             )
         )
         ||
         (
@@ -438,6 +477,8 @@ service cloud.firestore {
           && request.resource.data.userId == resource.data.userId
           && request.resource.data.test == resource.data.test
           && request.resource.data.scope == resource.data.scope
+          // a manager can only rewrite rows of their OWN gym (previously only the new gymId was checked)
+          && request.resource.data.gymId == resource.data.gymId
           && validOfficialRow(request.resource.data)
         )
         || isAdmin();
