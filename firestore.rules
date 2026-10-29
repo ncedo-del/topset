@@ -131,12 +131,10 @@ service cloud.firestore {
     // Collection: scoutShortlists/{id} (${scoutId}__${athleteId})
     //   - scoutId: string (matches auth.uid)
     //   - athleteId: string (<= 60 chars)
-    //   - name: string (<= 60 chars)
-    //   - avatar: string (<= 40 chars)
-    //   - sport: string (<= 60 chars)
-    //   - location: string (<= 60 chars)
     //   - note: string (<= 300 chars)
     //   - addedAt: number
+    //   (no copy of the athlete's name/avatar/sport/location: the scout UI reads the live public
+    //    profile, so nothing about an athlete survives them going private or deleting their account)
     //
     // Collection: introRequests/{id} (${scoutId}__${athleteId})
     //   - scoutId: string (matches auth.uid)
@@ -775,8 +773,12 @@ service cloud.firestore {
         && request.resource.data.orgVerified == false
         && request.resource.data.createdAt is number;
 
+      // A scout may edit their org details, but doing so ALWAYS drops verification
+      // (orgVerified must be written as false), otherwise someone approved as one organisation
+      // could rename themselves to another and keep the badge. Only an admin can set it to true.
       allow update: if (isSelf(uid)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['orgName','orgType'])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['orgName','orgType','orgVerified'])
+          && request.resource.data.orgVerified == false
           && request.resource.data.orgName is string
           && request.resource.data.orgName.size() >= 2 && request.resource.data.orgName.size() <= 60
           && request.resource.data.orgType in ['team','scout','sponsor','gym','other'])
@@ -790,12 +792,8 @@ service cloud.firestore {
       allow read: if isSelf(resource.data.scoutId) || isAdmin();
 
       function validShortlistDoc(d) {
-        return d.keys().hasOnly(['scoutId','athleteId','name','avatar','sport','location','note','addedAt'])
+        return d.keys().hasOnly(['scoutId','athleteId','note','addedAt'])
           && d.athleteId is string && d.athleteId.size() <= 60
-          && d.name is string && d.name.size() <= 60
-          && (d.get('avatar', '') is string && d.get('avatar', '').size() <= 40)
-          && (d.get('sport', '') is string && d.get('sport', '').size() <= 60)
-          && (d.get('location', '') is string && d.get('location', '').size() <= 60)
           && d.note is string && d.note.size() <= 300
           && d.addedAt is number;
       }
@@ -805,8 +803,13 @@ service cloud.firestore {
         && id == request.resource.data.scoutId + '__' + request.resource.data.athleteId
         && validShortlistDoc(request.resource.data);
 
+      // Edit the note, or strip the legacy name/avatar/sport/location copy that older docs carry:
+      // the RESULT must be a clean doc, and the identity fields must not move.
       allow update: if isSelf(resource.data.scoutId)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['note'])
+        && request.resource.data.keys().hasOnly(['scoutId','athleteId','note','addedAt'])
+        && request.resource.data.scoutId == resource.data.scoutId
+        && request.resource.data.athleteId == resource.data.athleteId
+        && request.resource.data.addedAt == resource.data.addedAt
         && request.resource.data.note is string && request.resource.data.note.size() <= 300;
 
       allow delete: if isSelf(resource.data.scoutId) || isAdmin();
@@ -832,6 +835,8 @@ service cloud.firestore {
         && request.resource.data.scoutOrg == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgName
         && request.resource.data.scoutOrgType == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgType
         && request.resource.data.scoutOrgVerified == get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgVerified
+        // only scouts an admin has verified may contact athletes (browsing + shortlisting stay open)
+        && get(/databases/$(database)/documents/scoutAccounts/$(request.auth.uid)).data.orgVerified == true
         // only to athletes who chose a public profile
         && get(/databases/$(database)/documents/athleteProfiles/$(request.resource.data.athleteId)).data.isPublic == true;
 

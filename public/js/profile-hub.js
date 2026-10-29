@@ -69,7 +69,8 @@
             rows += hubRow('tests','Manage Tests','Default catalog, sport assignment','window.hubGo(\'openManageTests\')')
                   + hubRow('sport','Manage Sports','The list athletes pick from','window.hubGo(\'openManageSports\')')
                   + hubRow('gym','Manage Gyms','Tiers, codes, managers','window.hubGo(\'openManageGyms\')')
-                  + hubRow('event','Manage Event','Public event board','window.hubGo(\'openManageEvent\')');
+                  + hubRow('event','Manage Event','Public event board','window.hubGo(\'openManageEvent\')')
+                  + hubRow('user','Verify Scouts','Approve scout & sponsor accounts','window.hubGo(\'openVerifyScouts\')');
         } else if (u.managesGymId){
             rows += hubRow('gym','My Gym','Roster, official day, tests','window.hubGo(\'openMyGym\')');
         }

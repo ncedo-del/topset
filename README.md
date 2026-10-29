@@ -18,7 +18,8 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
 ### 2. Scout & Sponsor Discovery
 - **Talent Discovery**: Filter athletes by sport, position, age group, location, and verified performance thresholds.
 - **Verified Credentials**: Verification badges distinguishing gym-tested official benchmarks from unverified submissions.
-- **Shortlists & Private Notes**: Scouts can shortlist athletes with private scouting evaluations.
+- **Scout Verification**: Anyone can sign up as a scout and browse/shortlist, but only scouts an admin has verified (Profile > Verify Scouts) can send intro requests. Editing the organisation name resets verification.
+- **Shortlists & Private Notes**: Scouts can shortlist athletes with private notes. A shortlist stores only the athlete's id and the scout's note; cards are drawn from the athlete's live public profile, so nothing about an athlete lingers once they go private or delete their account.
 - **Direct Introductions**: Secure opportunity applications where contact details are shared only upon mutual agreement.
 - **Side-by-Side Athlete Comparison**: Compare up to 4 athletes across standardized benchmark tests.
 

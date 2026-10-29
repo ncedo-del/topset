@@ -286,12 +286,21 @@ body.scout-mode{padding-bottom:0}
     }
 
     // ── Shortlist ───────────────────────────────────────────────────────
+    // Older shortlist docs carry a copy of the athlete's name/avatar/sport/location. That copy would
+    // outlive the athlete going private or deleting their account, so strip it the first time we see it.
+    const LEGACY_COPY = ['name', 'avatar', 'sport', 'location'];
+    function stripLegacyCopy(d) {
+        const x = d.data(); if (!LEGACY_COPY.some(k => k in x)) return;
+        const del = firebase.firestore.FieldValue.delete(), u = {};
+        LEGACY_COPY.forEach(k => { if (k in x) u[k] = del; });
+        d.ref.update(u).catch(e => console.error('shortlist cleanup failed:', e));
+    }
     async function toggleShortlist(id) {
         const uid = appState.currentUserId, p = profileById(id) || (SC.shortlist.get(id) && { id }); if (!uid || !p) return;
         const ref = db.collection('scoutShortlists').doc(`${uid}__${id}`);
         try {
             if (SC.shortlist.has(id)) await ref.delete();
-            else await ref.set({ scoutId: uid, athleteId: id, name: String(p.name || '').slice(0, 60), avatar: avatarKey(p.avatar), sport: String(p.sport || '').slice(0, 60), location: String(p.location || '').slice(0, 60), note: '', addedAt: Date.now() });
+            else await ref.set({ scoutId: uid, athleteId: id, note: '', addedAt: Date.now() }); // no copy of the athlete's details: cards are drawn from their live public profile
         } catch (e) { console.error('shortlist failed:', e); showToast('Could not update your shortlist.'); }
     }
     async function saveNote(id, text) {
@@ -306,9 +315,9 @@ body.scout-mode{padding-bottom:0}
         else {
             if (!SC.profilesLoaded) { loadProfiles(); }
             const groups = {};
-            items.forEach(s => { const p = profileById(s.athleteId); const sport = (p ? p.sport : s.sport) || 'No sport listed'; (groups[sport] = groups[sport] || []).push({ s, p }); });
+            items.forEach(s => { const p = profileById(s.athleteId); const sport = p ? (p.sport || 'No sport listed') : 'No longer available'; (groups[sport] = groups[sport] || []).push({ s, p }); });
             Object.keys(groups).sort().forEach(sp => {
-                html += `<div class="sc-section-title">${esc(sp)} <small>${groups[sp].length}</small></div><div class="sc-grid">${groups[sp].map(({ s, p }) => p ? cardHTML(p, { note: s.note, cmp: true }) : cardHTML({ id: s.athleteId, name: s.name, avatar: s.avatar, sport: s.sport, location: s.location }, { note: s.note, gone: SC.profilesLoaded })).join('')}</div>`;
+                html += `<div class="sc-section-title">${esc(sp)} <small>${groups[sp].length}</small></div><div class="sc-grid">${groups[sp].map(({ s, p }) => p ? cardHTML(p, { note: s.note, cmp: true }) : cardHTML({ id: s.athleteId, name: 'Athlete no longer available', avatar: '', sport: '', location: '' }, { note: s.note, gone: SC.profilesLoaded })).join('')}</div>`;
             });
         }
         $('#scMain').innerHTML = html;
@@ -342,6 +351,9 @@ ${tests.map(t => `<tr><td>${esc(t)}</td>${ps.map(p => `<td>${cell(p, t)}</td>`).
     function introBlock(p) {
         const r = SC.requests.get(p.id);
         if (!r) {
+            if (!SC.acct || !SC.acct.orgVerified) {
+                return `<div class="sc-note"><b>Verification pending.</b> You can browse and shortlist now. Intro requests unlock once TOPSET has verified your organisation, which protects athletes (many are young) from unknown contacts.</div>`;
+            }
             return `<button type="button" class="btn btn-primary" data-act="intro-open" id="scIntroBtn">Request intro</button>
 <div id="scIntroForm" class="hidden"><textarea class="sc-textarea" id="scIntroMsg" maxlength="400" placeholder="Who you are, what you're offering, and why this athlete. They'll read this before deciding."></textarea><div class="sc-actions"><button type="button" class="btn btn-primary" data-act="intro-send" data-id="${esc(p.id)}">Send request</button><button type="button" class="btn btn-outline" data-act="intro-cancel">Cancel</button></div></div>
 <p class="sc-fine">They see your name, organisation and message. Your contact details aren't shared by TOPSET, and theirs stay hidden until they accept and choose what to share.</p>`;
@@ -370,6 +382,7 @@ ${introBlock(p)}`;
     }
     async function sendIntro(id) {
         const p = profileById(id), a = SC.acct; if (!p || !a) return;
+        if (!a.orgVerified) return showToast('Intro requests unlock once TOPSET has verified your organisation.');
         if (rateLimited('introSend', 2500)) return;
         const msg = ($('#scIntroMsg')?.value || '').trim().slice(0, 400);
         if (msg.length < 10) return showToast("Add a short message — who you are and what you're offering.");
@@ -401,7 +414,7 @@ ${introBlock(p)}`;
 <div class="sc-acct-card"><div class="sc-sec" style="margin-top:0">Organisation</div>
 <div class="form-group"><label>Name</label><input id="scAcctOrg" maxlength="60" value="${esc(a.orgName || '')}"></div>
 <div class="form-group"><label>Type</label><select id="scAcctType">${ORG_TYPES.map(([k, l]) => `<option value="${k}"${a.orgType === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
-<p class="sc-fine" style="margin:0 0 12px">Organisation profile on TOPSET.</p>
+<p class="sc-fine" style="margin:0 0 12px">${a.orgVerified ? '<span class="badge badge-green">Verified</span> Athletes see this badge on your intro requests.' : '<span class="badge badge-new">Pending verification</span> You can browse and shortlist. Intro requests unlock once TOPSET verifies your organisation.'}</p>
 <button type="button" class="btn btn-primary btn-sm" data-act="acct-save">Save</button></div>
 <div class="sc-acct-card"><div class="sc-sec" style="margin-top:0">Theme</div><div class="hub-seg"><button type="button" class="${dark ? 'active' : ''}" data-act="theme" data-t="dark">Dark</button><button type="button" class="${dark ? '' : 'active'}" data-act="theme" data-t="light">Light</button></div></div>
 <div class="sc-acct-card"><div class="sc-actions" style="margin:0"><button type="button" class="btn btn-outline" data-act="logout">Sign out</button><button type="button" class="btn-danger-outline" data-act="delete">Delete account</button></div></div>`;
@@ -432,7 +445,11 @@ ${introBlock(p)}`;
             case 'delete': return window.handleDeleteAccount();
             case 'acct-save': {
                 const n = ($('#scAcctOrg').value || '').trim().slice(0, 60); if (n.length < 2) return showToast('Add your organisation name.');
-                return db.collection('scoutAccounts').doc(appState.currentUserId).update({ orgName: n, orgType: $('#scAcctType').value }).then(() => showToast('Saved.')).catch(err => { console.error(err); showToast('Could not save.'); });
+                const ty = $('#scAcctType').value, cur = SC.acct || {};
+                if (n === cur.orgName && ty === cur.orgType) return showToast('Saved.');
+                if (cur.orgVerified && !confirm('Changing your organisation name or type resets verification until TOPSET re-checks it, and intro requests pause meanwhile. Continue?')) return;
+                // orgVerified:false is REQUIRED by firestore.rules on any self edit of org details.
+                return db.collection('scoutAccounts').doc(appState.currentUserId).update({ orgName: n, orgType: ty, orgVerified: false }).then(() => showToast(cur.orgVerified ? 'Saved. Verification reset: pending review.' : 'Saved.')).catch(err => { console.error(err); showToast('Could not save.'); });
             }
         }
     }
@@ -503,7 +520,9 @@ ${introBlock(p)}`;
         const key = SC.isScout ? 's' : 'a'; if (SC.roleKey === key) return; SC.roleKey = key; teardownLists();
         const uid = appState.currentUserId; if (!uid || !initFirebase()) return;
         if (SC.isScout) {
-            SC.unsubs.push(db.collection('scoutShortlists').where('scoutId', '==', uid).onSnapshot(s => { SC.shortlist = new Map(); s.forEach(d => SC.shortlist.set(d.data().athleteId, d.data())); refreshActive(); }, e => console.error('shortlist sub:', e)));
+            SC.unsubs.push(db.collection('scoutShortlists').where('scoutId', '==', uid).onSnapshot(s => { SC.shortlist = new Map(); s.forEach(d => { SC.shortlist.set(d.data().athleteId, d.data()); stripLegacyCopy(d); }); refreshActive(); }, e => console.error('shortlist sub:', e)));
+            // Live copy of our own org record, so an admin's approval unlocks intros without a reload.
+            SC.unsubs.push(db.collection('scoutAccounts').doc(uid).onSnapshot(s => { if (s.exists) { SC.acct = { ...(SC.acct || {}), ...s.data() }; refreshActive(); } }, e => console.error('acct sub:', e)));
             SC.unsubs.push(db.collection('introRequests').where('scoutId', '==', uid).onSnapshot(s => { SC.requests = new Map(); s.forEach(d => SC.requests.set(d.data().athleteId, { id: d.id, ...d.data() })); refreshActive(); }, e => console.error('requests sub:', e)));
         } else {
             SC.unsubs.push(db.collection('introRequests').where('athleteId', '==', uid).onSnapshot(s => {

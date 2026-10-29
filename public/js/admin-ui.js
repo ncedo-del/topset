@@ -654,3 +654,65 @@
             updateOfficialAvailability();
         }
         showToast(joinedNewGym ? 'Joined gym! Your existing results now count toward its leaderboard.' : 'Profile updated successfully!'); closeEditProfileModal(); renderLeaderboard(); }); };
+
+
+    // ── Verify Scouts (admin) ───────────────────────────────────────────────
+    // Scouts can browse and shortlist as soon as they sign up, but can only send intro requests once
+    // an admin has verified their organisation (firestore.rules enforces it; scout.js shows the state).
+    // Verify off-platform first (call the organisation, check their website or socials), then approve.
+    // escapeHTML() (above) does not escape quotes, so anything user-controlled that lands inside an
+    // HTML ATTRIBUTE here (a scout's email is self-editable) must go through this one instead.
+    const vsAttr = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    function ensureVerifyScoutsModal(){
+        if ($('#verifyScoutsModal')) return;
+        const el = document.createElement('div');
+        el.className = 'modal-overlay hidden'; el.id = 'verifyScoutsModal';
+        el.innerHTML = `<div class="modal"><button type="button" class="modal-close-x" onclick="closeVerifyScouts()" aria-label="Close" title="Close">&times;</button>
+            <h2>Verify Scouts</h2>
+            <p class="text-muted" style="font-size:13px;margin:-4px 0 12px;">Only verified scouts can send intro requests to athletes, and many athletes are under 19. Check the organisation is real before approving. Changing an organisation's name resets its verification.</p>
+            <div id="verifyScoutsList"><p class="text-muted" style="padding:8px;">Loading...</p></div>
+            <div class="modal-buttons"><button type="button" class="btn btn-outline" onclick="closeVerifyScouts()">Close</button></div></div>`;
+        document.body.appendChild(el);
+        el.addEventListener('click', e => { if (e.target === el) closeVerifyScouts(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVerifyScouts(); });
+    }
+    window.openVerifyScouts = async function(){
+        if (!getCurrentUser()?.isAdmin || !initFirebase()) return;
+        ensureVerifyScoutsModal();
+        $('#verifyScoutsModal').classList.remove('hidden');
+        await renderVerifyScouts();
+    };
+    window.closeVerifyScouts = function(){ const m = $('#verifyScoutsModal'); if (m) m.classList.add('hidden'); };
+    async function renderVerifyScouts(){
+        const el = $('#verifyScoutsList'); if (!el) return;
+        try {
+            const snap = await db.collection('scoutAccounts').get();
+            const rows = await Promise.all(snap.docs.map(async d => {
+                let u = null; try { const us = await db.collection('users').doc(d.id).get(); if (us.exists) u = us.data(); } catch(e){}
+                return { uid: d.id, ...d.data(), scoutName: u?.name || '', scoutEmail: u?.email || '' };
+            }));
+            // pending first, then newest
+            rows.sort((a,b) => (a.orgVerified === true) - (b.orgVerified === true) || (b.createdAt || 0) - (a.createdAt || 0));
+            if (!rows.length){ el.innerHTML = '<p class="text-muted" style="padding:8px;">No scout accounts yet.</p>'; return; }
+            el.innerHTML = rows.map(r => {
+                const verified = r.orgVerified === true;
+                const mail = (r.scoutEmail && /^[^\s@"'<>]+@[^\s@"'<>]+\.[^\s@"'<>]+$/.test(r.scoutEmail)) ? `<a href="mailto:${vsAttr(r.scoutEmail)}">${escapeHTML(r.scoutEmail)}</a>` : (r.scoutEmail ? escapeHTML(r.scoutEmail) : 'no email on file');
+                const when = r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '';
+                return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;"><strong>${escapeHTML(r.orgName || '(no name)')}</strong><span class="badge ${verified ? 'badge-green' : 'badge-new'}">${verified ? 'Verified' : 'Pending'}</span></div>
+                    <div style="font-size:12px;color:var(--text-secondary);margin:4px 0 8px;">${escapeHTML(r.orgType || '')} &middot; ${escapeHTML(r.scoutName || 'unnamed')} &middot; ${mail}${when ? ' &middot; signed up ' + escapeHTML(when) : ''}</div>
+                    <button type="button" class="btn ${verified ? 'btn-outline' : 'btn-primary'} btn-sm" onclick="setScoutVerified('${vsAttr(r.uid)}', ${verified ? 'false' : 'true'})">${verified ? 'Revoke verification' : 'Verify organisation'}</button>
+                </div>`;
+            }).join('');
+        } catch(err){ console.error('renderVerifyScouts failed:', err); el.innerHTML = '<p class="text-muted" style="padding:8px;">Could not load scout accounts.</p>'; }
+    }
+    window.setScoutVerified = async function(uid, value){
+        if (!getCurrentUser()?.isAdmin || !initFirebase()) return;
+        if (rateLimited('adminWrite', RATE_LIMITS.adminWrite)) return;
+        if (value === false && !confirm('Revoke this organisation\'s verification? Intro requests pause for them until re-verified.')) return;
+        try {
+            await db.collection('scoutAccounts').doc(uid).update({ orgVerified: value === true });
+            showToast(value ? 'Organisation verified.' : 'Verification revoked.');
+            await renderVerifyScouts();
+        } catch(err){ console.error('setScoutVerified failed:', err); showToast('Could not update verification.'); }
+    };
