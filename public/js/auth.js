@@ -193,10 +193,15 @@
     async function deleteAllUserData(uid){
         if (!initFirebase()) return { ok:false, keptOfficial:0 };
         try {
-            const [entriesSnap, lbSnap, journalSnap] = await Promise.all([
+            // eventLeaderboard rows (public, carry name + avatar) and the athlete's own opportunity
+            // applications (carry name, sport, location) used to outlive the account. Both are
+            // self-deletable per firestore.rules, so they're safe to include in the same batches.
+            const [entriesSnap, lbSnap, journalSnap, eventSnap, appsSnap] = await Promise.all([
                 db.collection('entries').where('userId','==',uid).get(),
                 db.collection('leaderboard').where('userId','==',uid).get(),
-                db.collection('journal').where('userId','==',uid).get()
+                db.collection('journal').where('userId','==',uid).get(),
+                db.collection('eventLeaderboard').where('userId','==',uid).get(),
+                db.collection('applications').where('athleteId','==',uid).get()
             ]);
             // Only VERIFIED official entries are locked to the gym's record (rules); pending and
             // rejected ones are the athlete's to delete. Official leaderboard docs are
@@ -204,7 +209,7 @@
             const deletableEntries = entriesSnap.docs.filter(d => !(d.data().isOfficial === true && d.data().officialStatus === 'verified'));
             const keptOfficial = entriesSnap.docs.length - deletableEntries.length;
             const deletableLb = lbSnap.docs.filter(d => d.data().scope !== 'official');
-            const allDocs = [...deletableEntries, ...deletableLb, ...journalSnap.docs];
+            const allDocs = [...deletableEntries, ...deletableLb, ...journalSnap.docs, ...eventSnap.docs, ...appsSnap.docs];
             for (let i=0; i<allDocs.length; i+=450){
                 const batch = db.batch();
                 allDocs.slice(i, i+450).forEach(d=>batch.delete(d.ref));
