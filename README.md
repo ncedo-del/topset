@@ -22,10 +22,11 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
 - **Direct Introductions**: Secure opportunity applications where contact details are shared only upon mutual agreement.
 - **Side-by-Side Athlete Comparison**: Compare up to 4 athletes across standardized benchmark tests.
 
-### 3. Training Clubs & Gym Management
-- **Multi-Tenancy**: Club lookup and membership joined via invite codes.
-- **Class Scheduling & Attendance**: Structured class schedules, attendance check-ins, and weekly training journals.
-- **Manager Roster**: Club managers review attendance, rosters, and test verifications.
+### 3. Gyms & Verified Results
+- **Multi-Tenancy**: Gyms join members via invite codes. Codes resolve through a get-only lookup (`inviteCodes/{code}`) and are shown only to the gym's manager and admins (`gymSecrets/{gymId}`).
+- **Official Test Days**: A manager opens a test date; athletes submit *pending* official results; the manager verifies them (never their own). Only verified results reach official leaderboards and public profiles.
+- **Manager Roster**: Managers review the roster, record guardian consent for minors, and verify results.
+- *Not shipped:* class scheduling, attendance check-ins and a club journal. The code is parked in [`legacy/`](legacy/README.md).
 
 ### 4. Admin & Events
 - **Catalog Management**: Global standardized athletic test catalog with admin customization.
@@ -36,10 +37,10 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
 ## Architecture & Tech Stack
 
 - **Frontend**: Vanilla JS (ES6+) with theme-aware CSS custom properties (Dark/Light mode). No bloated frameworks or complex build steps.
-- **Authentication**: Firebase Authentication (Email/Password, Google Sign-In, Email Verification) with strict POPIA compliance for minor athletes under 19.
-- **Data Layer (Live)**: Cloud Firestore with security rules covering all collections.
-- **Relational Data & Discovery Layer**: Supabase PostgreSQL schema (`supabase/schema.sql`) for advanced scout matching, multi-attribute indexing, and window-function performance deltas.
-- **PWA & Offline**: Service Worker app-shell caching with dynamic cache busting.
+- **Authentication**: Firebase Authentication (Email/Password, Google Sign-In, Email Verification) plus technical consent gating for athletes under 19 (see `minors.js` and `firestore.rules`). This is a technical control, not a legal sign-off: a privacy notice, consent records and a deletion/retention process are still required for POPIA compliance.
+- **Data Layer (Live)**: Cloud Firestore. `firestore.rules` is the only server-side enforcement (there are no Cloud Functions), so it is covered by an emulator test suite in `tests/rules/` that runs in CI.
+- **Relational Data & Discovery Layer (Planned, not wired in)**: `supabase/schema.sql` is a target schema for scout matching and analytics. No client code references Supabase yet.
+- **PWA & Offline**: Service Worker caches the app shell only (bump `CACHE_NAME` in `sw.js` when shell assets change); Firestore offline persistence is enabled.
 - **Hosting**: Firebase Hosting (`firebase.json` configured with `public: "public"`).
 
 ---
@@ -57,7 +58,11 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
 ├── TOPSET-PRODUCT-STRATEGY.md # Product strategy and vision
 ├── TOPSET-SYSTEM-GUIDE.md     # Complete developer system guide
 ├── supabase/
-│   └── schema.sql             # Target PostgreSQL relational DDL
+│   └── schema.sql             # Planned PostgreSQL schema (not wired in)
+├── tests/rules/               # Firestore rules tests (emulator)
+├── scripts/                   # check-syntax, invite-code migration
+├── legacy/                    # Parked, unloaded modules (see legacy/README.md)
+├── .github/workflows/ci.yml   # Runs syntax check + rules tests
 └── public/
     ├── index.html             # Single-page application shell
     ├── home.css               # Athlete dashboard & progress styles
@@ -79,11 +84,7 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
         ├── opportunities-ui.js# Team trials, sponsorships & applications
         ├── leaderboard-ui.js  # Global & scoped leaderboards, radar cards
         ├── entries-journal.js # Test-entry logging & streak tracking
-        ├── clubs.js           # Training club multi-tenancy layer
-        ├── classes.js         # Class/schedule/enrollment data models
-        ├── classes-ui.js      # Club manager panel
-        ├── classes-member-ui.js # Member-facing club tab
-        ├── gyms.js            # Gym verification layer
+        ├── gyms.js            # Gym lookup, invite codes, manager assignment
         ├── minors.js          # POPIA compliance & parental consent
         ├── notifications-ui.js# User notifications & alerts
         ├── profile-hub.js     # User role router & settings
@@ -96,15 +97,24 @@ Built as an offline-first PWA hosted on Firebase (Auth + Firestore + Hosting) wi
 
 ## Setup & Deployment
 
-1. **Prerequisites**: Ensure Node.js and Firebase CLI (`npm install -g firebase-tools`) are installed.
-2. **Configuration**: Set Firebase credentials in `public/js/core.js` and Supabase keys in your environment.
-3. **Local Testing**:
+1. **Prerequisites**: Node.js 20+, Java (for the Firestore emulator) and the Firebase CLI (installed locally by `npm install`).
+2. **Install dev tooling**: `npm install` (the app itself has no build step; `package.json` only carries tests and scripts).
+3. **Configuration**: The Firebase web config in `public/js/core.js` is public by design. Protect the project instead: restrict the API key to your domains in Google Cloud Console and enable **Firebase App Check** for Firestore and Auth.
+4. **Test**:
    ```powershell
-   npx serve public
-   # or
-   firebase emulators:start --only hosting,firestore
+   npm test              # syntax check + Firestore rules tests (starts the emulator)
+   npm run emulators     # emulator only, for manual poking
+   npx serve public      # serve the app locally
    ```
-4. **Deploy**:
+5. **Deploy**:
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\deploy.ps1
    ```
+
+### Rolling out the invite-code change
+Existing gyms still carry `inviteCode` on the gym doc. The rules and client accept both shapes during rollout:
+
+1. `npm run migrate:invite-codes` (backfill; needs `GOOGLE_APPLICATION_CREDENTIALS`, see the script header)
+2. Deploy rules + hosting.
+3. `npm run migrate:invite-codes -- --strip` (removes the old field)
+4. Delete the `LEGACY` branch in `firestore.rules` and the legacy query in `public/js/gyms.js`, deploy again.
