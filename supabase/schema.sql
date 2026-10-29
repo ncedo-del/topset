@@ -140,8 +140,25 @@ ALTER TABLE public.opportunity_applications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read test catalog" ON public.test_catalog FOR SELECT USING (true);
 CREATE POLICY "Public read active opportunities" ON public.opportunities FOR SELECT USING (is_active = true);
 
--- Allow public read for opted-in public athlete profiles (for Scout discovery)
-CREATE POLICY "Public read public athlete profiles" ON public.athlete_profiles FOR SELECT USING (is_public = true);
+-- Allow public read for opted-in public athlete profiles (for Scout discovery).
+-- Minors: the Firebase rules only let a profile go public with guardian consent for under-19s.
+-- Mirror that here as defence in depth. '14-17' is the one band that is always minors; 18-year-olds
+-- sit in '18-24' and are gated by the Firebase rules, so the app must keep writing is_public/
+-- guardian_consent consistently (a sync function should set guardian_consent for every minor row).
+CREATE POLICY "Public read public athlete profiles" ON public.athlete_profiles
+    FOR SELECT USING (is_public = true AND (age_group IS DISTINCT FROM '14-17' OR guardian_consent = true));
 
--- Allow read for test entries
-CREATE POLICY "Public read test entries" ON public.test_entries FOR SELECT USING (true);
+-- test_entries: intentionally NO public SELECT policy.
+-- The previous policy (USING (true)) let anyone holding the public anon key read EVERY user's
+-- results, including minors', along with their Firebase uid and gym. With RLS on and no policy,
+-- only the service role can read this table. Reads for the app should go through a narrow view or
+-- RPC exposing only VERIFIED official results of public, consented profiles, e.g.:
+--
+--   CREATE VIEW public.public_verified_results AS
+--   SELECT e.firebase_uid, e.test_name, e.value, e.test_date, e.gym_id
+--   FROM public.test_entries e
+--   JOIN public.athlete_profiles p ON p.firebase_uid = e.firebase_uid AND p.is_public = true
+--   WHERE e.is_official AND e.official_status = 'verified';
+--
+-- Authenticated per-user reads need Supabase's third-party (Firebase) auth integration so that
+-- auth.jwt()->>'sub' = firebase_uid; add that policy when migration actually starts.
