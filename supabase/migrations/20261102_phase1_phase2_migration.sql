@@ -1,11 +1,9 @@
 -- ==============================================================================
--- TOPSET MIGRATION: PHASE 1 & 2
--- Athletic Test Results, Progression History, Benchmarks & Leaderboards
+-- TOPSET MIGRATION: PHASE 1 & 2 (SELF-CONTAINED)
 -- Target Database: Supabase PostgreSQL
--- Identity Provider: Firebase Authentication (via public.firebase_uid())
 -- ==============================================================================
 
--- 0. Authentication Helper Functions (placed in public schema)
+-- 0. Authentication Helper Function (in public schema)
 CREATE OR REPLACE FUNCTION public.firebase_uid() RETURNS TEXT AS $$
     SELECT NULLIF(
         COALESCE(
@@ -17,7 +15,32 @@ CREATE OR REPLACE FUNCTION public.firebase_uid() RETURNS TEXT AS $$
     )::text;
 $$ LANGUAGE SQL STABLE;
 
--- 1. Test Catalog (Standard Global & Gym-Scoped Custom Tests)
+-- 1. Athlete Profiles (Required for profile discovery & verification views)
+CREATE TABLE IF NOT EXISTS public.athlete_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    firebase_uid TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    avatar TEXT DEFAULT 'gym',
+    age_group TEXT,
+    gender TEXT,
+    sport TEXT,
+    position TEXT,
+    location TEXT,
+    bio TEXT,
+    is_public BOOLEAN DEFAULT false,
+    open_to_sponsorship BOOLEAN DEFAULT false,
+    open_to_trials BOOLEAN DEFAULT false,
+    open_to_opportunities BOOLEAN DEFAULT false,
+    guardian_consent BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_athlete_profiles_sport ON public.athlete_profiles(sport);
+CREATE INDEX IF NOT EXISTS idx_athlete_profiles_location ON public.athlete_profiles(location);
+CREATE INDEX IF NOT EXISTS idx_athlete_profiles_public ON public.athlete_profiles(is_public) WHERE is_public = true;
+
+-- 2. Test Catalog (Standard Global & Gym-Scoped Custom Tests)
 CREATE TABLE IF NOT EXISTS public.test_catalog (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -25,13 +48,12 @@ CREATE TABLE IF NOT EXISTS public.test_catalog (
     higher_is_better BOOLEAN DEFAULT true,
     input_type TEXT DEFAULT 'number' CHECK (input_type IN ('number', 'text')),
     placeholder TEXT,
-    sport TEXT, -- NULL = General / All sports
-    gym_id TEXT, -- NULL = Standard Global; non-null = Gym-scoped custom test
+    sport TEXT,
+    gym_id TEXT,
     display_order INT DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Unique constraint ensuring no duplicates within the same scope, while permitting gym shadowing
 CREATE UNIQUE INDEX IF NOT EXISTS idx_test_catalog_scope_name 
     ON public.test_catalog (COALESCE(gym_id, '__global__'), name);
 CREATE INDEX IF NOT EXISTS idx_test_catalog_sport ON public.test_catalog(sport);
@@ -53,11 +75,11 @@ ON CONFLICT (id) DO UPDATE SET
     input_type = EXCLUDED.input_type,
     placeholder = EXCLUDED.placeholder;
 
--- 2. Test Entries (Performance History & Benchmark Submissions)
+-- 3. Test Entries (Performance History & Benchmark Submissions)
 CREATE TABLE IF NOT EXISTS public.test_entries (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    firestore_id TEXT UNIQUE, -- Preserves original Firestore doc ID for 1:1 reconciliation
-    firebase_uid TEXT NOT NULL, -- Direct foreign key to Firebase Auth UID
+    firestore_id TEXT UNIQUE,
+    firebase_uid TEXT NOT NULL,
     test_id TEXT NOT NULL REFERENCES public.test_catalog(id) ON UPDATE CASCADE,
     test_name TEXT NOT NULL,
     value NUMERIC(10, 2) NOT NULL CHECK (value >= 0 AND value <= 100000),
@@ -65,8 +87,8 @@ CREATE TABLE IF NOT EXISTS public.test_entries (
     logged_at TIMESTAMPTZ DEFAULT NOW(),
     is_official BOOLEAN DEFAULT false,
     official_status TEXT CHECK (official_status IN ('pending', 'verified', 'rejected')),
-    gym_id TEXT, -- NULL = Public pool; non-null = Gym member pool
-    verified_by TEXT, -- Manager Firebase UID
+    gym_id TEXT,
+    verified_by TEXT,
     verified_by_name TEXT,
     verified_at TIMESTAMPTZ,
     verified_gym_name TEXT,
@@ -78,7 +100,38 @@ CREATE INDEX IF NOT EXISTS idx_test_entries_pool ON public.test_entries(gym_id, 
 CREATE INDEX IF NOT EXISTS idx_test_entries_firestore_id ON public.test_entries(firestore_id);
 CREATE INDEX IF NOT EXISTS idx_test_entries_date ON public.test_entries(test_date DESC);
 
--- 3. Athlete Personal Records View (Phase 2 SQL Core)
+-- 4. Opportunities & Applications
+CREATE TABLE IF NOT EXISTS public.opportunities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL,
+    organization_name TEXT NOT NULL,
+    sport TEXT NOT NULL,
+    opportunity_type TEXT NOT NULL,
+    location TEXT,
+    requirements TEXT,
+    description TEXT,
+    deadline DATE,
+    created_by TEXT,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_opportunities_sport ON public.opportunities(sport);
+CREATE INDEX IF NOT EXISTS idx_opportunities_type ON public.opportunities(opportunity_type);
+
+CREATE TABLE IF NOT EXISTS public.opportunity_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    opportunity_id UUID NOT NULL REFERENCES public.opportunities(id) ON DELETE CASCADE,
+    athlete_firebase_uid TEXT NOT NULL,
+    athlete_name TEXT NOT NULL,
+    status TEXT DEFAULT 'submitted',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (opportunity_id, athlete_firebase_uid)
+);
+
+CREATE INDEX IF NOT EXISTS idx_applications_athlete ON public.opportunity_applications(athlete_firebase_uid);
+
+-- 5. Athlete Personal Records View
 CREATE OR REPLACE VIEW public.athlete_personal_records AS
 WITH scored_entries AS (
     SELECT 
@@ -122,7 +175,7 @@ ORDER BY
     test_date DESC,
     logged_at DESC;
 
--- 4. Analytical Progression & Delta Timeline View
+-- 6. Analytical Progression & Delta Timeline View
 CREATE OR REPLACE VIEW public.athlete_progression_view AS
 SELECT 
     e.id,
@@ -162,7 +215,7 @@ WINDOW
         PARTITION BY e.firebase_uid, e.test_id, e.gym_id, e.is_official
     );
 
--- 5. Native Leaderboard Rankings & Percentile View
+-- 7. Native Leaderboard Rankings & Percentile View
 CREATE OR REPLACE VIEW public.leaderboard_rankings_view AS
 SELECT 
     pr.entry_id,
@@ -194,7 +247,7 @@ SELECT
     ) AS percentile
 FROM public.athlete_personal_records pr;
 
--- 6. Public Verified Results View (Safe Read-Only View for Scout Discovery)
+-- 8. Public Verified Results View (Safe Read-Only View for Scout Discovery)
 CREATE OR REPLACE VIEW public.public_verified_results_view AS
 SELECT 
     e.firebase_uid,
@@ -211,15 +264,32 @@ JOIN public.test_catalog t ON e.test_id = t.id
 JOIN public.athlete_profiles p ON p.firebase_uid = e.firebase_uid AND p.is_public = true
 WHERE e.is_official = true AND e.official_status = 'verified';
 
--- 7. Row Level Security Policies
+-- 9. Row Level Security Policies
+ALTER TABLE public.athlete_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.test_catalog ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.test_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.opportunities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.opportunity_applications ENABLE ROW LEVEL SECURITY;
 
--- Catalog: Everyone can view
+-- Athlete Profiles
+DROP POLICY IF EXISTS "Public read public athlete profiles" ON public.athlete_profiles;
+CREATE POLICY "Public read public athlete profiles" ON public.athlete_profiles
+    FOR SELECT USING (is_public = true AND (age_group IS DISTINCT FROM '14-17' OR guardian_consent = true));
+
+DROP POLICY IF EXISTS "Athletes can manage own profile" ON public.athlete_profiles;
+CREATE POLICY "Athletes can manage own profile" ON public.athlete_profiles
+    FOR ALL USING (firebase_uid = public.firebase_uid());
+
+-- Catalog & Opportunities
 DROP POLICY IF EXISTS "Public read test catalog" ON public.test_catalog;
 CREATE POLICY "Public read test catalog" 
 ON public.test_catalog FOR SELECT 
 USING (true);
+
+DROP POLICY IF EXISTS "Public read active opportunities" ON public.opportunities;
+CREATE POLICY "Public read active opportunities" 
+ON public.opportunities FOR SELECT 
+USING (is_active = true);
 
 -- Test Entries: Strictly scoped to athlete ownership and manager verification
 DROP POLICY IF EXISTS "Public read test entries" ON public.test_entries;
@@ -274,3 +344,8 @@ USING (
     AND gym_id = ((NULLIF(current_setting('request.jwt.claims', true), ''))::json->'user_metadata'->>'manages_gym_id')
     AND firebase_uid != public.firebase_uid()
 );
+
+-- Applications
+DROP POLICY IF EXISTS "Athletes can manage own applications" ON public.opportunity_applications;
+CREATE POLICY "Athletes can manage own applications" ON public.opportunity_applications
+    FOR ALL USING (athlete_firebase_uid = public.firebase_uid());
