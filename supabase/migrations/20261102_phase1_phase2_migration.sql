@@ -2,15 +2,16 @@
 -- TOPSET MIGRATION: PHASE 1 & 2
 -- Athletic Test Results, Progression History, Benchmarks & Leaderboards
 -- Target Database: Supabase PostgreSQL
--- Identity Provider: Firebase Authentication (via auth.jwt()->>'sub' / auth.firebase_uid())
+-- Identity Provider: Firebase Authentication (via public.firebase_uid())
 -- ==============================================================================
 
--- 0. Authentication Helper Functions
-CREATE OR REPLACE FUNCTION auth.firebase_uid() RETURNS TEXT AS $$
+-- 0. Authentication Helper Functions (placed in public schema)
+CREATE OR REPLACE FUNCTION public.firebase_uid() RETURNS TEXT AS $$
     SELECT NULLIF(
         COALESCE(
-            current_setting('request.jwt.claims', true)::json->>'sub',
-            current_setting('request.jwt.claim.sub', true)
+            (NULLIF(current_setting('request.jwt.claims', true), ''))::json->>'sub',
+            (NULLIF(current_setting('request.jwt.claims', true), ''))::json->>'user_id',
+            NULLIF(current_setting('request.jwt.claim.sub', true), '')
         ),
         ''
     )::text;
@@ -78,7 +79,6 @@ CREATE INDEX IF NOT EXISTS idx_test_entries_firestore_id ON public.test_entries(
 CREATE INDEX IF NOT EXISTS idx_test_entries_date ON public.test_entries(test_date DESC);
 
 -- 3. Athlete Personal Records View (Phase 2 SQL Core)
--- Computes the single best personal record per athlete, test, pool and scope using DISTINCT ON
 CREATE OR REPLACE VIEW public.athlete_personal_records AS
 WITH scored_entries AS (
     SELECT 
@@ -162,7 +162,7 @@ WINDOW
         PARTITION BY e.firebase_uid, e.test_id, e.gym_id, e.is_official
     );
 
--- 5. Native Leaderboard Rankings & Percentile View (Phase 2 Calculation Replacement)
+-- 5. Native Leaderboard Rankings & Percentile View
 CREATE OR REPLACE VIEW public.leaderboard_rankings_view AS
 SELECT 
     pr.entry_id,
@@ -232,12 +232,12 @@ DROP POLICY IF EXISTS "Managers can verify official gym entries" ON public.test_
 
 CREATE POLICY "Athletes can view own entries" 
 ON public.test_entries FOR SELECT 
-USING (firebase_uid = auth.firebase_uid());
+USING (firebase_uid = public.firebase_uid());
 
 CREATE POLICY "Athletes can insert own entries" 
 ON public.test_entries FOR INSERT 
 WITH CHECK (
-    firebase_uid = auth.firebase_uid()
+    firebase_uid = public.firebase_uid()
     AND value >= 0 AND value <= 100000
     AND test_date <= CURRENT_DATE
 );
@@ -245,18 +245,18 @@ WITH CHECK (
 CREATE POLICY "Athletes can update own entries" 
 ON public.test_entries FOR UPDATE 
 USING (
-    firebase_uid = auth.firebase_uid()
+    firebase_uid = public.firebase_uid()
     AND (is_official = false OR official_status = 'pending')
 )
 WITH CHECK (
-    firebase_uid = auth.firebase_uid()
+    firebase_uid = public.firebase_uid()
     AND (is_official = false OR official_status = 'pending')
 );
 
 CREATE POLICY "Athletes can delete own entries" 
 ON public.test_entries FOR DELETE 
 USING (
-    firebase_uid = auth.firebase_uid()
+    firebase_uid = public.firebase_uid()
     AND (is_official = false OR official_status = 'pending')
 );
 
@@ -264,13 +264,13 @@ CREATE POLICY "Managers can view official gym entries"
 ON public.test_entries FOR SELECT 
 USING (
     is_official = true 
-    AND gym_id = (current_setting('request.jwt.claims', true)::json->'user_metadata'->>'manages_gym_id')
+    AND gym_id = ((NULLIF(current_setting('request.jwt.claims', true), ''))::json->'user_metadata'->>'manages_gym_id')
 );
 
 CREATE POLICY "Managers can verify official gym entries" 
 ON public.test_entries FOR UPDATE 
 USING (
     is_official = true 
-    AND gym_id = (current_setting('request.jwt.claims', true)::json->'user_metadata'->>'manages_gym_id')
-    AND firebase_uid != auth.firebase_uid()
+    AND gym_id = ((NULLIF(current_setting('request.jwt.claims', true), ''))::json->'user_metadata'->>'manages_gym_id')
+    AND firebase_uid != public.firebase_uid()
 );

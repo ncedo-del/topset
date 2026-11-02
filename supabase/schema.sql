@@ -4,12 +4,13 @@
 -- Users are identified by their Firebase UID (`firebase_uid TEXT`)
 -- ==============================================================================
 
--- 0. Authentication Helper Functions
-CREATE OR REPLACE FUNCTION auth.firebase_uid() RETURNS TEXT AS $$
+-- 0. Authentication Helper Functions (in public schema)
+CREATE OR REPLACE FUNCTION public.firebase_uid() RETURNS TEXT AS $$
     SELECT NULLIF(
         COALESCE(
-            current_setting('request.jwt.claims', true)::json->>'sub',
-            current_setting('request.jwt.claim.sub', true)
+            (NULLIF(current_setting('request.jwt.claims', true), ''))::json->>'sub',
+            (NULLIF(current_setting('request.jwt.claims', true), ''))::json->>'user_id',
+            NULLIF(current_setting('request.jwt.claim.sub', true), '')
         ),
         ''
     )::text;
@@ -281,44 +282,44 @@ CREATE POLICY "Public read public athlete profiles" ON public.athlete_profiles
     FOR SELECT USING (is_public = true AND (age_group IS DISTINCT FROM '14-17' OR guardian_consent = true));
 
 CREATE POLICY "Athletes can manage own profile" ON public.athlete_profiles
-    FOR ALL USING (firebase_uid = auth.firebase_uid());
+    FOR ALL USING (firebase_uid = public.firebase_uid());
 
 -- Test Entries: Owned by athlete, verifiable by manager
 CREATE POLICY "Athletes can view own entries" ON public.test_entries
-    FOR SELECT USING (firebase_uid = auth.firebase_uid());
+    FOR SELECT USING (firebase_uid = public.firebase_uid());
 
 CREATE POLICY "Athletes can insert own entries" ON public.test_entries
     FOR INSERT WITH CHECK (
-        firebase_uid = auth.firebase_uid()
+        firebase_uid = public.firebase_uid()
         AND value >= 0 AND value <= 100000
         AND test_date <= CURRENT_DATE
     );
 
 CREATE POLICY "Athletes can update own entries" ON public.test_entries
     FOR UPDATE USING (
-        firebase_uid = auth.firebase_uid()
+        firebase_uid = public.firebase_uid()
         AND (is_official = false OR official_status = 'pending')
     );
 
 CREATE POLICY "Athletes can delete own entries" ON public.test_entries
     FOR DELETE USING (
-        firebase_uid = auth.firebase_uid()
+        firebase_uid = public.firebase_uid()
         AND (is_official = false OR official_status = 'pending')
     );
 
 CREATE POLICY "Managers can view official gym entries" ON public.test_entries
     FOR SELECT USING (
         is_official = true 
-        AND gym_id = (current_setting('request.jwt.claims', true)::json->'user_metadata'->>'manages_gym_id')
+        AND gym_id = ((NULLIF(current_setting('request.jwt.claims', true), ''))::json->'user_metadata'->>'manages_gym_id')
     );
 
 CREATE POLICY "Managers can verify official gym entries" ON public.test_entries
     FOR UPDATE USING (
         is_official = true 
-        AND gym_id = (current_setting('request.jwt.claims', true)::json->'user_metadata'->>'manages_gym_id')
-        AND firebase_uid != auth.firebase_uid()
+        AND gym_id = ((NULLIF(current_setting('request.jwt.claims', true), ''))::json->'user_metadata'->>'manages_gym_id')
+        AND firebase_uid != public.firebase_uid()
     );
 
 -- Applications
 CREATE POLICY "Athletes can manage own applications" ON public.opportunity_applications
-    FOR ALL USING (athlete_firebase_uid = auth.firebase_uid());
+    FOR ALL USING (athlete_firebase_uid = public.firebase_uid());
