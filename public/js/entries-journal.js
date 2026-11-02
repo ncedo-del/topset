@@ -23,7 +23,9 @@
             batch.set(entryRef, e);
             batch.update(db.collection('users').doc(uid2), { lastWriteAt: Date.now() });
             await batch.commit();
-            return { id: entryRef.id, ...e };
+            const saved = { id: entryRef.id, ...e };
+            if (window.supabaseClient) window.supabaseClient.syncEntry(saved).catch(()=>{});
+            return saved;
         }
         catch(err){
             console.error('addEntry failed:', err);

@@ -27,6 +27,9 @@
             $('#statUniqueTests').textContent=[...new Set(appState.entries.map(e=>e.test))].length;
             $('#statPRCount').textContent=prs.length;
         }
+        if (window.supabaseClient && appState.currentUserId && appState.entries.length) {
+            window.supabaseClient.runShadowReconciliation(appState.entries, appState.currentUserId);
+        }
     }
     function renderHistory(){
         // ── Chronological Delta & Progression Helpers ───────────────────────────
