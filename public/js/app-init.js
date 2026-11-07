@@ -27,7 +27,7 @@
         // anything else so a scout/sponsor following a /athlete/{uid} link
         // never sees the normal signed-in app shell flash first. See
         // renderPublicAthletePage() in athlete-profile-ui.js.
-        const athleteRouteMatch = location.pathname.match(/^\/athlete\/([^/]+)\/?$/);
+        const athleteRouteMatch = location.pathname.match(/(?:^|\/)athlete\/([^/]+)\/?$/);
         if (athleteRouteMatch){
             applyTheme(localStorage.getItem(KEYS.theme)||'dark');
             document.querySelector('.header')?.classList.add('hidden');
@@ -172,6 +172,6 @@
     // never competes with the initial render for network/CPU resources.
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(err => console.error('Service worker registration failed:', err));
+            navigator.serviceWorker.register('./sw.js').catch(err => console.error('Service worker registration failed:', err));
         });
     }

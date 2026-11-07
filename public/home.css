@@ -6,9 +6,9 @@
 
 :root {
     --sidebar-w: 248px;
-    --home-hero-img: url('/hero-sm.jpg');
+    --home-hero-img: url('hero-sm.jpg');
 }
-@media (min-width: 769px) { :root { --home-hero-img: url('/hero.jpg'); } }
+@media (min-width: 769px) { :root { --home-hero-img: url('hero.jpg'); } }
 
 /* Athletes don't use the Scout interface: the Athlete/Scout switch is gone from the athlete header.
    Scouts sign up / sign in through the auth modal's role selector and get their own shell. */

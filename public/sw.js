@@ -11,13 +11,13 @@
 // doesn't match, so a bump is what actually clears out a previous version for
 // everyone still holding it. JS/CSS files are never cached here at all (see the
 // fetch handler below), so THEY don't need a bump to show up fresh.
-const CACHE_NAME = 'topset-shell-2026-10-28';
+const CACHE_NAME = 'topset-shell-2026-11-07';
 const SHELL_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -58,18 +58,12 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   // Only intercept requests for files actually listed in SHELL_ASSETS above.
-  // This used to be missing — every same-origin GET matched here, which meant
-  // /js/*.js and styles.css got pulled into this cache too, even though
-  // install() only ever pre-cached the 5 shell files. Because the strategy
-  // below is stale-while-revalidate (serve cached instantly, refresh in the
-  // background for NEXT time), that meant the FIRST page load after every
-  // deploy still served yesterday's JS — the network fetch to update the
-  // cache happened, but only behind the scenes, so a fix never appeared
-  // until a SECOND reload. That's the actual "I deployed and nothing
-  // changed" bug. JS and CSS now pass straight through to the network/the
-  // browser's normal HTTP cache instead, so a deploy is live on the very
-  // next load, no double-reload needed.
-  if (!SHELL_ASSETS.includes(url.pathname)) return;
+  const cleanPath = url.pathname.endsWith('/') ? url.pathname + 'index.html' : url.pathname;
+  const matchesShell = SHELL_ASSETS.some((asset) => {
+    const filename = asset.replace(/^\.\//, '');
+    return filename === '' ? url.pathname.endsWith('/') : cleanPath.endsWith('/' + filename);
+  });
+  if (!matchesShell) return;
 
   // Stale-while-revalidate for the shell only: serve the cached copy instantly
   // for a fast load, then quietly fetch a fresh one in the background. If

@@ -51,7 +51,7 @@
         switch: '<path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/>'
     };
     const svg = (k, s, fill) => `<svg viewBox="0 0 24 24" width="${s || 18}" height="${s || 18}" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">${ICON[k]}</svg>`;
-    const logoSrc = () => (document.documentElement.getAttribute('data-theme') === 'light') ? '/logo-light.png' : '/logo-dark.png';
+    const logoSrc = () => (document.documentElement.getAttribute('data-theme') === 'light') ? 'logo-light.png' : 'logo-dark.png';
 
     // ── CSS ─────────────────────────────────────────────────────────────
     (function injectCSS() {
