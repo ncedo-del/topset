@@ -18,17 +18,27 @@ const supabaseClient = {
         const normalized = String(testName).trim().toLowerCase();
         const map = {
             'broad jump': 'broad_jump',
+            'standing broad jump': 'broad_jump',
             '3km run': '3km_run',
+            '5km run': '5km_run',
+            '5km': '5km_run',
             '2:00 push-ups': 'pushups',
             'push-ups': 'pushups',
             'pushups': 'pushups',
+            '2:00 push ups': 'pushups',
             '2:00 sit-ups': 'situps',
             'sit-ups': 'situps',
             'situps': 'situps',
             'sit and reach': 'sit_reach',
             'sit & reach': 'sit_reach',
             'sit_reach': 'sit_reach',
-            'bodyweight': 'bodyweight'
+            'bodyweight': 'bodyweight',
+            '2:00 hand release push up': 'hand_release_pushups',
+            '2:00 hand release push ups': 'hand_release_pushups',
+            '2:00 curl up test': 'curl_up_test',
+            "official hyrox p'f''t": 'hyrox_pft',
+            'official hyrox p’f’t': 'hyrox_pft',
+            'official hyrox pft': 'hyrox_pft'
         };
         if (map[normalized]) return map[normalized];
         return normalized.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -63,6 +73,7 @@ const supabaseClient = {
         if (!this.isConfigured()) return null;
         const includeAuth = options.auth !== false;
         const headers = await this.getHeaders(includeAuth);
+        if (options.prefer) headers['Prefer'] = options.prefer;
         const url = `${SUPABASE_CONFIG.url}/rest/v1/${endpoint}`;
 
         try {
@@ -135,6 +146,7 @@ const supabaseClient = {
 
         const res = await this.query('test_entries?on_conflict=firestore_id', {
             method: 'POST',
+            prefer: 'resolution=merge-duplicates,return=representation',
             body: payload
         });
 
