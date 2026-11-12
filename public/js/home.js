@@ -128,43 +128,51 @@
       }
     }
 
-    // ── 2. "Your Next Move" action card ──────────────────────────────
-    const nextMoveTag = $('homeNextMoveTagText');
-    const nextMoveStep = $('homeNextMoveStep');
-    const nextMoveTitle = $('homeNextMoveTitle');
-    const nextMoveDesc = $('homeNextMoveDesc');
-    const nextMoveBtn = $('homeNextMoveBtn');
-    const nextMoveBtnText = $('homeNextMoveBtnText');
+    // ── 2. Athletic CV Completeness & Milestone (Strategy Deck Move 3) ────
+    const cvPercent = $('homeCvPercent');
+    const cvProgressFill = $('homeCvProgressFill');
+    const cvBadge = $('homeCvBadge');
+    const cvNext = $('homeCvNext');
+    const cvMainBtn = $('homeCvMainBtn');
+    const cvMainBtnText = $('homeCvMainBtnText');
+    const cvViewBtn = $('homeCvViewBtn');
+    const cvShareBtn = $('homeCvShareBtn');
 
-    if (nextMoveTitle && nextMoveBtn) {
+    const comp = typeof window.computeProfileCompleteness === 'function'
+      ? window.computeProfileCompleteness(user, entries, appState.athleteProfile)
+      : { percent: 0, level: 'Building Profile', badgeClass: 'badge-subtle', nextStep: 'Sign up to create your Athletic CV', hasVerified: false };
+
+    if (cvPercent) cvPercent.textContent = `${comp.percent}%`;
+    if (cvProgressFill) cvProgressFill.style.width = `${comp.percent}%`;
+    if (cvBadge) {
+      cvBadge.textContent = comp.level.toUpperCase();
+      cvBadge.className = `home-cv-badge ${comp.badgeClass}`;
+    }
+    if (cvNext) cvNext.textContent = comp.nextStep;
+
+    if (cvMainBtn && cvMainBtnText) {
       if (!signedIn) {
-        if (nextMoveTag) nextMoveTag.textContent = 'GET STARTED';
-        if (nextMoveStep) nextMoveStep.textContent = 'Athlete Identity';
-        nextMoveTitle.textContent = 'Claim your athletic identity';
-        if (nextMoveDesc) nextMoveDesc.textContent = 'Create your profile to start logging verified benchmarks, tracking progression, and becoming discoverable to scouts.';
-        if (nextMoveBtnText) nextMoveBtnText.textContent = 'Sign Up / Sign In';
-        nextMoveBtn.setAttribute('data-home-action', 'auth');
-      } else if (entries.length === 0) {
-        if (nextMoveTag) nextMoveTag.textContent = 'MILESTONE 1';
-        if (nextMoveStep) nextMoveStep.textContent = 'Baseline Benchmark';
-        nextMoveTitle.textContent = 'Record your baseline result';
-        if (nextMoveDesc) nextMoveDesc.textContent = "You haven't logged any performance tests yet. Record your first benchmark to establish your verified baseline and join the leaderboard.";
-        if (nextMoveBtnText) nextMoveBtnText.textContent = 'Log a Result';
-        nextMoveBtn.setAttribute('data-home-action', 'log');
-      } else if (!user?.sport || !user?.location || !user?.bio) {
-        if (nextMoveTag) nextMoveTag.textContent = 'PROFILE COMPLETION';
-        if (nextMoveStep) nextMoveStep.textContent = 'Scout Discoverability';
-        nextMoveTitle.textContent = 'Complete your athletic portfolio';
-        if (nextMoveDesc) nextMoveDesc.textContent = 'Athletes with complete profiles (sport, location, and bio) receive significantly more engagement from scouts and team opportunities.';
-        if (nextMoveBtnText) nextMoveBtnText.textContent = 'Complete Profile';
-        nextMoveBtn.setAttribute('data-home-action', 'profile');
+        cvMainBtnText.textContent = 'Sign In / Join';
+        cvMainBtn.setAttribute('data-home-action', 'auth');
+        if (cvViewBtn) cvViewBtn.classList.add('hidden');
+        if (cvShareBtn) cvShareBtn.classList.add('hidden');
       } else {
-        if (nextMoveTag) nextMoveTag.textContent = 'NEXT OPPORTUNITY';
-        if (nextMoveStep) nextMoveStep.textContent = 'Pursue Opportunities';
-        nextMoveTitle.textContent = 'Pursue team trials & sponsorships';
-        if (nextMoveDesc) nextMoveDesc.textContent = 'Check open team trials, talent showcases, and sponsor grants matching your verified athletic marks.';
-        if (nextMoveBtnText) nextMoveBtnText.textContent = 'Explore Opportunities';
-        nextMoveBtn.setAttribute('data-home-action', 'opps');
+        if (comp.percent < 35) {
+          cvMainBtnText.textContent = 'Complete Profile';
+          cvMainBtn.setAttribute('data-home-action', 'profile');
+        } else if (entries.length === 0) {
+          cvMainBtnText.textContent = 'Log Baseline Result';
+          cvMainBtn.setAttribute('data-home-action', 'log');
+        } else if (!comp.hasVerified) {
+          cvMainBtnText.textContent = 'Log Test for Verification';
+          cvMainBtn.setAttribute('data-home-action', 'log');
+        } else {
+          cvMainBtnText.textContent = 'Explore Opportunities';
+          cvMainBtn.setAttribute('data-home-action', 'opps');
+        }
+
+        if (cvViewBtn) cvViewBtn.classList.remove('hidden');
+        if (cvShareBtn) cvShareBtn.classList.remove('hidden');
       }
     }
 
@@ -336,6 +344,40 @@
       window.navigateTo(dest);
     }
   });
+
+    window.openMyAthleticCV = function() {
+      if (!appState.currentUserId) {
+        if (typeof showToast === 'function') showToast('Please sign in first.');
+        return;
+      }
+      if (typeof window.renderPublicAthletePage === 'function') {
+        window.renderPublicAthletePage(appState.currentUserId);
+      }
+    };
+
+    window.shareMyAthleticCV = async function() {
+      if (!appState.currentUserId) {
+        if (typeof showToast === 'function') showToast('Please sign in first.');
+        return;
+      }
+      const cvUrl = `${window.location.origin}/athlete/${encodeURIComponent(appState.currentUserId)}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `${appState.currentUser?.name || 'Athlete'} — TOPSET Athletic CV`,
+            text: 'Check out my verified athletic benchmarks and performance CV on TOPSET:',
+            url: cvUrl
+          });
+          return;
+        } catch(e) {}
+      }
+      try {
+        await navigator.clipboard.writeText(cvUrl);
+        if (typeof showToast === 'function') showToast('Athletic CV link copied to clipboard!');
+      } catch(err) {
+        if (typeof showToast === 'function') showToast(cvUrl);
+      }
+    };
 
   document.addEventListener('DOMContentLoaded', renderHome);
   window.addEventListener('load', renderHome);

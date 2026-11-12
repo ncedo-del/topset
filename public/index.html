@@ -85,24 +85,38 @@
                 </div>
             </section>
 
-            <!-- 2. "Your Next Move" action card -->
-            <section class="home-next-move" id="homeNextMoveSection">
-                <div class="home-next-move-card">
-                    <div class="home-next-move-header">
-                        <span class="home-next-move-tag">
-                            <span class="next-move-pulse"></span>
-                            <span id="homeNextMoveTagText">YOUR NEXT MOVE</span>
-                        </span>
-                        <span class="home-next-move-step" id="homeNextMoveStep">Objective</span>
+            <!-- 2. Athletic CV & Completeness Engine (Strategy Deck Move 3) -->
+            <section class="home-cv-section" id="homeCvSection">
+                <div class="home-cv-card">
+                    <div class="home-cv-head">
+                        <div class="home-cv-title-wrap">
+                            <span class="home-cv-badge" id="homeCvBadge">BUILDING PROFILE</span>
+                            <h3 class="home-cv-title">Athletic CV</h3>
+                        </div>
+                        <div class="home-cv-percent-wrap">
+                            <span class="home-cv-percent" id="homeCvPercent">0%</span>
+                            <span class="home-cv-percent-label">Complete</span>
+                        </div>
                     </div>
-                    <div class="home-next-move-body">
-                        <h3 class="home-next-move-title" id="homeNextMoveTitle">Record your baseline result</h3>
-                        <p class="home-next-move-desc" id="homeNextMoveDesc">Log your first performance benchmark to establish your verified baseline and join the leaderboard.</p>
+                    <div class="home-cv-progress-bar">
+                        <div class="home-cv-progress-fill" id="homeCvProgressFill" style="width: 0%;"></div>
                     </div>
-                    <div class="home-next-move-actions">
-                        <button type="button" class="btn btn-primary" id="homeNextMoveBtn" data-home-action="log">
-                            <span id="homeNextMoveBtnText">Log a Result</span>
-                            <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    <div class="home-cv-body">
+                        <div class="home-cv-step-label">NEXT RECRUITER MILESTONE</div>
+                        <p class="home-cv-next" id="homeCvNext">Add your sport &amp; region to establish your athletic identity.</p>
+                    </div>
+                    <div class="home-cv-actions">
+                        <button type="button" class="btn btn-primary btn-sm" id="homeCvMainBtn" data-home-action="profile">
+                            <span id="homeCvMainBtnText">Complete Profile</span>
+                            <svg class="btn-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-sm hidden" id="homeCvViewBtn" onclick="window.openMyAthleticCV()">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            View Public CV
+                        </button>
+                        <button type="button" class="btn btn-ghost btn-sm hidden" id="homeCvShareBtn" onclick="window.shareMyAthleticCV()">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                            Share Link
                         </button>
                     </div>
                 </div>

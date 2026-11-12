@@ -91,3 +91,113 @@
             });
         } catch(err){ console.error('syncAthleteProfileDisplayInfo failed:', err); }
     }
+
+    // ── Profile Completeness Engine ─────────────────────────────────────
+    // Implements Strategy Deck Recommendation 3: real evidence-based
+    // scoring across Identity, Baseline Benchmarks, Progression, and Verification.
+    function computeProfileCompleteness(user, entries = [], athleteProfile = null) {
+        if (!user) {
+            return {
+                percent: 0,
+                level: 'Not Signed In',
+                badgeClass: 'badge-subtle',
+                nextStep: 'Sign up to create your Athletic CV',
+                checklist: [],
+                hasVerified: false
+            };
+        }
+
+        const checklist = [];
+        let score = 0;
+
+        // 1. Identity (up to 30 pts)
+        const hasName = !!(user.name && user.name.trim().length > 1);
+        checklist.push({ label: 'Athlete Name', done: hasName, pts: 5 });
+        if (hasName) score += 5;
+
+        const hasAvatar = !!(user.avatar && user.avatar !== 'gym');
+        checklist.push({ label: 'Profile Avatar', done: hasAvatar, pts: 5 });
+        if (hasAvatar) score += 5;
+
+        const sport = athleteProfile?.sport || user.sport;
+        const hasSport = !!(sport && sport.trim().length > 1);
+        checklist.push({ label: 'Sport Selected', done: hasSport, pts: 10 });
+        if (hasSport) score += 10;
+
+        const location = athleteProfile?.location || user.location;
+        const hasLocation = !!(location && location.trim().length > 1);
+        checklist.push({ label: 'Region / Location', done: hasLocation, pts: 5 });
+        if (hasLocation) score += 5;
+
+        const bio = athleteProfile?.bio || user.bio;
+        const hasBio = !!(bio && bio.trim().length >= 15);
+        checklist.push({ label: 'Athlete Bio', done: hasBio, pts: 5 });
+        if (hasBio) score += 5;
+
+        // 2. Baseline Benchmarks (up to 30 pts)
+        const hasOneTest = entries.length >= 1;
+        checklist.push({ label: 'First Benchmark Logged', done: hasOneTest, pts: 15 });
+        if (hasOneTest) score += 15;
+
+        const uniqueTests = new Set(entries.map(e => e.test)).size;
+        const hasMultipleTests = uniqueTests >= 2;
+        checklist.push({ label: '2+ Benchmarks Tracked', done: hasMultipleTests, pts: 15 });
+        if (hasMultipleTests) score += 15;
+
+        // 3. Progression & Deltas (up to 20 pts)
+        const testCounts = {};
+        for (const e of entries) {
+            testCounts[e.test] = (testCounts[e.test] || 0) + 1;
+        }
+        const hasProgression = Object.values(testCounts).some(c => c >= 2);
+        checklist.push({ label: 'Progression History (Repeat Attempt)', done: hasProgression, pts: 20 });
+        if (hasProgression) score += 20;
+
+        // 4. Verification Proof (up to 20 pts)
+        const hasVerified = entries.some(e => e.isOfficial && e.officialStatus === 'verified') ||
+                            Object.keys(athleteProfile?.verifiedResults || {}).length > 0;
+        checklist.push({ label: 'Gym or Official Verification', done: hasVerified, pts: 20 });
+        if (hasVerified) score += 20;
+
+        const percent = Math.min(100, score);
+
+        // Next milestone recommendation
+        let nextStep = 'Your Athletic CV is 100% complete!';
+        if (!hasSport || !hasLocation) {
+            nextStep = 'Add your sport & region (+15%)';
+        } else if (!hasBio) {
+            nextStep = 'Write a short athletic bio (+5%)';
+        } else if (!hasOneTest) {
+            nextStep = 'Record your baseline benchmark (+15%)';
+        } else if (!hasMultipleTests) {
+            nextStep = 'Log a second physical benchmark (+15%)';
+        } else if (!hasProgression) {
+            nextStep = 'Log a repeat attempt to show progression (+20%)';
+        } else if (!hasVerified) {
+            nextStep = 'Get 1 test verified by an accredited gym to become Recruiter Ready (+20%)';
+        }
+
+        let level = 'Building Profile';
+        let badgeClass = 'badge-subtle';
+        if (hasVerified && percent >= 80) {
+            level = 'Recruiter Ready';
+            badgeClass = 'badge-green';
+        } else if (percent >= 80) {
+            level = 'Performance Tracked';
+            badgeClass = 'badge-gold';
+        } else if (percent >= 50) {
+            level = 'Active Athlete';
+            badgeClass = 'badge-blue';
+        }
+
+        return {
+            percent,
+            level,
+            badgeClass,
+            nextStep,
+            checklist,
+            hasVerified
+        };
+    }
+
+    window.computeProfileCompleteness = computeProfileCompleteness;

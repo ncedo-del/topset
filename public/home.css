@@ -316,3 +316,233 @@
 }
 .history-footnote { padding: 12px 16px; border-top: 1px solid var(--border); }
 
+/* ---------- Athletic CV & Completeness Card ---------- */
+.home-cv-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--transition);
+}
+.home-cv-card:hover {
+    border-color: rgba(74, 222, 128, 0.4);
+}
+.home-cv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.home-cv-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.home-cv-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-primary);
+}
+.home-cv-badge {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+}
+.home-cv-badge.badge-green {
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+.home-cv-badge.badge-gold {
+    background: rgba(245, 197, 24, 0.15);
+    color: var(--accent-gold);
+    border: 1px solid rgba(245, 197, 24, 0.3);
+}
+.home-cv-badge.badge-blue {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+.home-cv-percent-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.home-cv-percent {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent-green);
+    line-height: 1;
+}
+.home-cv-percent-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.home-cv-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.home-cv-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+.home-cv-body {
+    margin-bottom: 16px;
+}
+.home-cv-step-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+}
+.home-cv-next {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+.home-cv-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Public Athlete CV Executive Screen */
+.public-cv-container {
+    max-width: 680px;
+    margin: 20px auto 40px;
+    padding: 0 16px;
+}
+.public-cv-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px 24px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    text-align: center;
+}
+.public-cv-header {
+    margin-bottom: 20px;
+}
+.public-cv-avatar-wrap {
+    margin: 0 auto 14px;
+    width: fit-content;
+}
+.public-cv-name {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--text-primary);
+}
+.public-cv-meta {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+.public-cv-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 10px 0 16px;
+}
+.public-cv-bio {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-green);
+    margin: 14px 0 24px;
+    text-align: left;
+}
+.public-cv-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 24px 0 12px;
+}
+.public-cv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.public-cv-stat {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.public-cv-stat.is-verified {
+    border-color: rgba(74, 222, 128, 0.4);
+    background: rgba(74, 222, 128, 0.04);
+}
+.public-cv-stat-test {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+.public-cv-stat-val {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+.public-cv-stat-sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.public-cv-verified-tag {
+    font-size: 10px;
+    font-weight: 800;
+    color: #4ade80;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
