@@ -229,7 +229,7 @@
             <div class="skeleton-stat-card"><div class="skeleton skeleton-stat-label"></div><div class="skeleton skeleton-stat-value"></div><div class="skeleton skeleton-stat-sub"></div></div>
         </div>
         <div class="card"><div class="card-header">Log Test Result<span id="logGymBadge" class="hidden" style="font-size:11px;font-weight:600;color:var(--accent-green);margin-left:8px;padding:4px 10px;background:var(--accent-tint-bg);border-radius:40px;"></span></div>
-            <form id="logForm" onsubmit="handleLogSubmit(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTest" required onchange="updateResultField()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroup"><label id="resultLabel">Result</label><input type="text" id="logResult" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDate" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div><div class="form-group hidden" id="officialCheckboxWrap" style="margin-top:12px;"><label style="display:flex;align-items:center;gap:12px;cursor:pointer;text-transform:none;font-weight:600;color:var(--text-primary);font-size:13px;padding:10px 8px;margin:-10px -8px;border-radius:8px;-webkit-user-select:none;user-select:none;"><input type="checkbox" id="logIsOfficial" style="width:22px;height:22px;min-width:22px;flex-shrink:0;accent-color:var(--accent-green);">Mark as Official Result</label><span id="officialHint" style="font-size:11px;color:var(--text-muted);margin-top:3px;display:block;"></span></div></form>
+            <form id="logForm" onsubmit="handleLogSubmit(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTest" required onchange="updateResultField()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroup"><label id="resultLabel">Result</label><input type="text" id="logResult" placeholder="Select test first" required autocomplete="off"></div></div><div id="logProtocolPreview" class="hidden"></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDate" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Result</button></div><div class="form-group hidden" id="officialCheckboxWrap" style="margin-top:12px;"><label style="display:flex;align-items:center;gap:12px;cursor:pointer;text-transform:none;font-weight:600;color:var(--text-primary);font-size:13px;padding:10px 8px;margin:-10px -8px;border-radius:8px;-webkit-user-select:none;user-select:none;"><input type="checkbox" id="logIsOfficial" style="width:22px;height:22px;min-width:22px;flex-shrink:0;accent-color:var(--accent-green);">Mark as Official Result</label><span id="officialHint" style="font-size:11px;color:var(--text-muted);margin-top:3px;display:block;"></span></div></form>
         </div>
         <!-- Second Log form, ONLY shown to signed-in members who belong to a gym (toggled in
              updateLogFormVisibility). Lets a gym member ALSO log a result into the public,
@@ -239,7 +239,7 @@
              carries the "Official" flag — official results are a gym-scoped concept tied to a
              gym's officialTestDate, which doesn't apply to the public pool. -->
         <div class="card hidden" id="publicLogCard"><div class="card-header">Log to TOPSET Public<span style="font-size:11px;font-weight:500;color:var(--text-muted);margin-left:8px;text-transform:none;">Compete gym-wide, not just at your gym</span></div>
-            <form id="logFormPublic" onsubmit="handleLogSubmitPublic(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTestPublic" required onchange="updateResultFieldPublic()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroupPublic"><label id="resultLabelPublic">Result</label><input type="text" id="logResultPublic" placeholder="Select test first" required autocomplete="off"></div></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDatePublic" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Public Result</button></div></form>
+            <form id="logFormPublic" onsubmit="handleLogSubmitPublic(event)"><div class="form-row"><div class="form-group"><label>Test</label><select id="logTestPublic" required onchange="updateResultFieldPublic()"><option value="">-- Select Test --</option></select></div><div class="form-group" id="resultGroupPublic"><label id="resultLabelPublic">Result</label><input type="text" id="logResultPublic" placeholder="Select test first" required autocomplete="off"></div></div><div id="logProtocolPreviewPublic" class="hidden"></div><div class="date-submit-row"><div class="form-group"><label>Date</label><input type="date" id="logDatePublic" required></div><button type="submit" class="btn btn-primary"><svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Log Public Result</button></div></form>
         </div>
     </div>
     <div class="page" id="page-history">
@@ -645,6 +645,23 @@
   </div>
 </div>
 
+<div class="modal-overlay hidden" id="protocolModal">
+  <div class="modal modal-wide" style="max-width:760px;">
+    <button type="button" class="modal-close-x" onclick="window.closeBenchmarkProtocol()" aria-label="Close" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    <div class="proto-modal-header">
+      <div class="proto-modal-badge-group">
+        <span class="proto-modal-code" id="protoModalCode">TOPSET-STD</span>
+        <span class="proto-modal-cat" id="protoModalCategory">Benchmark</span>
+      </div>
+      <h2 id="protoModalTitle" style="margin:8px 0 0;">Official Testing Protocol</h2>
+    </div>
+    <div id="protoModalContent"></div>
+    <div class="modal-buttons" style="margin-top:20px;">
+      <button type="button" class="btn btn-primary" onclick="window.closeBenchmarkProtocol()">Understood &amp; Close</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- Firebase: powers ALL app data — profiles, entries, history, PRs, streaks, leaderboard, and auth. -->
@@ -658,6 +675,7 @@
 <script src="./js/gyms.js"></script>
 <script src="./js/athlete-profile.js"></script>
 <script src="./js/athlete-profile-ui.js"></script>
+<script src="./js/benchmark-protocols.js"></script>
 <script src="./js/discover-ui.js"></script>
 <script src="./js/entries-journal.js"></script>
 <script src="./js/results-ui.js"></script>

@@ -171,7 +171,22 @@
     function getPersonalBests(entries){ const map={}; entries.forEach(e=>{ const cfg=getTestConfig(e.test); if(!cfg)return; const k=e.test; if(!map[k])map[k]=e; else { if(cfg.higherIsBetter?e.value>map[k].value:e.value<map[k].value) map[k]=e; else if(e.value===map[k].value&&e.date>map[k].date) map[k]=e; } }); return Object.values(map); }
     function formatTime(sec){ const m=Math.floor(sec/60), s=Math.floor(sec%60); return `${m}:${s.toString().padStart(2,'0')}`; }
     function parseTime(raw){ const p=raw.split(':'); if(p.length===2){ const m=parseInt(p[0]), s=parseInt(p[1]); if(!isNaN(m)&&!isNaN(s)) return m*60+s; } return NaN; }
-    function updateResultField(){ const t=$('#logTest').value, cfg=getTestConfig(t), inp=$('#logResult'), lbl=$('#resultLabel'); if(!cfg){ inp.type='text'; inp.step='any'; inp.placeholder='Select test first'; lbl.textContent='Result'; return; } inp.type=cfg.inputType; inp.step='any'; inp.placeholder=cfg.placeholder; lbl.textContent=cfg.unit==='time'?'Time (mm:ss)':`Result (${cfg.unit})`; inp.value=''; updateOfficialAvailability(); }
+    function updateResultField(){
+        const t=$('#logTest').value, cfg=getTestConfig(t), inp=$('#logResult'), lbl=$('#resultLabel'), protoBox=$('#logProtocolPreview');
+        if(!cfg){
+            inp.type='text'; inp.step='any'; inp.placeholder='Select test first'; lbl.textContent='Result';
+            if (protoBox){ protoBox.innerHTML=''; protoBox.classList.add('hidden'); }
+            return;
+        }
+        inp.type=cfg.inputType; inp.step='any'; inp.placeholder=cfg.placeholder;
+        lbl.textContent=cfg.unit==='time'?'Time (mm:ss)':`Result (${cfg.unit})`;
+        inp.value='';
+        if (protoBox && typeof window.renderProtocolSummaryCardHTML === 'function'){
+            protoBox.innerHTML = window.renderProtocolSummaryCardHTML(t);
+            protoBox.classList.remove('hidden');
+        }
+        updateOfficialAvailability();
+    }
     // The "Mark as Official" checkbox only appears — and is only enabled — when
     // the currently-selected log date matches the member's gym's officialTestDate.
     // This mirrors the entries.create security rule (which re-checks the same

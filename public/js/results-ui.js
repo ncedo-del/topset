@@ -7,7 +7,21 @@
     // of which gym the member actually belongs to. No official-result concept
     // here at all, so there's no equivalent of updateOfficialAvailability.
     function getTestConfigPublic(n){ return (appState.globalTests||[]).find(t=>t.name===n); }
-    function updateResultFieldPublic(){ const t=$('#logTestPublic').value, cfg=getTestConfigPublic(t), inp=$('#logResultPublic'), lbl=$('#resultLabelPublic'); if(!cfg){ inp.type='text'; inp.step='any'; inp.placeholder='Select test first'; lbl.textContent='Result'; return; } inp.type=cfg.inputType; inp.step='any'; inp.placeholder=cfg.placeholder; lbl.textContent=cfg.unit==='time'?'Time (mm:ss)':`Result (${cfg.unit})`; inp.value=''; }
+    function updateResultFieldPublic(){
+        const t=$('#logTestPublic').value, cfg=getTestConfigPublic(t), inp=$('#logResultPublic'), lbl=$('#resultLabelPublic'), protoBox=$('#logProtocolPreviewPublic');
+        if(!cfg){
+            inp.type='text'; inp.step='any'; inp.placeholder='Select test first'; lbl.textContent='Result';
+            if (protoBox){ protoBox.innerHTML=''; protoBox.classList.add('hidden'); }
+            return;
+        }
+        inp.type=cfg.inputType; inp.step='any'; inp.placeholder=cfg.placeholder;
+        lbl.textContent=cfg.unit==='time'?'Time (mm:ss)':`Result (${cfg.unit})`;
+        inp.value='';
+        if (protoBox && typeof window.renderProtocolSummaryCardHTML === 'function'){
+            protoBox.innerHTML = window.renderProtocolSummaryCardHTML(t);
+            protoBox.classList.remove('hidden');
+        }
+    }
     async function handleLogSubmitPublic(e){ return guardedSubmit(e, 'logEntry', RATE_LIMITS.logEntry, async()=>{ const test=$('#logTestPublic').value, raw=$('#logResultPublic').value.trim(), date=$('#logDatePublic').value||todayStr(); if(!test) return showToast('Please select a test.'); const cfg=getTestConfigPublic(test); if(!cfg) return showToast('Please select a test.'); let value; if(cfg.unit==='time'){ value=parseTime(raw); if(isNaN(value)) return showToast('Invalid time format (mm:ss).'); } else { value=parseFloat(raw); if(isNaN(value)) return showToast('Invalid number.'); } if(!isValidEntryValue(value, cfg)) return showToast('That result looks out of range — double check the number.'); if(!isValidLogDate(date)) return showToast('Please pick a valid date (not in the future).'); const saved = await addEntry({test,value,date,isOfficial:false,gymId:null}); if(!saved) return; await pushBestToCloud(test); const disp=cfg.unit==='time'?raw:`${value} ${cfg.unit}`; showToast(`${test}: ${disp} logged to TOPSET Public!`); $('#logTestPublic').value=''; $('#logResultPublic').value=''; $('#logDatePublic').value=todayStr(); updateResultFieldPublic(); updateStatsRow(); }); }
     function skeletonTableRows(cols, count=5){
         const widths=['skeleton-cell-md','skeleton-cell-lg','skeleton-cell-sm','skeleton-cell-sm','skeleton-cell-md'];

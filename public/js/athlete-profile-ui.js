@@ -123,13 +123,18 @@
                     ${verified.map(v=>`
                         <div class="public-verified-row">
                             <div style="min-width:0;">
-                                <div class="pv-test">${escapeHTML(v.test||'')}</div>
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div class="pv-test">${escapeHTML(v.test||'')}</div>
+                                    <button type="button" class="cv-proto-pill" onclick="window.openBenchmarkProtocol('${encodeURIComponent(v.test||'')}')" title="View official testing standard">
+                                        Protocol
+                                    </button>
+                                </div>
                                 <div class="pv-meta">📍 ${escapeHTML([v.gymName||'Accredited Gym', v.date ? formatDate(v.date) : ''].filter(Boolean).join(' · '))}</div>
                             </div>
                             <div class="pv-val" style="color:var(--accent-green);font-weight:800;">${escapeHTML(String(v.display ?? v.value))}</div>
                         </div>
                     `).join('')}
-                    <p class="pv-note">Independently witnessed under TOPSET testing protocol.</p>
+                    <p class="pv-note">Independently witnessed under TOPSET standardized protocol.</p>
                 </div>` : '';
 
         const prHTML = prList.length ? `
@@ -138,13 +143,21 @@
                         Performance Benchmark Portfolio (${prList.length})
                     </div>
                     <div class="public-cv-grid">
-                        ${prList.map(item => `
+                        ${prList.map(item => {
+                            const testName = item.test_name || item.test || 'Benchmark';
+                            return `
                             <div class="public-cv-stat">
-                                <span class="public-cv-stat-test">${escapeHTML(item.test_name || item.test || 'Benchmark')}</span>
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;width:100%;">
+                                    <span class="public-cv-stat-test">${escapeHTML(testName)}</span>
+                                    <button type="button" class="cv-proto-pill" onclick="window.openBenchmarkProtocol('${encodeURIComponent(testName)}')" title="View standard protocol & valid rep rules">
+                                        STD
+                                    </button>
+                                </div>
                                 <strong class="public-cv-stat-val">${item.pb_value ?? item.value}${item.unit ? ' <small style="font-size:12px;font-weight:600;color:var(--text-muted);">' + escapeHTML(item.unit) + '</small>' : ''}</strong>
                                 <span class="public-cv-stat-sub">${item.pb_date ? formatDate(item.pb_date) : 'Personal Best'}</span>
                             </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 </div>` : '';
 
