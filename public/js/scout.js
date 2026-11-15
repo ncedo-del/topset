@@ -38,7 +38,7 @@
         signupType: 'athlete', retried: false, claiming: false
     };
     window.topsetIsScout = () => !!SC.acct; // profile-hub.js uses this to show the portal row
-    const F = { q: '', sport: '', age: '', test: '', verifiedOnly: false, spons: false, trials: false, opps: false };
+    const F = { q: '', sport: '', age: '', test: '', verifiedOnly: false, recruiterReady: false, spons: false, trials: false, opps: false };
 
     const ICON = {
         discover: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
@@ -215,6 +215,7 @@ body.scout-mode{padding-bottom:0}
             if (F.sport && p.sport !== F.sport) return false;
             if (F.age && p.ageGroup !== F.age) return false;
             const v = verifiedList(p);
+            if (F.recruiterReady && (!v.length || !p.name || !p.sport || !p.location)) return false;
             if (F.verifiedOnly && !v.length) return false;
             if (F.test && !v.some(r => r.test === F.test)) return false;
             if (F.spons && !p.availability?.openToSponsorship) return false;
@@ -237,10 +238,11 @@ body.scout-mode{padding-bottom:0}
         const meta = [p.sport, p.location, p.ageGroup].filter(Boolean).map(esc).join(' · ') || 'No details yet';
         const av = [p.availability?.openToSponsorship && 'Sponsorship', p.availability?.openToTrials && 'Trials', p.availability?.openToOpportunities && 'Opportunities'].filter(Boolean);
         let vs = v; if (F.test) vs = [...v.filter(r => r.test === F.test), ...v.filter(r => r.test !== F.test)];
+        const isReady = p.name && p.sport && p.location && v.length > 0;
         const body = o.gone
             ? '<div class="sc-ver-none">This profile is no longer public.</div>'
             : (v.length
-                ? `<div class="sc-ver-tag">${svg('check', 12)} ${v.length} verified result${v.length > 1 ? 's' : ''}</div><div class="sc-ver-rows">${vs.slice(0, 3).map(r => `<div class="sc-ver-row"><span>${esc(r.test)}</span><strong>${esc(r.display ?? r.value)}</strong></div>`).join('')}</div>`
+                ? `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${isReady ? '<span class="home-cv-badge badge-green" style="font-size:9.5px;padding:2px 7px;">Recruiter Ready</span>' : ''}<div class="sc-ver-tag">${svg('check', 12)} ${v.length} verified</div></div><div class="sc-ver-rows">${vs.slice(0, 3).map(r => `<div class="sc-ver-row"><span>${esc(r.test)}</span><strong>${esc(r.display ?? r.value)}</strong></div>`).join('')}</div>`
                 : '<div class="sc-ver-none">No verified results yet</div>');
         return `<article class="sc-card" data-act="open" data-id="${esc(p.id)}">
   <div class="sc-card-top">${avatarCircleHTML(p.avatar, 46)}<div class="sc-card-id"><div class="sc-name">${esc(p.name || 'TOPSET Athlete')}</div><div class="sc-meta">${meta}</div></div>
@@ -267,6 +269,7 @@ body.scout-mode{padding-bottom:0}
   <select id="scTest"><option value="">Any verified test</option>${tests.map(t => `<option value="${esc(t)}"${F.test === t ? ' selected' : ''}>Best at: ${esc(t)}</option>`).join('')}</select>
 </div>
 <div class="sc-chips">
+  <button type="button" class="sc-chip${F.recruiterReady ? ' on' : ''}" data-act="chip" data-k="recruiterReady">Recruiter Ready (100%)</button>
   <button type="button" class="sc-chip${F.verifiedOnly ? ' on' : ''}" data-act="chip" data-k="verifiedOnly">Verified results only</button>
   <button type="button" class="sc-chip${F.spons ? ' on' : ''}" data-act="chip" data-k="spons">Open to sponsorship</button>
   <button type="button" class="sc-chip${F.trials ? ' on' : ''}" data-act="chip" data-k="trials">Open to trials</button>
@@ -308,9 +311,42 @@ body.scout-mode{padding-bottom:0}
         if (!cur || cur.note === text) return;
         try { await db.collection('scoutShortlists').doc(`${appState.currentUserId}__${id}`).update({ note: text }); } catch (e) { console.error(e); showToast('Could not save the note.'); }
     }
+    function exportShortlistCSV() {
+        const items = [...SC.shortlist.values()];
+        if (!items.length) return showToast('Your shortlist is empty.');
+        const headers = ['Athlete Name', 'Sport', 'Age Group', 'Location', 'Verified Benchmarks Count', 'Key Benchmarks', 'Scout Note', 'Date Added'];
+        const rows = items.map(s => {
+            const p = profileById(s.athleteId);
+            if (!p) return [`"${s.athleteId}"`, '"Unavailable"', '""', '""', '0', '""', `"${(s.note || '').replace(/"/g, '""')}"`, `"${fmtTs(s.addedAt)}"`];
+            const vList = verifiedList(p);
+            const bmStr = vList.map(r => `${r.test}: ${r.display ?? r.value}`).join('; ');
+            return [
+                `"${(p.name || 'Athlete').replace(/"/g, '""')}"`,
+                `"${(p.sport || '').replace(/"/g, '""')}"`,
+                `"${(p.ageGroup || '').replace(/"/g, '""')}"`,
+                `"${(p.location || '').replace(/"/g, '""')}"`,
+                vList.length,
+                `"${bmStr.replace(/"/g, '""')}"`,
+                `"${(s.note || '').replace(/"/g, '""')}"`,
+                `"${fmtTs(s.addedAt)}"`
+            ];
+        });
+
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `topset-scout-shortlist-${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Shortlist exported to CSV!');
+    }
     function renderShortlist() {
         const items = [...SC.shortlist.values()].sort((a, b) => b.addedAt - a.addedAt);
-        let html = `<div class="sc-head"><div><h1>Shortlist</h1><p>Private to you. Add a note on any athlete, then tick two or more to compare their verified results side by side.</p></div><button type="button" class="btn btn-primary" data-act="compare">${svg('compare', 15)} Compare (${SC.cmp.size})</button></div>`;
+        let html = `<div class="sc-head"><div><h1>Shortlist</h1><p>Private to you. Add a note on any athlete, then tick two or more to compare their verified results side by side.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline" data-act="export-csv"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button><button type="button" class="btn btn-primary" data-act="compare">${svg('compare', 15)} Compare (${SC.cmp.size})</button></div></div>`;
         if (!items.length) html += '<div class="sc-empty">Nobody here yet. Tap the bookmark on an athlete in Discover.</div>';
         else {
             if (!SC.profilesLoaded) { loadProfiles(); }
@@ -435,6 +471,7 @@ ${introBlock(p)}`;
             case 'chip': F[t.dataset.k] = !F[t.dataset.k]; t.classList.toggle('on', F[t.dataset.k]); return renderResults();
             case 'refresh': return loadProfiles(true);
             case 'compare': return openCompare();
+            case 'export-csv': return exportShortlistCSV();
             case 'intro-open': $('#scIntroForm').classList.remove('hidden'); t.classList.add('hidden'); return $('#scIntroMsg').focus();
             case 'intro-cancel': $('#scIntroForm').classList.add('hidden'); return $('#scIntroBtn').classList.remove('hidden');
             case 'intro-send': return sendIntro(id);

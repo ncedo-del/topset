@@ -43,6 +43,7 @@
             <button class="nav-tab" data-page="history"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
             <button class="nav-tab" data-page="prs"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
             <button class="nav-tab" data-page="leaderboard" id="desktopNavLeaderboard"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+            <button class="nav-tab" data-page="discover" id="desktopNavDiscover"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Discover</button>
             <button class="nav-tab" id="desktopNavOpportunities" onclick="window.openOpportunitiesModal()"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Opps</button>
             <button class="nav-tab hidden" data-page="event" id="desktopNavEvent"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
         </nav>
@@ -64,6 +65,7 @@
     <button class="bottom-nav-item" data-page="history"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> History</button>
     <button class="bottom-nav-item" data-page="prs"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg> PRs</button>
     <button class="bottom-nav-item" data-page="leaderboard" id="bottomNavLeaderboard"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg> Board</button>
+    <button class="bottom-nav-item" data-page="discover" id="bottomNavDiscover"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Discover</button>
     <button class="bottom-nav-item" id="bottomNavOpportunities" onclick="window.openOpportunitiesModal()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Opps</button>
     <button class="bottom-nav-item hidden" data-page="event" id="bottomNavEvent"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/></svg> Event</button>
     <button class="bottom-nav-item hidden" id="bottomNavManageTestsBtn" onclick="window.openManageTests()"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94Z"/></svg> Tests</button>
@@ -359,6 +361,81 @@
     </div>
     <div class="page" id="page-prs"><div class="card"><div class="card-header">Personal Records</div><div class="table-wrapper"><table><thead><tr><th>Test</th><th>Best Result</th><th>Date</th><th>Status</th><th></th></tr></thead><tbody id="prTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 5H4a3 3 0 0 0 3 5"/><path d="M17 5h3a3 3 0 0 1-3 5"/></svg></span>No PRs yet. Start logging!</td></tr></tbody></table></div></div></div>
     <div class="page" id="page-leaderboard"><div class="card"><div class="card-header">Leaderboard <span id="leaderboardGymLabel" style="font-size:13px;font-weight:600;color:var(--accent-green);margin-left:8px;padding:4px 10px;background:var(--accent-tint-bg);border-radius:40px;"></span> <select id="filterBoardScope" class="hidden" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="gym">My Gym</option><option value="public">Public · TopSet-Wide</option></select> <span style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-left:8px;">Spotlight:</span><select id="spotlightLiftSelect" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:14px;padding:8px 12px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">-- Select Test --</option></select><select id="filterResultScope" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="regular">Regular</option><option value="official">Official</option></select><select id="filterAgeGroup" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Ages</option><option value="18-24">18-24</option><option value="25-34">25-34</option><option value="35-44">35-44</option><option value="45-54">45-54</option><option value="55+">55+</option></select><select id="filterGender" onchange="renderLeaderboard()" style="font-family:var(--font-body);font-size:13px;padding:6px 10px;border-radius:40px;border:2px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-weight:600;"><option value="">All Genders</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div><div id="myRankBar"></div><div class="table-wrapper"><table><thead><tr><th>Rank</th><th>User</th><th>Test</th><th>Best</th><th>Date</th></tr></thead><tbody id="leaderboardTableBody"><tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 16v-4"/><path d="M12 16v-8"/><path d="M17 16v-2"/></svg></span>Select a spotlight test to see rankings.</td></tr></tbody></table></div></div></div>
+    <div class="page" id="page-discover">
+        <div class="card discover-hero-card">
+            <div class="discover-hero-top">
+                <div>
+                    <div class="history-eyebrow">TALENT DISCOVERY &amp; RECRUITING</div>
+                    <h2 class="history-title" style="margin:4px 0 6px;">Discover Verified Athletes</h2>
+                    <p class="history-sub">Search athletes by verified benchmarks, physical criteria, sports discipline, and recruiter readiness.</p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" onclick="window.switchToScoutMode()" title="Open Dedicated Scout Portal">
+                    <svg class="btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg> Scout Portal
+                </button>
+            </div>
+            
+            <div class="discover-filter-container">
+                <div class="discover-filter-row">
+                    <div class="discover-input-wrap">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="search" id="discoverSearch" placeholder="Search by name, sport, or location..." oninput="window.applyDiscoverFilters()">
+                    </div>
+                    <select id="discoverSportFilter" onchange="window.applyDiscoverFilters()">
+                        <option value="">All Sports</option>
+                    </select>
+                    <select id="discoverAgeGroup" onchange="window.applyDiscoverFilters()">
+                        <option value="">All Ages</option>
+                        <option value="14-17">14-17 (Youth)</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55+">55+</option>
+                    </select>
+                    <select id="discoverTierFilter" onchange="window.applyDiscoverFilters()">
+                        <option value="">All Readiness Tiers</option>
+                        <option value="recruiter_ready">Recruiter Ready (100%)</option>
+                        <option value="verified_only">Verified Benchmarks Only</option>
+                        <option value="contender">Contenders &amp; Visible (50%+)</option>
+                    </select>
+                </div>
+
+                <div class="discover-benchmark-filter-row">
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text-muted);white-space:nowrap;">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        Benchmark Filter:
+                    </div>
+                    <select id="discoverBenchmarkSelect" onchange="window.onDiscoverBenchmarkChange()" style="flex:1;min-width:160px;">
+                        <option value="">-- Any Benchmark Standard --</option>
+                    </select>
+                    <div class="discover-threshold-wrap hidden" id="discoverThresholdWrap">
+                        <span id="discoverThresholdLabel" style="font-size:11.5px;font-weight:700;color:var(--text-secondary);">Min:</span>
+                        <input type="text" id="discoverBenchmarkThreshold" placeholder="e.g. 2.40" oninput="window.applyDiscoverFilters()" style="width:110px;">
+                    </div>
+                </div>
+
+                <div class="discover-chips-row">
+                    <label class="discover-chip-label">
+                        <input type="checkbox" id="discoverFilterTrials" onchange="window.applyDiscoverFilters()">
+                        <span>Open to Trials</span>
+                    </label>
+                    <label class="discover-chip-label">
+                        <input type="checkbox" id="discoverFilterSponsorship" onchange="window.applyDiscoverFilters()">
+                        <span>Open to Sponsorship</span>
+                    </label>
+                    <label class="discover-chip-label">
+                        <input type="checkbox" id="discoverFilterOpportunities" onchange="window.applyDiscoverFilters()">
+                        <span>Open to Opportunities</span>
+                    </label>
+                    <div id="discoverResultCount" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--text-muted);display:flex;align-items:center;"></div>
+                </div>
+            </div>
+
+            <div class="discover-grid" id="discoverResultsGrid">
+                <div class="empty-state" style="grid-column:1/-1;">Loading athletes...</div>
+            </div>
+        </div>
+    </div>
     <div class="page" id="page-event">
         <div class="card">
             <div class="card-header" id="eventTitle">Event</div>
