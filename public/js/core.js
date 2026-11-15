@@ -442,10 +442,68 @@
         return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">${AVATAR_ICONS[avatarKey(v)].svg}</svg>`;
     }
     // Icon size scales with the circle it sits in (roughly half its width).
-    function avatarCircleHTML(v, circlePx){
+    // Supports photoURL: renders circular <img> with auto-fallback to SVG icon on error.
+    function avatarCircleHTML(v, circlePx, photoURL){
         circlePx = circlePx || 40;
-        return `<span class="avatar-circle" style="width:${circlePx}px;height:${circlePx}px;flex-shrink:0;">${avatarIconSVG(v, Math.round(circlePx*0.5))}</span>`;
+        if (typeof v === 'object' && v !== null) {
+            photoURL = v.photoURL || v.photoUrl || photoURL;
+            v = v.avatar;
+        }
+        const photo = photoURL || (typeof v === 'string' && (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('data:image/')) ? v : null);
+        const iconKey = (photo && v === photo) ? DEFAULT_AVATAR : v;
+        const iconSvg = avatarIconSVG(iconKey, Math.round(circlePx * 0.5));
+
+        if (photo) {
+            return `<span class="avatar-circle avatar-has-photo" style="width:${circlePx}px;height:${circlePx}px;flex-shrink:0;position:relative;overflow:hidden;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;">` +
+                `<img src="${escapeHTML(photo)}" alt="Avatar" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='inline-flex';" />` +
+                `<span class="avatar-icon-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${iconSvg}</span>` +
+            `</span>`;
+        }
+        return `<span class="avatar-circle" style="width:${circlePx}px;height:${circlePx}px;flex-shrink:0;">${iconSvg}</span>`;
     }
+
+    // Client-side instant square-crop & high-efficiency WebP compression for avatars (<30KB)
+    function processAvatarImage(file, maxSize = 300, quality = 0.85) {
+        return new Promise((resolve, reject) => {
+            if (!file || !file.type || !file.type.startsWith('image/')) {
+                return reject(new Error('Please select a valid image file.'));
+            }
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Failed to read image file.'));
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Failed to parse image data.'));
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const w = img.naturalWidth || img.width;
+                        const h = img.naturalHeight || img.height;
+                        const size = Math.min(w, h);
+                        const sx = (w - size) / 2;
+                        const sy = (h - size) / 2;
+                        const targetSize = Math.min(size, maxSize);
+
+                        canvas.width = targetSize;
+                        canvas.height = targetSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, sx, sy, size, size, 0, 0, targetSize, targetSize);
+
+                        const dataUrl = canvas.toDataURL('image/webp', quality);
+                        canvas.toBlob((blob) => {
+                            resolve({ blob: blob || file, dataUrl, width: targetSize, height: targetSize });
+                        }, 'image/webp', quality);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    window.processAvatarImage = processAvatarImage;
 
     const STORAGE_PREFIX='topset_', KEYS={ theme:STORAGE_PREFIX+'theme', spotlightLift:STORAGE_PREFIX+'spotlight_lift', resultScope:STORAGE_PREFIX+'result_scope', boardScope:STORAGE_PREFIX+'board_scope', seenAbout:STORAGE_PREFIX+'seen_about', seenInstall:STORAGE_PREFIX+'seen_install', seenNotif:STORAGE_PREFIX+'seen_notif' };
     // appState.tests = the effective merged catalog (global + gym, gym shadows on name

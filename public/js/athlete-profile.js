@@ -48,6 +48,7 @@
             uid,
             name: user?.name || 'TOPSET Athlete',
             avatar: avatarKey(user?.avatar),
+            photoURL: user?.photoURL || null,
             ageGroup: displayAgeGroup(user),
             gender: user?.gender || null,
             sport: (fields.sport||'').trim().slice(0,60),
@@ -86,6 +87,7 @@
             await athleteProfileRef(uid).update({
                 name: user.name || 'TOPSET Athlete',
                 avatar: avatarKey(user.avatar),
+                photoURL: user.photoURL || null,
                 ageGroup: displayAgeGroup(user),
                 gender: user.gender || null
             });
@@ -115,8 +117,8 @@
         checklist.push({ label: 'Athlete Name', done: hasName, pts: 5 });
         if (hasName) score += 5;
 
-        const hasAvatar = !!(user.avatar && user.avatar !== 'gym');
-        checklist.push({ label: 'Profile Avatar', done: hasAvatar, pts: 5 });
+        const hasAvatar = !!((user.avatar && user.avatar !== 'gym') || user.photoURL);
+        checklist.push({ label: 'Profile Picture / Avatar', done: hasAvatar, pts: 5 });
         if (hasAvatar) score += 5;
 
         const sport = athleteProfile?.sport || user.sport;

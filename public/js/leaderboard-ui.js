@@ -157,7 +157,7 @@
                 ${overallBadge}
             </div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-                ${avatarCircleHTML(u.avatar,52)}
+                ${avatarCircleHTML(u.avatar, 52, u.photoURL)}
                 <div style="min-width:0;">
                     <div style="font-family:var(--font-display);font-size:19px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHTML(u.name)}</div>
                     <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${infoLine}</div>
@@ -456,7 +456,7 @@
                         tb.innerHTML=filtered.map((r,i)=>{
                             const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
                             const disp=cfg&&cfg.unit==='time'?formatTime(Number(r.best_value)):`${r.best_value} ${cfg?.unit||''}`;
-                            return `<tr><td class="leaderboard-rank ${rc}">${r.rank || (i+1)}</td><td><div style="display:flex;align-items:center;gap:8px;">${avatarCircleHTML(r.avatar||'gym',40)}<strong>${escapeHTML(r.athlete_name||'TOPSET Athlete')}</strong></div></td><td>${escapeHTML(r.test_name||spotlight)}</td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(r.best_date||todayStr())}</td></tr>`;
+                            return `<tr><td class="leaderboard-rank ${rc}">${r.rank || (i+1)}</td><td><div style="display:flex;align-items:center;gap:8px;">${avatarCircleHTML(r.avatar||'gym',40,r.photo_url||r.photoURL)}<strong>${escapeHTML(r.athlete_name||'TOPSET Athlete')}</strong></div></td><td>${escapeHTML(r.test_name||spotlight)}</td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(r.best_date||todayStr())}</td></tr>`;
                         }).join('');
                         return;
                     }
@@ -480,7 +480,7 @@
             if (cfg) filtered.sort((a,b)=>cfg.higherIsBetter?b.value-a.value:a.value-b.value);
             updateMyRankBar(spotlight, scope, cfg, filtered, gym, boardScope);
             if (!filtered.length){ tb.innerHTML=`<tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg></span>No entries for "${escapeHTML(spotlight)}" ${ageFilter||genderFilter?'in this group ':''}yet.</td></tr>`; return; }
-            tb.innerHTML=filtered.map((r,i)=>{ const rc=i===0?'gold':i===1?'silver':i===2?'bronze':''; const disp=cfg&&cfg.unit==='time'?formatTime(r.value):`${r.value} ${cfg?.unit||''}`; return `<tr><td class="leaderboard-rank ${rc}">${i+1}</td><td><div style="display:flex;align-items:center;gap:8px;">${avatarCircleHTML(r.avatar,40)}<strong>${escapeHTML(r.name)}</strong></div></td><td>${escapeHTML(r.test)}</td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(r.date)}</td></tr>`; }).join('');
+            tb.innerHTML=filtered.map((r,i)=>{ const rc=i===0?'gold':i===1?'silver':i===2?'bronze':''; const disp=cfg&&cfg.unit==='time'?formatTime(r.value):`${r.value} ${cfg?.unit||''}`; return `<tr><td class="leaderboard-rank ${rc}">${i+1}</td><td><div style="display:flex;align-items:center;gap:8px;">${avatarCircleHTML(r.avatar,40,r.photoURL||r.photo_url)}<strong>${escapeHTML(r.name)}</strong></div></td><td>${escapeHTML(r.test)}</td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(r.date)}</td></tr>`; }).join('');
         }, err=>{ console.error('Leaderboard listener error:', err); tb.innerHTML='<tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg></span>Couldn\'t load the leaderboard. Check your connection.</td></tr>'; });
     }
     function updateSpotlightSelect(){ const sel=$('#spotlightLiftSelect'), cur=sel.value||appState.spotlightLift; sel.innerHTML='<option value="">-- Select Test --</option>'+appState.tests.filter(testVisibleToUser).map(t=>`<option value="${escapeHTML(t.name)}" ${t.name===cur?'selected':''}>${escapeHTML(t.name)}</option>`).join(''); }

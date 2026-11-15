@@ -259,6 +259,7 @@ service cloud.firestore {
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin','managesGymId','guardianConsentAt','guardianConsentBy','createdAt','accountType'])
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name']) || (request.resource.data.name is string && request.resource.data.name.size() <= 60))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['avatar']) || (request.resource.data.avatar is string && request.resource.data.avatar.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['photoURL']) || (request.resource.data.photoURL == null || (request.resource.data.photoURL is string && request.resource.data.photoURL.size() <= 50000)))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['gender']) || (request.resource.data.gender == null || (request.resource.data.gender is string && request.resource.data.gender.size() <= 30)))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['sport']) || (request.resource.data.sport == null || (request.resource.data.sport is string && request.resource.data.sport.size() <= 60)))
           && (
@@ -629,6 +630,7 @@ service cloud.firestore {
           && request.resource.data.name == myProfile().name
           && request.resource.data.name.size() <= 60
           && (request.resource.data.get('avatar', '') is string && request.resource.data.get('avatar', '').size() <= 40)
+          && (request.resource.data.get('photoURL', null) == null || (request.resource.data.photoURL is string && request.resource.data.photoURL.size() <= 50000))
           && request.resource.data.get('gender', null) == myProfile().get('gender', null)
           && request.resource.data.get('ageGroup', null) == expectedAgeGroup(myProfile())
           && request.resource.data.get('bio', '') is string && request.resource.data.get('bio', '').size() <= 500
@@ -660,6 +662,7 @@ service cloud.firestore {
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['verifiedResults'])
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name']) || (request.resource.data.name == myProfile().name && request.resource.data.name.size() <= 60))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['avatar']) || (request.resource.data.avatar is string && request.resource.data.avatar.size() <= 40))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['photoURL']) || (request.resource.data.photoURL == null || (request.resource.data.photoURL is string && request.resource.data.photoURL.size() <= 50000)))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['gender']) || request.resource.data.get('gender', null) == myProfile().get('gender', null))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['ageGroup']) || request.resource.data.get('ageGroup', null) == expectedAgeGroup(myProfile()))
           && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['bio']) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 500))

@@ -73,7 +73,7 @@
         const isOwner = appState.currentUserId && appState.currentUserId === uid;
         if (!p && isOwner) {
             p = await getMyAthleteProfile();
-            if (p) p = { ...p, isPublic: false, name: appState.currentUser?.name, avatar: appState.currentUser?.avatar };
+            if (p) p = { ...p, isPublic: false, name: appState.currentUser?.name, avatar: appState.currentUser?.avatar, photoURL: appState.currentUser?.photoURL };
         }
 
         if (!p){
@@ -168,7 +168,7 @@
                 <div class="public-cv-card">
                     <div class="public-cv-header">
                         <div class="public-cv-avatar-wrap">
-                            ${avatarCircleHTML(p.avatar, 84)}
+                            ${avatarCircleHTML(p.avatar, 84, p.photoURL)}
                         </div>
                         <h1 class="public-cv-name">${escapeHTML(p.name||'TOPSET Athlete')}</h1>
                         <div class="public-cv-meta">${escapeHTML(infoParts.join(' · ')||'Athlete Portfolio')}</div>

@@ -245,7 +245,7 @@ body.scout-mode{padding-bottom:0}
                 ? `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${isReady ? '<span class="home-cv-badge badge-green" style="font-size:9.5px;padding:2px 7px;">Recruiter Ready</span>' : ''}<div class="sc-ver-tag">${svg('check', 12)} ${v.length} verified</div></div><div class="sc-ver-rows">${vs.slice(0, 3).map(r => `<div class="sc-ver-row"><span>${esc(r.test)}</span><strong>${esc(r.display ?? r.value)}</strong></div>`).join('')}</div>`
                 : '<div class="sc-ver-none">No verified results yet</div>');
         return `<article class="sc-card" data-act="open" data-id="${esc(p.id)}">
-  <div class="sc-card-top">${avatarCircleHTML(p.avatar, 46)}<div class="sc-card-id"><div class="sc-name">${esc(p.name || 'TOPSET Athlete')}</div><div class="sc-meta">${meta}</div></div>
+  <div class="sc-card-top">${avatarCircleHTML(p.avatar, 46, p.photoURL)}<div class="sc-card-id"><div class="sc-name">${esc(p.name || 'TOPSET Athlete')}</div><div class="sc-meta">${meta}</div></div>
   <button type="button" class="sc-bm${bm ? ' on' : ''}" data-act="bm" data-id="${esc(p.id)}" title="${bm ? 'Remove from shortlist' : 'Add to shortlist'}">${svg('shortlist', 17, bm)}</button></div>
   ${body}
   ${!o.gone && av.length ? `<div class="sc-av">${av.map(a => `<span class="badge badge-green">${a}</span>`).join('')}</div>` : ''}
@@ -365,7 +365,7 @@ body.scout-mode{padding-bottom:0}
         const tests = [...new Set(ps.flatMap(p => verifiedList(p).map(r => r.test)))].sort();
         const cell = (p, t) => { const b = bestFor(p, t); return b ? `<b>${esc(b.display ?? b.value)}</b><small>${esc(b.gymName || '')}${b.date ? ' · ' + esc(formatDate(b.date)) : ''}</small>` : '<span style="color:var(--text-muted)">—</span>'; };
         $('#scCompareBody').innerHTML = `<button type="button" class="modal-close-x" data-act="close">${svg('close', 16)}</button><h2>Compare athletes</h2><p class="sc-fine" style="margin:-8px 0 14px">Verified results only, shown as recorded. TOPSET doesn't pick a winner — different gyms and dates matter.</p>
-<div style="overflow-x:auto"><table class="sc-cmp-table"><thead><tr><th></th>${ps.map(p => `<th>${avatarCircleHTML(p.avatar, 36)}<div class="sc-name" style="margin-top:6px">${esc(p.name || 'Athlete')}</div></th>`).join('')}</tr></thead><tbody>
+<div style="overflow-x:auto"><table class="sc-cmp-table"><thead><tr><th></th>${ps.map(p => `<th>${avatarCircleHTML(p.avatar, 36, p.photoURL)}<div class="sc-name" style="margin-top:6px">${esc(p.name || 'Athlete')}</div></th>`).join('')}</tr></thead><tbody>
 <tr><td>Sport · Location</td>${ps.map(p => `<td>${esc([p.sport, p.location].filter(Boolean).join(' · ') || '—')}</td>`).join('')}</tr>
 <tr><td>Age band</td>${ps.map(p => `<td>${esc(p.ageGroup || '—')}</td>`).join('')}</tr>
 <tr><td>Verified results</td>${ps.map(p => `<td><b>${verifiedList(p).length}</b></td>`).join('')}</tr>
@@ -405,7 +405,7 @@ ${tests.map(t => `<tr><td>${esc(t)}</td>${ps.map(p => `<td>${cell(p, t)}</td>`).
         const v = verifiedList(p), s = SC.shortlist.get(id);
         const av = [p.availability?.openToSponsorship && 'Open to sponsorship', p.availability?.openToTrials && 'Open to trials', p.availability?.openToOpportunities && 'Open to opportunities'].filter(Boolean);
         body.innerHTML = `<button type="button" class="modal-close-x" data-act="close">${svg('close', 16)}</button>
-<div class="sc-d-head">${avatarCircleHTML(p.avatar, 68)}<div><h2>${esc(p.name || 'TOPSET Athlete')}</h2><div class="sc-meta">${esc([p.sport, p.location, p.ageGroup].filter(Boolean).join(' · ') || 'No details yet')}</div></div></div>
+<div class="sc-d-head">${avatarCircleHTML(p.avatar, 68, p.photoURL)}<div><h2>${esc(p.name || 'TOPSET Athlete')}</h2><div class="sc-meta">${esc([p.sport, p.location, p.ageGroup].filter(Boolean).join(' · ') || 'No details yet')}</div></div></div>
 ${av.length ? `<div class="sc-av" style="margin-bottom:10px">${av.map(a => `<span class="badge badge-green">${a}</span>`).join('')}</div>` : ''}
 ${p.bio ? `<p style="font-size:14px;line-height:1.6;color:var(--text-secondary)">${esc(p.bio)}</p>` : ''}
 <div class="sc-sec">Verified results</div>

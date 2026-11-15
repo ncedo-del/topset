@@ -206,7 +206,7 @@
                 <div class="discover-athlete-card" onclick="location.href='/athlete/${encodeURIComponent(p.id)}'">
                     <div class="discover-card-header">
                         <div class="discover-card-avatar">
-                            ${typeof avatarCircleHTML === 'function' ? avatarCircleHTML(p.avatar, 52) : ''}
+                            ${typeof avatarCircleHTML === 'function' ? avatarCircleHTML(p.avatar, 52, p.photoURL) : ''}
                         </div>
                         <div class="discover-card-title">
                             <h3 class="discover-card-name">${escapeHTML(p.name || 'TOPSET Athlete')}</h3>

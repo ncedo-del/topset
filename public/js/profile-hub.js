@@ -76,7 +76,7 @@
         }
         rows += hubRow('logout','Log Out','','window.hubGo(\'handleLogout\')', true);
         body.innerHTML = `
-            <div class="hub-head">${avatarCircleHTML(u.avatar, 88)}<h2>${escapeHTML(u.name||'Athlete')}</h2><div class="hub-handle">@${escapeHTML(handleBase)}${u.sport?' · '+escapeHTML(u.sport):''}</div></div>
+            <div class="hub-head" style="cursor:pointer;" onclick="window.hubGo('openEditProfileModal')" title="Edit profile & photo">${avatarCircleHTML(u.avatar, 88, u.photoURL)}<h2>${escapeHTML(u.name||'Athlete')}</h2><div class="hub-handle">@${escapeHTML(handleBase)}${u.sport?' · '+escapeHTML(u.sport):''}</div></div>
             <div class="hub-pills">
                 <div class="hub-pill">${hubSvg('fire',16)}<strong>${streak}</strong><small>Streak</small></div>
                 <div class="hub-pill">${hubSvg('trophy',16)}<strong>${prs}</strong><small>PRs</small></div>

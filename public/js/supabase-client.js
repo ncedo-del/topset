@@ -216,6 +216,75 @@ const supabaseClient = {
             console.warn('[TOPSET Shadow Reconciliation] Error during check:', err);
             return null;
         }
+    },
+
+    // ── Supabase Storage: Athlete Avatars ────────────────────────────
+    async uploadAvatar(fileOrBlob, uid) {
+        if (!this.isConfigured() || !uid) return null;
+        if (Date.now() < this._backoffUntil) {
+            console.info('[TOPSET Supabase Storage] Skipping upload: backoff cooling active.');
+            return null;
+        }
+
+        const filename = `${encodeURIComponent(uid)}.webp`;
+        const url = `${SUPABASE_CONFIG.url}/storage/v1/object/avatars/${filename}`;
+
+        let authHeader = `Bearer ${SUPABASE_CONFIG.anonKey}`;
+        if (typeof auth !== 'undefined' && auth?.currentUser) {
+            try {
+                const token = await auth.currentUser.getIdToken();
+                if (token) authHeader = `Bearer ${token}`;
+            } catch (e) {}
+        }
+
+        const headers = {
+            'apikey': SUPABASE_CONFIG.anonKey,
+            'Authorization': authHeader,
+            'x-upsert': 'true',
+            'Content-Type': 'image/webp'
+        };
+
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), 8000) : null;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers,
+                body: fileOrBlob,
+                signal: controller ? controller.signal : undefined
+            });
+
+            if (timeoutId) clearTimeout(timeoutId);
+
+            if (!res.ok) {
+                const errText = await res.text();
+                console.warn(`[TOPSET Supabase Storage] Upload failed [${res.status}]:`, errText);
+                return null;
+            }
+
+            const publicUrl = `${SUPABASE_CONFIG.url}/storage/v1/object/public/avatars/${filename}?t=${Date.now()}`;
+            console.info('%c[TOPSET Supabase Storage] Avatar uploaded successfully:', 'color:#4ade80;', publicUrl);
+            return publicUrl;
+        } catch (err) {
+            if (timeoutId) clearTimeout(timeoutId);
+            console.warn('[TOPSET Supabase Storage] Network/DNS failure during avatar upload:', err.message || err);
+            return null;
+        }
+    },
+
+    async deleteAvatar(uid) {
+        if (!this.isConfigured() || !uid) return false;
+        try {
+            const filename = `${encodeURIComponent(uid)}.webp`;
+            const url = `${SUPABASE_CONFIG.url}/storage/v1/object/avatars/${filename}`;
+            const headers = await this.getHeaders(true);
+            await fetch(url, { method: 'DELETE', headers });
+            return true;
+        } catch (err) {
+            console.warn('[TOPSET Supabase Storage] Avatar delete error:', err);
+            return false;
+        }
     }
 };
 

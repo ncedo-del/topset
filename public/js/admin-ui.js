@@ -10,10 +10,54 @@
         el.addEventListener('click', e=>{ const b=e.target.closest('.avatar-pick-btn'); if(b) setAvatarPickerValue(pickerSel, inputSel, b.dataset.key); });
         setAvatarPickerValue(pickerSel, inputSel, $(inputSel)?.value);
     }
+    let _pendingAvatarBlob = null;
+    function renderEditProfilePicPreview(photoURL, avatarKeyVal){
+        const container = $('#profilePicPreview');
+        if (!container) return;
+        container.innerHTML = avatarCircleHTML(avatarKeyVal || 'gym', 60, photoURL);
+        const rmBtn = $('#profilePicRemoveBtn');
+        if (rmBtn) {
+            if (photoURL) rmBtn.classList.remove('hidden');
+            else rmBtn.classList.add('hidden');
+        }
+    }
+    window.renderEditProfilePicPreview = renderEditProfilePicPreview;
+
+    window.handleProfilePicSelect = async function(e){
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const statusEl = $('#profilePicStatus');
+        if (statusEl) statusEl.textContent = 'Processing & compressing photo...';
+        try {
+            const res = await processAvatarImage(file, 300, 0.85);
+            _pendingAvatarBlob = res.blob;
+            if ($('#profilePhotoURL')) $('#profilePhotoURL').value = res.dataUrl;
+            renderEditProfilePicPreview(res.dataUrl, $('#profileAvatar')?.value);
+            if (statusEl) statusEl.textContent = 'Photo ready (<30KB). Click "Save Changes" to save.';
+        } catch (err) {
+            console.error('handleProfilePicSelect error:', err);
+            if (statusEl) statusEl.textContent = 'Error: ' + (err.message || 'invalid image');
+            showToast('Could not process photo: ' + (err.message || 'invalid image'));
+        }
+    };
+
+    window.handleProfilePicRemove = function(){
+        _pendingAvatarBlob = 'DELETE';
+        if ($('#profilePhotoURL')) $('#profilePhotoURL').value = '';
+        if ($('#profilePicInput')) $('#profilePicInput').value = '';
+        renderEditProfilePicPreview('', $('#profileAvatar')?.value);
+        const statusEl = $('#profilePicStatus');
+        if (statusEl) statusEl.textContent = 'Photo removed. Selected icon will be used.';
+    };
+
     function setAvatarPickerValue(pickerSel, inputSel, key){
         key = avatarKey(key);
         const input=$(inputSel); if(input) input.value=key;
         $(pickerSel)?.querySelectorAll('.avatar-pick-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+        if (pickerSel === '#profileAvatarPicker') {
+            const currentPhoto = $('#profilePhotoURL')?.value;
+            renderEditProfilePicPreview(currentPhoto, key);
+        }
     }
     // ── Sport dropdowns ────────────────────────────────────────────────────
     // Fills a <select> from the ADMIN-MANAGED sports list (core.js getSportNames(),
@@ -101,7 +145,39 @@
         });
     };
     // NEW: Profile editing
-    window.openEditProfileModal = async function(){ if(!appState.currentUserId){ showToast('Please sign in first.'); return; } const user=getCurrentUser(); if(user){ $('#profileName').value=user.name||''; setAvatarPickerValue('#profileAvatarPicker','#profileAvatar',user.avatar); $('#profileAgeGroup').value=user.ageGroup||''; $('#profileGender').value=user.gender||''; populateSportSelect($('#profileSport'), user.sport||'', 'No sport selected'); $('#profilePassword').value=''; $('#profileGymCode').value=''; const statusEl=$('#profileGymStatus'); const leaveBtn=$('#leaveGymBtn'); if(user.gymId){ statusEl.textContent='Loading...'; const gym=await getGymById(user.gymId); statusEl.innerHTML = gym ? `<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Member of ${escapeHTML(gym.name)}` : '<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>Gym not found'; $('#profileGymCode').placeholder='Enter a new code to switch gyms'; leaveBtn.classList.remove('hidden'); } else { statusEl.textContent='(not in a gym yet)'; $('#profileGymCode').placeholder='Enter invite code to join a gym'; leaveBtn.classList.add('hidden'); } $('#editProfileModal').classList.remove('hidden'); } };
+    window.openEditProfileModal = async function(){
+        if(!appState.currentUserId){ showToast('Please sign in first.'); return; }
+        const user=getCurrentUser();
+        if(user){
+            _pendingAvatarBlob = null;
+            $('#profileName').value=user.name||'';
+            if ($('#profilePhotoURL')) $('#profilePhotoURL').value = user.photoURL || '';
+            setAvatarPickerValue('#profileAvatarPicker','#profileAvatar',user.avatar);
+            renderEditProfilePicPreview(user.photoURL, user.avatar);
+            if ($('#profilePicStatus')) {
+                $('#profilePicStatus').textContent = user.photoURL ? 'Custom photo active. Or choose an SVG icon below.' : 'Upload a photo (compressed to <30KB). Or choose an SVG icon below.';
+            }
+            $('#profileAgeGroup').value=user.ageGroup||'';
+            $('#profileGender').value=user.gender||'';
+            populateSportSelect($('#profileSport'), user.sport||'', 'No sport selected');
+            $('#profilePassword').value='';
+            $('#profileGymCode').value='';
+            const statusEl=$('#profileGymStatus');
+            const leaveBtn=$('#leaveGymBtn');
+            if(user.gymId){
+                statusEl.textContent='Loading...';
+                const gym=await getGymById(user.gymId);
+                statusEl.innerHTML = gym ? `<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Member of ${escapeHTML(gym.name)}` : '<svg style="width:12px;height:12px;vertical-align:-1px;margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>Gym not found';
+                $('#profileGymCode').placeholder='Enter a new code to switch gyms';
+                leaveBtn.classList.remove('hidden');
+            } else {
+                statusEl.textContent='(not in a gym yet)';
+                $('#profileGymCode').placeholder='Enter invite code to join a gym';
+                leaveBtn.classList.add('hidden');
+            }
+            $('#editProfileModal').classList.remove('hidden');
+        }
+    };
     // Leaving is forward-only, matching how joining works: it clears gymId on the
     // profile so future entries/leaderboard rows go to the public pool, but does NOT
     // retroactively rewrite past entries — those stay tagged to the gym they were
@@ -608,7 +684,40 @@
             renderManageTestsList();
         }
     };
-    window.handleEditProfileSubmit = async function(e){ return guardedSubmit(e, 'profileSave', RATE_LIMITS.profileSave, async()=>{ if(!appState.currentUserId) return; const newName=$('#profileName').value.trim().slice(0,30); const newAvatar=avatarKey($('#profileAvatar').value); const newAgeGroup=$('#profileAgeGroup').value; const newGender=$('#profileGender').value; const newSport=$('#profileSport').value.trim().slice(0,60); const newPw=$('#profilePassword').value.trim(); const gymCodeInput=$('#profileGymCode').value.trim().slice(0,20); if(!newName) return showToast('Name cannot be empty.'); if(newPw.length>0 && newPw.length<6) return showToast('Password must be at least 6 characters.'); const updates={ name:newName, avatar:newAvatar, ageGroup:newAgeGroup||null, gender:newGender||null, sport:newSport||null };
+    window.handleEditProfileSubmit = async function(e){ return guardedSubmit(e, 'profileSave', RATE_LIMITS.profileSave, async()=>{
+        if(!appState.currentUserId) return;
+        const newName=$('#profileName').value.trim().slice(0,30);
+        const newAvatar=avatarKey($('#profileAvatar').value);
+        const newAgeGroup=$('#profileAgeGroup').value;
+        const newGender=$('#profileGender').value;
+        const newSport=$('#profileSport').value.trim().slice(0,60);
+        const newPw=$('#profilePassword').value.trim();
+        const gymCodeInput=$('#profileGymCode').value.trim().slice(0,20);
+        if(!newName) return showToast('Name cannot be empty.');
+        if(newPw.length>0 && newPw.length<6) return showToast('Password must be at least 6 characters.');
+
+        let finalPhotoURL = $('#profilePhotoURL')?.value || null;
+        if (_pendingAvatarBlob === 'DELETE') {
+            finalPhotoURL = null;
+            if (window.supabaseClient && typeof window.supabaseClient.deleteAvatar === 'function') {
+                window.supabaseClient.deleteAvatar(appState.currentUserId).catch(() => {});
+            }
+        } else if (_pendingAvatarBlob && _pendingAvatarBlob !== 'DELETE') {
+            // 1. Primary: Upload to Supabase Storage bucket 'avatars'
+            if (window.supabaseClient && typeof window.supabaseClient.uploadAvatar === 'function') {
+                const sbUrl = await window.supabaseClient.uploadAvatar(_pendingAvatarBlob, appState.currentUserId);
+                if (sbUrl) {
+                    finalPhotoURL = sbUrl;
+                }
+            }
+            // 2. Resilient Fallback: If Supabase was paused or offline, finalPhotoURL retains the compressed <30KB WebP
+        }
+        _pendingAvatarBlob = null;
+
+        const updates={ name:newName, avatar:newAvatar, photoURL:finalPhotoURL, ageGroup:newAgeGroup||null, gender:newGender||null, sport:newSport||null };
+        if (typeof auth !== 'undefined' && auth?.currentUser && typeof auth.currentUser.updateProfile === 'function') {
+            try { await auth.currentUser.updateProfile({ photoURL: finalPhotoURL }); } catch (e) {}
+        }
         // Year of birth is set ONCE (firestore.rules lock it afterwards); age group is always derived from it.
         { const cu=getCurrentUser(); const picked=parseInt(($('#profileBirthYear')||{}).value,10); const hasBY=Number.isInteger(cu?.birthYear); const by = hasBY ? cu.birthYear : (validBirthYear(picked) ? picked : null);
           if (by){ updates.ageGroup = ageGroupFromBirthYear(by); if (!hasBY) updates.birthYear = by; }
@@ -653,7 +762,11 @@
             subscribeTests(updates.gymId, ()=>{ populateLogTestSelect(); updateSpotlightSelect(); populatePublicLogTestSelect(); });
             updateOfficialAvailability();
         }
-        showToast(joinedNewGym ? 'Joined gym! Your existing results now count toward its leaderboard.' : 'Profile updated successfully!'); closeEditProfileModal(); renderLeaderboard(); }); };
+        showToast(joinedNewGym ? 'Joined gym! Your existing results now count toward its leaderboard.' : 'Profile updated successfully!');
+        closeEditProfileModal();
+        if (typeof window.renderProfileHub === 'function') window.renderProfileHub();
+        renderLeaderboard();
+    }); };
 
 
     // ── Verify Scouts (admin) ───────────────────────────────────────────────
