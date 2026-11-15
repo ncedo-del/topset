@@ -464,14 +464,42 @@
         );
         try {
             if (boardScope === 'gym'){
-                const pubSnap = await db.collection('leaderboard').where('test','==',spotlight).where('scope','==',scope).where('gymId','==',null).get();
-                let rows = []; pubSnap.forEach(d=>{ const x=d.data(); if (lbRowTrusted(x)) rows.push(x); });
+                let rows = null;
+                if (window.supabaseClient && window.supabaseClient.isConfigured()){
+                    const testId = window.supabaseClient.resolveTestId(spotlight);
+                    if (testId){
+                        try {
+                            const sbPub = await window.supabaseClient.getLeaderboardRankings(testId, scope, null);
+                            if (Array.isArray(sbPub) && sbPub.length){
+                                rows = sbPub.map(r=>({ userId: r.firebase_uid, ageGroup: r.age_group, gender: r.gender, value: Number(r.best_value) }));
+                            }
+                        } catch(e){}
+                    }
+                }
+                if (!rows){
+                    const pubSnap = await db.collection('leaderboard').where('test','==',spotlight).where('scope','==',scope).where('gymId','==',null).get();
+                    rows = []; pubSnap.forEach(d=>{ const x=d.data(); if (lbRowTrusted(x)) rows.push(x); });
+                }
                 rows = applyDemoFilters(rows);
                 rows.sort((a,b)=>cfg.higherIsBetter?b.value-a.value:a.value-b.value);
                 pubRows = rows;
             } else {
-                const gymSnap = await db.collection('leaderboard').where('test','==',spotlight).where('scope','==',scope).where('gymId','==',gym.id).get();
-                let rows = []; gymSnap.forEach(d=>{ const x=d.data(); if (lbRowTrusted(x)) rows.push(x); });
+                let rows = null;
+                if (window.supabaseClient && window.supabaseClient.isConfigured()){
+                    const testId = window.supabaseClient.resolveTestId(spotlight);
+                    if (testId){
+                        try {
+                            const sbGym = await window.supabaseClient.getLeaderboardRankings(testId, scope, gym.id);
+                            if (Array.isArray(sbGym) && sbGym.length){
+                                rows = sbGym.map(r=>({ userId: r.firebase_uid, ageGroup: r.age_group, gender: r.gender, value: Number(r.best_value) }));
+                            }
+                        } catch(e){}
+                    }
+                }
+                if (!rows){
+                    const gymSnap = await db.collection('leaderboard').where('test','==',spotlight).where('scope','==',scope).where('gymId','==',gym.id).get();
+                    rows = []; gymSnap.forEach(d=>{ const x=d.data(); if (lbRowTrusted(x)) rows.push(x); });
+                }
                 rows = applyDemoFilters(rows);
                 rows.sort((a,b)=>cfg.higherIsBetter?b.value-a.value:a.value-b.value);
                 gymRows = rows;

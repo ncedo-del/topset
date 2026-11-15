@@ -37,13 +37,34 @@
         percentileCache.delete(percentileCacheKey(testName, scope, gymFilter, uid));
     }
     async function computeTestPercentile(testName, scope, gymFilter){
-        if (!initFirebase()) return null;
         const cfg = getTestConfig(testName);
         if (!cfg) return null;
         const uid = getCurrentUserId();
         const cacheKey = percentileCacheKey(testName, scope, gymFilter, uid);
         const cached = percentileCache.get(cacheKey);
         if (cached && cached.expiresAt > Date.now()) return cached.value;
+
+        // Phase 3: Fast-path query using Supabase PostgreSQL window views
+        if (window.supabaseClient && window.supabaseClient.isConfigured()){
+            try {
+                const testId = window.supabaseClient.resolveTestId(testName);
+                if (testId){
+                    const sbRows = await window.supabaseClient.getLeaderboardRankings(testId, scope, gymFilter);
+                    if (Array.isArray(sbRows) && sbRows.length > 0){
+                        const userRow = sbRows.find(r => r.firebase_uid === uid);
+                        if (userRow && userRow.percentile_rank != null){
+                            const pct = Math.round(Number(userRow.percentile_rank));
+                            percentileCache.set(cacheKey, { value: pct, expiresAt: Date.now() + PERCENTILE_CACHE_TTL_MS });
+                            return pct;
+                        }
+                    }
+                }
+            } catch(e) {
+                // Fall through to Firestore
+            }
+        }
+
+        if (!initFirebase()) return null;
         try {
             let query = db.collection('leaderboard').where('test','==',testName).where('scope','==',scope).where('gymId','==',gymFilter);
             const snap = await query.get();
@@ -400,6 +421,51 @@
         // public/TopSet-wide board (gymId==null) — the same two pools the dual Log
         // form writes into. A gym-less user only ever has the public pool, same as
         // every account did before gyms existed.
+        const targetGymId = boardScope==='gym' ? user.gymId : null;
+
+        // Phase 3: Fast-path query using Supabase PostgreSQL precomputed window rankings
+        if (window.supabaseClient && window.supabaseClient.isConfigured()){
+            const testId = window.supabaseClient.resolveTestId(spotlight);
+            if (testId){
+                try {
+                    const sbRows = await window.supabaseClient.getLeaderboardRankings(testId, scope, targetGymId);
+                    if (Array.isArray(sbRows) && sbRows.length > 0){
+                        const ageFilter=$('#filterAgeGroup').value, genderFilter=$('#filterGender').value;
+                        let filtered = sbRows;
+                        if (ageFilter) filtered = filtered.filter(r=>r.age_group===ageFilter);
+                        if (genderFilter) filtered = filtered.filter(r=>r.gender===genderFilter);
+
+                        const mappedRows = filtered.map(r=>({
+                            userId: r.firebase_uid,
+                            name: r.athlete_name || 'TOPSET Athlete',
+                            avatar: r.avatar || 'gym',
+                            test: r.test_name || spotlight,
+                            value: Number(r.best_value),
+                            date: r.best_date || todayStr(),
+                            ageGroup: r.age_group,
+                            gender: r.gender
+                        }));
+
+                        updateMyRankBar(spotlight, scope, cfg, mappedRows, gym, boardScope);
+
+                        if (!filtered.length){
+                            tb.innerHTML=`<tr><td colspan="5" class="empty-state"><span class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></svg></span>No entries for "${escapeHTML(spotlight)}" ${ageFilter||genderFilter?'in this group ':''}yet.</td></tr>`;
+                            return;
+                        }
+
+                        tb.innerHTML=filtered.map((r,i)=>{
+                            const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+                            const disp=cfg&&cfg.unit==='time'?formatTime(Number(r.best_value)):`${r.best_value} ${cfg?.unit||''}`;
+                            return `<tr><td class="leaderboard-rank ${rc}">${r.rank || (i+1)}</td><td><div style="display:flex;align-items:center;gap:8px;">${avatarCircleHTML(r.avatar||'gym',40)}<strong>${escapeHTML(r.athlete_name||'TOPSET Athlete')}</strong></div></td><td>${escapeHTML(r.test_name||spotlight)}</td><td class="num-cell highlight-pr">${disp}</td><td>${formatDate(r.best_date||todayStr())}</td></tr>`;
+                        }).join('');
+                        return;
+                    }
+                } catch(sbErr){
+                    console.warn('Phase 3 Supabase leaderboard fallback to Firestore:', sbErr);
+                }
+            }
+        }
+
         let query = db.collection('leaderboard').where('test','==',spotlight).where('scope','==',scope);
         query = boardScope==='gym' ? query.where('gymId','==',user.gymId) : query.where('gymId','==',null);
         leaderboardUnsub = query.onSnapshot(snapshot=>{

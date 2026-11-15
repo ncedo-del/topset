@@ -69,19 +69,30 @@ const supabaseClient = {
         return headers;
     },
 
+    _backoffUntil: 0,
+    _isHealthy: null,
+
     async query(endpoint, options = {}) {
         if (!this.isConfigured()) return null;
+        if (Date.now() < this._backoffUntil) return null; // Cool-down to prevent UI lag on network failure
+
         const includeAuth = options.auth !== false;
         const headers = await this.getHeaders(includeAuth);
         if (options.prefer) headers['Prefer'] = options.prefer;
         const url = `${SUPABASE_CONFIG.url}/rest/v1/${endpoint}`;
 
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), options.timeout || 5000) : null;
+
         try {
             const res = await fetch(url, {
                 method: options.method || 'GET',
                 headers,
-                body: options.body ? JSON.stringify(options.body) : undefined
+                body: options.body ? JSON.stringify(options.body) : undefined,
+                signal: controller ? controller.signal : undefined
             });
+
+            if (timeoutId) clearTimeout(timeoutId);
 
             if (!res.ok) {
                 const errorText = await res.text();
@@ -89,9 +100,14 @@ const supabaseClient = {
                 return null;
             }
 
+            this._isHealthy = true;
+            this._backoffUntil = 0;
             return await res.json();
         } catch (err) {
-            console.error(`Supabase network error on ${endpoint}:`, err);
+            if (timeoutId) clearTimeout(timeoutId);
+            this._isHealthy = false;
+            this._backoffUntil = Date.now() + 30000; // 30s silent cooldown on network/DNS failure
+            console.warn(`[TOPSET Phase 3] Supabase network/DNS fallback engaged: ${err.message || err}`);
             return null;
         }
     },
